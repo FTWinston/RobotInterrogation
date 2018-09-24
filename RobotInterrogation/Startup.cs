@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RobotInterrogation.Hubs;
+using RobotInterrogation.Services;
 
 namespace RobotInterrogation
 {
@@ -27,6 +28,9 @@ namespace RobotInterrogation
             {
                 configuration.RootPath = "ClientApp/build";
             });
+
+            services.AddScoped<InterviewService>();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,6 +49,11 @@ namespace RobotInterrogation
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<InterviewHub>("/hub/Interview");
+            });
 
             app.UseMvc(routes =>
             {
