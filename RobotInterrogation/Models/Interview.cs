@@ -2,11 +2,11 @@
 {
     public class Interview
     {
-        public InterviewStatus Status { get; private set; }
+        public InterviewStatus Status { get; private set; } = InterviewStatus.WaitingForFirstName;
 
-        public string FirstPlayerName { get; set; }
-        public string SecondPlayerName { get; set; }
-        public bool FirstPlayerIsInterviewer { get; set; }
+        public int NumPlayers { get; set; } = 0;
+
+        public bool FirstPlayerIsInterviewer { get; set; } = true;
 
         public Packet Packet { get; set; }
 

@@ -10,8 +10,8 @@ export const routes = (
     <Switch>
         <Route path="/" exact={true} component={Home} />
         <Route path="/host" component={Host} />
-        <Route path="/join" component={Join} />
+        <Route path="/join/:reason?" component={Join} />
         <Route path="/rules" component={Rules} />
-        <Route path="/interview" component={Interview} />
+        <Route path="/interview/:id" component={Interview} />
     </Switch>
 );

@@ -1,15 +1,22 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using RobotInterrogation.Models;
+using RobotInterrogation.Services;
 using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace RobotInterrogation.Hubs
 {
     public interface IInterviewMessages
     {
-        Task SetOwnName(string playerName);
-        Task SetOpponentName(string playerName);
-
         Task SetRole(bool isInterviewer);
+
+        Task SetWaitingForPlayer();
+        Task SetPlayersPresent();
+
+        /*
+        Task SwapRoles();
 
         Task ShowPenaltyChoice(string[] choices);
         Task SetPenalty(string penalty);
@@ -28,72 +35,110 @@ namespace RobotInterrogation.Hubs
         Task SetStatus(int state);
 
         Task StartTimer();
+        */
 
         Task EndGame(int endType);
-
-        Task SwapRoles();
     }
 
     public class InterviewHub : Hub<IInterviewMessages>
     {
-        public override Task OnConnectedAsync()
+        public InterviewHub(InterviewService service)
         {
-            return base.OnConnectedAsync();
+            Service = service;
         }
 
-        public async Task Join(int session)
-        {
-            // join specific session
+        private static ConcurrentDictionary<string, string> UserSessions = new ConcurrentDictionary<string, string>();
+        private string SessionID => UserSessions[Context.ConnectionId];
 
+        private InterviewService Service { get; }
+
+        public override async Task OnDisconnectedAsync(Exception exception)
+        {
+            await Clients
+                .GroupExcept(SessionID, Context.ConnectionId)
+                .EndGame(0);
+
+            UserSessions.TryRemove(Context.ConnectionId, out _);
+            await base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task<bool> Join(string session)
+        {
+            if (!Service.TryAddUser(session, out Interview interview))
+                return false;
+
+            UserSessions[Context.ConnectionId] = session;
+            await Groups.AddToGroupAsync(Context.ConnectionId, session);
+
+            bool isFirst = interview.NumPlayers < 2;
+            bool isInterviewer = interview.FirstPlayerIsInterviewer && isFirst;
+
+            await Clients.Caller.SetRole(isInterviewer);
+
+            if (isFirst)
+            {
+                await Clients
+                    .Group(session)
+                    .SetWaitingForPlayer();
+            }
+            else
+            {
+                await Clients
+                    .Group(session)
+                    .SetPlayersPresent();
+            }
+
+            return true;
+        }
+
+        public void SwapRoles()
+        {
+            // TODO: this would need to know your current role.
+            // Aha, no it just sends a "swap role" message which swaps your current role... sneaky.
             throw new NotImplementedException();
         }
 
-        public async Task SelectPenalty(string penalty)
+        public void SelectPenalty(string penalty)
         {
             throw new NotImplementedException();
         }
 
-        public async Task SelectPacket(string packet)
+        public void SelectPacket(string packet)
         {
             throw new NotImplementedException();
         }
 
-        public async Task SelectRole(string role)
+        public void SelectRole(string role)
         {
             throw new NotImplementedException();
         }
 
-        public async Task SelectSuspectNote(string suspectNote)
+        public void SelectSuspectNote(string suspectNote)
         {
             throw new NotImplementedException();
         }
 
-        public async Task SelectPrimaryQuestion(string question)
+        public void SelectPrimaryQuestion(string question)
         {
             throw new NotImplementedException();
         }
 
-        public async Task SelectSecondaryQuestion(string question)
+        public void SelectSecondaryQuestion(string question)
         {
             throw new NotImplementedException();
         }
 
-        public async Task StartInterview()
+        public void StartInterview()
         {
             throw new NotImplementedException();
         }
 
-        public async Task ConcludeInterview(bool isRobot)
+        public void ConcludeInterview(bool isRobot)
         {
             throw new NotImplementedException();
         }
 
-        public async Task KillInterviewer()
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task SwapRoles()
+        public void KillInterviewer()
         {
             throw new NotImplementedException();
         }
