@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using RobotInterrogation.Models;
 using RobotInterrogation.Services;
 
@@ -18,10 +19,9 @@ namespace RobotInterrogation.Controllers
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<Packet> ListPackets()
+        public IEnumerable<Packet> ListPackets([FromServices] IOptions<GameConfiguration> configuration)
         {
-            // TODO: can these be stored in a config file?
-            throw new NotImplementedException();
+            return configuration.Value.Packets;
         }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RobotInterrogation.Hubs;
+using RobotInterrogation.Models;
 using RobotInterrogation.Services;
 
 namespace RobotInterrogation
@@ -29,7 +30,10 @@ namespace RobotInterrogation
                 configuration.RootPath = "ClientApp/build";
             });
 
+            services.Configure<GameConfiguration>(options => Configuration.GetSection("GameConfiguration").Bind(options));
+
             services.AddScoped<InterviewService>();
+
             services.AddSignalR();
         }
 

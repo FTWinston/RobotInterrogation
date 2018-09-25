@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using RobotInterrogation.Models;
 using RobotInterrogation.Services;
 using System;
@@ -22,20 +21,19 @@ namespace RobotInterrogation.Hubs
         Task WaitForPenaltyChoice();
         Task SetPenalty(string penalty);
 
-        /*
-        Task ShowPacketChoice(string[] packets);
+        Task ShowPacketChoice(string[] options);
+        Task WaitForPacketChoice();
         Task SetPacket(string packetName);
 
-        Task ShowRoleChoice(string[] roles);
+        Task ShowRoleSelection(List<SuspectRole> roles);
 
-        Task ShowSuspectNoteChoice(string[] notes);
+        Task ShowQuestions(List<string> primary, List<string> secondary);
+
+        Task ShowSuspectNoteChoice(List<string> notes);
+        Task WaitForSuspectNoteChoice();
         Task SetSuspectNote(string note);
 
-        Task ShowPrimaryQuestionChoice(string[] questions);
-        Task ShowSecondaryQuestionChoice(string[] questions);
-
-        Task SetStatus(int state);
-
+        /*
         Task StartTimer();
         */
 
@@ -69,6 +67,12 @@ namespace RobotInterrogation.Hubs
         {
             if (Context.ConnectionId != interview.InterviewerConnectionID)
                 throw new Exception("Only the interviewer can issue this command for session " + SessionID);
+        }
+
+        private void EnsureIsSuspect(Interview interview)
+        {
+            if (Context.ConnectionId != interview.SuspectConnectionID)
+                throw new Exception("Only the suspect can issue this command for session " + SessionID);
         }
 
         public async Task<bool> Join(string session)
@@ -143,68 +147,148 @@ namespace RobotInterrogation.Hubs
 
             if (interview.Status == InterviewStatus.SelectingPenalty_Interviewer)
             {
-                interview.Status = InterviewStatus.SelectingPenalty_Suspect;
-
-                if (index < 0 || index >= interview.Penalties.Count)
-                    throw new IndexOutOfRangeException($"Interviewer penalty selection must be between 0 and {interview.Penalties.Count}, but is {index}");
-
-                interview.Penalties.RemoveAt(0);
-
-                // TODO: remove selection from interview penalties
-
-                await Clients
-                    .Client(interview.SuspectConnectionID)
-                    .ShowPenaltyChoice(interview.Penalties);
-
-                await Clients
-                    .GroupExcept(SessionID, interview.SuspectConnectionID)
-                    .WaitForPenaltyChoice();
+                await DiscardSinglePenalty(index, interview);
             }
             else if (interview.Status == InterviewStatus.SelectingPenalty_Suspect)
             {
-                interview.Status = InterviewStatus.SelectingPacket;
+                await AllocatePenalty(index, interview);
 
-                // the specified index is the one to keep
-                int removeIndex = index == 0 ? 1 : 0;
-                interview.Penalties.RemoveAt(removeIndex);
+                await Task.Delay(3000);
 
-                await Clients
-                    .Group(SessionID)
-                    .SetPenalty(interview.Penalties[0]);
+                await ShowPacketChoice(interview);
+            }
+            else if (interview.Status == InterviewStatus.SelectingPacket)
+            {
+                EnsureIsInterviewer(interview);
+                await SetPacket(interview, index);
 
-                // This will show the penalty. Wait 5 seconds before moving onto packet selection.
-                await Task.Delay(5000);
+                await Task.Delay(3000);
 
-                // ...
+                await ShowRoleSelection(interview);
+                await ShowQuestions(interview);
+            }
+            else if (interview.Status == InterviewStatus.SelectingRole)
+            {
+                EnsureIsSuspect(interview);
+                AllocateRole(interview, index);
+
+                await ShowSuspectNotes(interview);
+            }
+            else if (interview.Status == InterviewStatus.SelectingSuspectNote)
+            {
+                EnsureIsSuspect(interview);
+                await SetSuspectNote(interview, index);
+                interview.Status = InterviewStatus.ReadyToStart;
             }
             else
-                throw new Exception("Invalid command for curent status of session " + SessionID);
+                throw new Exception("Invalid command for current status of session " + SessionID);
         }
 
-        /*
-        public void SelectPacket(string packet)
+        private async Task SetPacket(Interview interview, int index)
         {
-            throw new NotImplementedException();
+            interview.Packet = Service.GetPacket(index);
+
+            await Clients.Group(SessionID)
+                .SetPacket(interview.Packet.Name);
+
+            interview.Status = InterviewStatus.SelectingRole;
         }
 
-        public void SelectRole(string role)
+        private async Task ShowRoleSelection(Interview interview)
         {
-            throw new NotImplementedException();
+            Service.AllocateRoles(interview);
+
+            await Clients
+                .Client(interview.SuspectConnectionID)
+                .ShowRoleSelection(interview.Roles);
         }
 
-        public void SelectSuspectNote(string suspectNote)
+        private static void AllocateRole(Interview interview, int index)
         {
-            throw new NotImplementedException();
+            var role = interview.Roles[index];
+
+            for (int i = interview.Roles.Count - 1; i >= 0; i--)
+            {
+                if (i != index)
+                    interview.Roles.RemoveAt(i);
+            }
         }
 
-        public void SelectPrimaryQuestion(string question)
+        private async Task ShowQuestions(Interview interview)
         {
-            throw new NotImplementedException();
+            Service.AllocateQuestions(interview);
+
+            await Clients
+                .Client(interview.InterviewerConnectionID)
+                .ShowQuestions(interview.PrimaryQuestions, interview.SecondaryQuestions);
         }
 
-        public void SelectSecondaryQuestion(string question)
+        private async Task DiscardSinglePenalty(int index, Interview interview)
         {
-            throw new NotImplementedException();
+            interview.Status = InterviewStatus.SelectingPenalty_Suspect;
+
+            if (index < 0 || index >= interview.Penalties.Count)
+                throw new IndexOutOfRangeException($"Interviewer penalty selection must be between 0 and {interview.Penalties.Count}, but is {index}");
+
+            interview.Penalties.RemoveAt(index);
+
+            await Clients
+                .Client(interview.SuspectConnectionID)
+                .ShowPenaltyChoice(interview.Penalties);
+
+            await Clients
+                .GroupExcept(SessionID, interview.SuspectConnectionID)
+                .WaitForPenaltyChoice();
+        }
+
+        private async Task AllocatePenalty(int index, Interview interview)
+        {
+            interview.Status = InterviewStatus.SelectingPacket;
+
+            // the specified index is the one to keep
+            int removeIndex = index == 0 ? 1 : 0;
+            interview.Penalties.RemoveAt(removeIndex);
+
+            await Clients
+                .Group(SessionID)
+                .SetPenalty(interview.Penalties[0]);
+        }
+
+        private async Task ShowPacketChoice(Interview interview)
+        {
+            var packets = Service.GetAllPackets();
+
+            await Clients
+                .Client(interview.InterviewerConnectionID)
+                .ShowPacketChoice(packets);
+
+            await Clients
+                .GroupExcept(SessionID, interview.InterviewerConnectionID)
+                .WaitForPacketChoice();
+        }
+
+        private async Task ShowSuspectNotes(Interview interview)
+        {
+            Service.AllocateSuspectNotes(interview);
+            interview.Status = InterviewStatus.SelectingSuspectNote;
+
+            await Clients
+                .Caller
+                .ShowSuspectNoteChoice(interview.SuspectNotes);
+
+            await Clients
+                .GroupExcept(SessionID, Context.ConnectionId)
+                .WaitForSuspectNoteChoice();
+        }
+
+        private async Task SetSuspectNote(Interview interview, int index)
+        {
+            int removeIndex = index == 0 ? 1 : 0;
+            interview.SuspectNotes.RemoveAt(removeIndex);
+
+            await Clients
+                .Group(SessionID)
+                .SetSuspectNote(interview.SuspectNotes[0]);
         }
 
         public void StartInterview()
@@ -212,6 +296,7 @@ namespace RobotInterrogation.Hubs
             throw new NotImplementedException();
         }
 
+        /*
         public void ConcludeInterview(bool isRobot)
         {
             throw new NotImplementedException();

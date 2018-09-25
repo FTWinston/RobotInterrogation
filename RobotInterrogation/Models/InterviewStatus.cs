@@ -10,13 +10,12 @@
 
         SelectingPacket,
 
-        /*
-        Setup_BothPlayers,
-        Setup_WaitingForInterviewer,
-        Setup_WaitingForSuspect,
-        
+        SelectingRole,
+        SelectingSuspectNote,
+
         ReadyToStart,
 
+        /*
         InProgress,
 
         FinalQuestion,

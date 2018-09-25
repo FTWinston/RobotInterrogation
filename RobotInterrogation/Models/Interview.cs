@@ -10,9 +10,13 @@ namespace RobotInterrogation.Models
         public string SuspectConnectionID { get; set; }
 
         public List<string> Penalties { get; } = new List<string>();
+        public List<string> SuspectNotes { get; } = new List<string>();
 
         public Packet Packet { get; set; }
 
-        public SuspectRole Role { get; set; }
+        public List<SuspectRole> Roles { get; } = new List<SuspectRole>();
+
+        public List<string> PrimaryQuestions { get; } = new List<string>();
+        public List<string> SecondaryQuestions { get; } = new List<string>();
     }
 }
