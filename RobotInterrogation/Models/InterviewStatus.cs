@@ -15,11 +15,7 @@
 
         ReadyToStart,
 
-        /*
         InProgress,
-
-        FinalQuestion,
-        */
 
         Finished,
     }

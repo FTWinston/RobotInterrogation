@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Redirect, RouteComponentProps } from 'react-router';
 import { connectSignalR } from '../Connectivity';
 import { ISuspectRole } from './interviewParts/elements/SuspectRole';
+import { InterviewerInProgress } from './interviewParts/InterviewerInProgress';
 import { InterviewerPenaltySelection } from './interviewParts/InterviewerPenaltySelection';
 import { InterviewerPositionSelection } from './interviewParts/InterviewerPositionSelection';
 import { InterviewerReadyToStart } from './interviewParts/InterviewerReadyToStart';
@@ -9,6 +10,7 @@ import { PacketDisplay } from './interviewParts/PacketDisplay';
 import { PacketSelection } from './interviewParts/PacketSelection';
 import { PenaltyDisplay } from './interviewParts/PenaltyDisplay';
 import { RoleSelection } from './interviewParts/RoleSelection';
+import { SuspectInProgress } from './interviewParts/SuspectInProgress';
 import { SuspectNoteSelection } from './interviewParts/SuspectNoteSelection';
 import { SuspectPenaltySelection } from './interviewParts/SuspectPenaltySelection';
 import { SuspectReadyToStart } from './interviewParts/SuspectReadyToStart';
@@ -34,6 +36,7 @@ const enum InterviewStatus {
     SuspectNoteSelection,
 
     ReadyToStart,
+    InProgress,
 }
 
 interface IState {
@@ -47,6 +50,7 @@ interface IState {
     suspectNote: string;
     role?: ISuspectRole;
     roles: ISuspectRole[];
+    duration: number;
 }
 
 export class Interview extends React.PureComponent<RouteComponentProps<{ id: string }>, IState> {
@@ -57,6 +61,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
 
         this.state = {
             choice: [],
+            duration: 0,
             isInterviewer: false,
             packet: '',
             penalty: '',
@@ -172,6 +177,31 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                     />
                 }
 
+            case InterviewStatus.InProgress:
+                if (this.state.isInterviewer) {
+                    const conclude = (isRobot: boolean) => this.connection.invoke('ConcludeInterview', isRobot);
+
+                    return <InterviewerInProgress
+                        conclude={conclude}
+                        duration={this.state.duration}
+                        penalty={this.state.penalty}
+                        primary={this.state.primaryQuestions}
+                        secondary={this.state.secondaryQuestions}
+                        suspectNote={this.state.suspectNote}
+                    />
+                }
+                else {
+                    const terminate = () => this.connection.invoke('TerminateInterviewer');
+
+                    return <SuspectInProgress
+                        duration={this.state.duration}
+                        penalty={this.state.penalty}
+                        role={this.state.role!}
+                        suspectNote={this.state.suspectNote}
+                        terminateInterviewer={terminate}
+                    />
+                }
+
             default:
                 return <div>Unknown status</div>;
         }
@@ -200,6 +230,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
             this.setState({
                 // clear any data from previous game
                 choice: [],
+                duration: 0,
                 packet: '',
                 penalty: '',
                 primaryQuestions: [],
@@ -297,6 +328,13 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                 suspectNote: note,
             });
         });
+
+        this.connection.on('StartTimer', (seconds: number) => {
+            this.setState({
+                duration: seconds,
+                status: InterviewStatus.InProgress,
+            });
+        })
 
         this.connection.onclose((error?: Error) => {
             /*

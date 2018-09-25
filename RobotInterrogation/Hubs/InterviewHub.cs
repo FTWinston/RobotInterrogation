@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
 using RobotInterrogation.Models;
 using RobotInterrogation.Services;
 using System;
@@ -33,24 +34,24 @@ namespace RobotInterrogation.Hubs
         Task WaitForSuspectNoteChoice();
         Task SetSuspectNote(string note);
 
-        /*
-        Task StartTimer();
-        */
+        Task StartTimer(int duration);
 
         Task EndGame(int endType);
     }
 
     public class InterviewHub : Hub<IInterviewMessages>
     {
-        public InterviewHub(InterviewService service)
+        public InterviewHub(InterviewService service, IOptions<GameConfiguration> configuration)
         {
             Service = service;
+            Configuration = configuration.Value;
         }
 
         private static ConcurrentDictionary<string, string> UserSessions = new ConcurrentDictionary<string, string>();
         private string SessionID => UserSessions[Context.ConnectionId];
 
         private InterviewService Service { get; }
+        private GameConfiguration Configuration { get; }
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
@@ -291,12 +292,17 @@ namespace RobotInterrogation.Hubs
                 .SetSuspectNote(interview.SuspectNotes[0]);
         }
 
-        public void StartInterview()
+        public async Task StartInterview()
         {
-            throw new NotImplementedException();
+            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.ReadyToStart);
+
+            await Clients
+                .Group(SessionID)
+                .StartTimer(Configuration.Duration);
+
+            interview.Status = InterviewStatus.InProgress;
         }
 
-        /*
         public void ConcludeInterview(bool isRobot)
         {
             throw new NotImplementedException();
@@ -306,6 +312,5 @@ namespace RobotInterrogation.Hubs
         {
             throw new NotImplementedException();
         }
-        */
     }
 }

@@ -8,6 +8,5 @@
     ]
   },
   "rules": {
-    "max-classes-per-file": 50
   }
 }
