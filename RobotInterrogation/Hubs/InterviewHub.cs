@@ -15,12 +15,12 @@ namespace RobotInterrogation.Hubs
         Task SetWaitingForPlayer();
         Task SetPlayersPresent();
 
+        Task SwapPositions();
+
+        Task SetPenaltyChoice(string[] options);
+        Task ChoosePenalty(int index);
+
         /*
-        Task SwapRoles();
-
-        Task ShowPenaltyChoice(string[] choices);
-        Task SetPenalty(string penalty);
-
         Task ShowPacketChoice(string[] packets);
         Task SetPacket(string packetName);
 
@@ -58,12 +58,16 @@ namespace RobotInterrogation.Hubs
                 .GroupExcept(SessionID, Context.ConnectionId)
                 .EndGame(0);
 
+            Service.RemoveSession(SessionID);
             UserSessions.TryRemove(Context.ConnectionId, out _);
             await base.OnDisconnectedAsync(exception);
         }
 
         public async Task<bool> Join(string session)
         {
+            if (!Service.ConfirmStatus(session, InterviewStatus.WaitingForConnections))
+                throw new Exception("Invalid command for curent status of session " + SessionID);
+
             if (!Service.TryAddUser(session, out Interview interview))
                 return false;
 
@@ -83,6 +87,9 @@ namespace RobotInterrogation.Hubs
             }
             else
             {
+                if (!Service.UpdateStatus(SessionID, InterviewStatus.WaitingForConnections, InterviewStatus.PositionSelection))
+                    throw new Exception("Invalid command for curent status of session " + SessionID);
+
                 await Clients
                     .Group(session)
                     .SetPlayersPresent();
@@ -91,18 +98,51 @@ namespace RobotInterrogation.Hubs
             return true;
         }
 
-        public void SwapRoles()
+        public async Task ConfirmPositions()
         {
-            // TODO: this would need to know your current role.
-            // Aha, no it just sends a "swap role" message which swaps your current role... sneaky.
-            throw new NotImplementedException();
+            if (!Service.UpdateStatus(SessionID, InterviewStatus.PositionSelection, InterviewStatus.SelectingPenalty_Interviewer))
+                throw new Exception("Invalid command for curent status of session " + SessionID);
+
+            // TODO: not a static list
+            var penalties = new string[] { "Swear", "Interrupt the interviewer", "Snap your fingers" };
+
+            await Clients
+                .Group(SessionID)
+                .SetPenaltyChoice(penalties);
         }
 
-        public void SelectPenalty(string penalty)
+        public async Task SwapPositions()
         {
-            throw new NotImplementedException();
+            if (!Service.ConfirmStatus(SessionID, InterviewStatus.PositionSelection))
+                throw new Exception("Invalid command for curent status of session " + SessionID);
+
+            await Clients
+                .Group(SessionID)
+                .SwapPositions();
         }
 
+        public async Task Select(int index)
+        {
+            if (Service.UpdateStatus(SessionID, InterviewStatus.SelectingPenalty_Interviewer, InterviewStatus.SelectingPenalty_Suspect))
+            {
+                await Clients
+                    .Group(SessionID)
+                    .ChoosePenalty(index);
+            }
+            else if (Service.UpdateStatus(SessionID, InterviewStatus.SelectingPenalty_Suspect, InterviewStatus.SelectingPacket))
+            {
+                await Clients
+                    .Group(SessionID)
+                    .ChoosePenalty(index);
+
+                // This will show the penalty. Wait 5 seconds before moving onto packet selection.
+                await Task.Delay(5000);
+            }
+            else
+                throw new Exception("Invalid command for curent status of session " + SessionID);
+        }
+
+        /*
         public void SelectPacket(string packet)
         {
             throw new NotImplementedException();
@@ -142,5 +182,6 @@ namespace RobotInterrogation.Hubs
         {
             throw new NotImplementedException();
         }
+        */
     }
 }

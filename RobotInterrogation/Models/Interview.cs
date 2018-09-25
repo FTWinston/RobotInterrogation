@@ -2,7 +2,7 @@
 {
     public class Interview
     {
-        public InterviewStatus Status { get; private set; } = InterviewStatus.WaitingForFirstName;
+        public InterviewStatus Status { get; set; } = InterviewStatus.WaitingForConnections;
 
         public int NumPlayers { get; set; } = 0;
 

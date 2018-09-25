@@ -2,17 +2,15 @@
 {
     public enum InterviewStatus
     {
-        WaitingForFirstName,
-        WaitingForSecondPlayer,
-        WaitingForSecondName,
-
-        RoleSelection,
+        WaitingForConnections,
+        PositionSelection,
 
         SelectingPenalty_Interviewer,
         SelectingPenalty_Suspect,
 
         SelectingPacket,
 
+        /*
         Setup_BothPlayers,
         Setup_WaitingForInterviewer,
         Setup_WaitingForSuspect,
@@ -22,6 +20,7 @@
         InProgress,
 
         FinalQuestion,
+        */
 
         Finished,
     }
