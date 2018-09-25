@@ -4,6 +4,7 @@ using RobotInterrogation.Models;
 using RobotInterrogation.Services;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace RobotInterrogation.Hubs
@@ -17,8 +18,9 @@ namespace RobotInterrogation.Hubs
 
         Task SwapPositions();
 
-        Task SetPenaltyChoice(string[] options);
-        Task ChoosePenalty(int index);
+        Task ShowPenaltyChoice(List<string> options);
+        Task WaitForPenaltyChoice();
+        Task SetPenalty(string penalty);
 
         /*
         Task ShowPacketChoice(string[] packets);
@@ -58,37 +60,40 @@ namespace RobotInterrogation.Hubs
                 .GroupExcept(SessionID, Context.ConnectionId)
                 .EndGame(0);
 
-            Service.RemoveSession(SessionID);
+            Service.RemoveInterview(SessionID);
             UserSessions.TryRemove(Context.ConnectionId, out _);
             await base.OnDisconnectedAsync(exception);
         }
 
+        private void EnsureIsInterviewer(Interview interview)
+        {
+            if (Context.ConnectionId != interview.InterviewerConnectionID)
+                throw new Exception("Only the interviewer can issue this command for session " + SessionID);
+        }
+
         public async Task<bool> Join(string session)
         {
-            if (!Service.ConfirmStatus(session, InterviewStatus.WaitingForConnections))
-                throw new Exception("Invalid command for curent status of session " + SessionID);
+            var interview = Service.GetInterviewWithStatus(session, InterviewStatus.WaitingForConnections);
 
-            if (!Service.TryAddUser(session, out Interview interview))
+            if (!Service.TryAddUser(interview, Context.ConnectionId))
                 return false;
 
             UserSessions[Context.ConnectionId] = session;
             await Groups.AddToGroupAsync(Context.ConnectionId, session);
 
-            bool isFirst = interview.NumPlayers < 2;
-            bool isInterviewer = interview.FirstPlayerIsInterviewer && isFirst;
+            bool isInterviewer = interview.InterviewerConnectionID == Context.ConnectionId;
 
             await Clients.Caller.SetRole(isInterviewer);
 
-            if (isFirst)
+            if (isInterviewer)
             {
                 await Clients
                     .Group(session)
                     .SetWaitingForPlayer();
             }
-            else
+            else // must be suspect, then
             {
-                if (!Service.UpdateStatus(SessionID, InterviewStatus.WaitingForConnections, InterviewStatus.PositionSelection))
-                    throw new Exception("Invalid command for curent status of session " + SessionID);
+                interview.Status = InterviewStatus.PositionSelection;
 
                 await Clients
                     .Group(session)
@@ -100,21 +105,32 @@ namespace RobotInterrogation.Hubs
 
         public async Task ConfirmPositions()
         {
-            if (!Service.UpdateStatus(SessionID, InterviewStatus.PositionSelection, InterviewStatus.SelectingPenalty_Interviewer))
-                throw new Exception("Invalid command for curent status of session " + SessionID);
+            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.PositionSelection);
 
-            // TODO: not a static list
-            var penalties = new string[] { "Swear", "Interrupt the interviewer", "Snap your fingers" };
+            EnsureIsInterviewer(interview);
+
+            interview.Status = InterviewStatus.SelectingPenalty_Interviewer;
+
+            Service.AllocatePenalties(interview);
 
             await Clients
-                .Group(SessionID)
-                .SetPenaltyChoice(penalties);
+                .Client(interview.InterviewerConnectionID)
+                .ShowPenaltyChoice(interview.Penalties);
+
+            await Clients
+                .GroupExcept(SessionID, interview.InterviewerConnectionID)
+                .WaitForPenaltyChoice();
         }
 
         public async Task SwapPositions()
         {
-            if (!Service.ConfirmStatus(SessionID, InterviewStatus.PositionSelection))
-                throw new Exception("Invalid command for curent status of session " + SessionID);
+            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.PositionSelection);
+
+            EnsureIsInterviewer(interview);
+
+            var tmp = interview.InterviewerConnectionID;
+            interview.InterviewerConnectionID = interview.SuspectConnectionID;
+            interview.SuspectConnectionID = tmp;
 
             await Clients
                 .Group(SessionID)
@@ -123,20 +139,43 @@ namespace RobotInterrogation.Hubs
 
         public async Task Select(int index)
         {
-            if (Service.UpdateStatus(SessionID, InterviewStatus.SelectingPenalty_Interviewer, InterviewStatus.SelectingPenalty_Suspect))
+            var interview = Service.GetInterview(SessionID);
+
+            if (interview.Status == InterviewStatus.SelectingPenalty_Interviewer)
             {
+                interview.Status = InterviewStatus.SelectingPenalty_Suspect;
+
+                if (index < 0 || index >= interview.Penalties.Count)
+                    throw new IndexOutOfRangeException($"Interviewer penalty selection must be between 0 and {interview.Penalties.Count}, but is {index}");
+
+                interview.Penalties.RemoveAt(0);
+
+                // TODO: remove selection from interview penalties
+
                 await Clients
-                    .Group(SessionID)
-                    .ChoosePenalty(index);
+                    .Client(interview.SuspectConnectionID)
+                    .ShowPenaltyChoice(interview.Penalties);
+
+                await Clients
+                    .GroupExcept(SessionID, interview.SuspectConnectionID)
+                    .WaitForPenaltyChoice();
             }
-            else if (Service.UpdateStatus(SessionID, InterviewStatus.SelectingPenalty_Suspect, InterviewStatus.SelectingPacket))
+            else if (interview.Status == InterviewStatus.SelectingPenalty_Suspect)
             {
+                interview.Status = InterviewStatus.SelectingPacket;
+
+                // the specified index is the one to keep
+                int removeIndex = index == 0 ? 1 : 0;
+                interview.Penalties.RemoveAt(removeIndex);
+
                 await Clients
                     .Group(SessionID)
-                    .ChoosePenalty(index);
+                    .SetPenalty(interview.Penalties[0]);
 
                 // This will show the penalty. Wait 5 seconds before moving onto packet selection.
                 await Task.Delay(5000);
+
+                // ...
             }
             else
                 throw new Exception("Invalid command for curent status of session " + SessionID);

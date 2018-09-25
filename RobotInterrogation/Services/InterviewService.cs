@@ -1,22 +1,23 @@
 ﻿using RobotInterrogation.Models;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace RobotInterrogation.Services
 {
     public class InterviewService
     {
         private static ConcurrentDictionary<int, Interview> Interviews = new ConcurrentDictionary<int, Interview>();
-        private static int NextSessionID = 1;
+        private static int NextInterviewID = 1;
         private static object IdLock = new object();
 
-        public string GetNextSessionID()
+        public string GetNextInterviewID()
         {
             int id;
 
             lock (IdLock)
             {
-                id = NextSessionID++;
+                id = NextInterviewID++;
             }
 
             Interviews[id] = new Interview();
@@ -24,51 +25,59 @@ namespace RobotInterrogation.Services
             return id.ToString();
         }
 
-        public bool TryAddUser(string sessionID, out Interview interview)
+        public bool TryAddUser(Interview interview, string connectionID)
         {
-            int id = int.Parse(sessionID);
-
-            if (!Interviews.TryGetValue(id, out interview))
-                return false;
-
             if (interview.Status != InterviewStatus.WaitingForConnections)
                 return false;
 
-            if (interview.NumPlayers >= 2)
-                return false;
+            if (interview.InterviewerConnectionID == null)
+            {
+                interview.InterviewerConnectionID = connectionID;
+                return true;
+            }
 
-            interview.NumPlayers++;
-            return true;
+            if (interview.SuspectConnectionID == null)
+            {
+                interview.SuspectConnectionID = connectionID;
+                return true;
+            }
+
+            return false;
         }
 
-        public void RemoveSession(string sessionID)
+        public void RemoveInterview(string interviewID)
         {
-            int id = int.Parse(sessionID);
+            int id = int.Parse(interviewID);
             Interviews.TryRemove(id, out _);
         }
 
-        public bool ConfirmStatus(string sessionID, InterviewStatus status)
+        public Interview GetInterview(string interviewID)
         {
-            int id = int.Parse(sessionID);
+            int id = int.Parse(interviewID);
 
             if (!Interviews.TryGetValue(id, out Interview interview))
-                return false;
+                throw new Exception($"Invalid interview ID: {interviewID}");
 
-            return interview.Status == status;
+            return interview;
         }
 
-        public bool UpdateStatus(string sessionID, InterviewStatus currentStatus, InterviewStatus newStatus)
+        public Interview GetInterviewWithStatus(string interviewID, InterviewStatus status)
         {
-            int id = int.Parse(sessionID);
+            var interview = GetInterview(interviewID);
 
-            if (!Interviews.TryGetValue(id, out Interview interview))
-                return false;
+            if (interview.Status != status)
+                throw new Exception($"Interview doesn't have the required status {status} - it is actually {interview.Status}");
 
-            if (interview.Status != currentStatus)
-                return false;
+            return interview;
+        }
 
-            interview.Status = newStatus;
-            return true;
+        public void AllocatePenalties(Interview interview)
+        {
+            // TODO: should be random, not just fixed
+            interview.Penalties.Clear();
+            interview.Penalties.Add("Swear");
+            interview.Penalties.Add("Interrupt the interviewer");
+            interview.Penalties.Add("Snap your fingers");
         }
     }
 }

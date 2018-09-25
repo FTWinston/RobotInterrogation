@@ -13,7 +13,7 @@ namespace RobotInterrogation.Controllers
         public string GetNextSessionID([FromServices] InterviewService service)
         {
             return service
-                .GetNextSessionID()
+                .GetNextInterviewID()
                 .ToString();
         }
 

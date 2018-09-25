@@ -1,12 +1,15 @@
-﻿namespace RobotInterrogation.Models
+﻿using System.Collections.Generic;
+
+namespace RobotInterrogation.Models
 {
     public class Interview
     {
         public InterviewStatus Status { get; set; } = InterviewStatus.WaitingForConnections;
 
-        public int NumPlayers { get; set; } = 0;
+        public string InterviewerConnectionID { get; set; }
+        public string SuspectConnectionID { get; set; }
 
-        public bool FirstPlayerIsInterviewer { get; set; } = true;
+        public List<string> Penalties { get; } = new List<string>();
 
         public Packet Packet { get; set; }
 

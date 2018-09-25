@@ -11,8 +11,7 @@ const enum InterviewStatus {
     SelectingPositions,
     RoleConfirmed,
 
-    InterviewerPenaltySelection,
-    SuspectPenaltySelection,
+    PenaltySelection,
     ShowingPenalty,
 }
 
@@ -62,17 +61,19 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                     return renderSuspectPositionSelection();
                 }
 
-            case InterviewStatus.InterviewerPenaltySelection:
-                const discardPenalty = (index: number) => this.connection.invoke('Select', index);
-                return this.state.isInterviewer
-                    ? <InterviewerPenaltySelection options={this.state.choice} action={discardPenalty} />
-                    : renderSuspectPenaltySelection();
+            case InterviewStatus.PenaltySelection:
+                if (this.state.choice.length > 0) {
+                    const selectPenalty = (index: number) => this.connection.invoke('Select', index);
 
-            case InterviewStatus.SuspectPenaltySelection:
-                const selectPenalty = (index: number) => this.connection.invoke('Select', index);
-                return this.state.isInterviewer
-                    ? renderInterviewerPenaltySelection()
-                    : <SuspectPenaltySelection options={this.state.choice} action={selectPenalty} />
+                    return this.state.isInterviewer
+                        ? <InterviewerPenaltySelection options={this.state.choice} action={selectPenalty} />
+                        : <SuspectPenaltySelection options={this.state.choice} action={selectPenalty} />
+                }
+                else {
+                    return this.state.isInterviewer
+                        ? renderInterviewerPenaltySelection()
+                        : renderSuspectPenaltySelection();
+                }
 
             case InterviewStatus.ShowingPenalty:
                 return <PenaltyDisplay role={this.state.isInterviewer ? 'interviewer' : 'suspect'} penalty={this.state.penalty} />;
@@ -115,30 +116,26 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
             });
         });
 
-        this.connection.on('SetPenaltyChoice', (options: string[]) => {
+        this.connection.on('ShowPenaltyChoice', (options: string[]) => {
             this.setState({
                 choice: options,
-                status: InterviewStatus.InterviewerPenaltySelection,
+                status: InterviewStatus.PenaltySelection,
             });
         });
 
-        this.connection.on('ChoosePenalty', (index: number) => {
-            if (this.state.status === InterviewStatus.InterviewerPenaltySelection) {
-                this.setState(state => {
-                    return {
-                        choice: state.choice.filter((_, i) => i !== index),
-                        status: InterviewStatus.SuspectPenaltySelection,
-                    };
-                });
-            }
-            else if (this.state.status === InterviewStatus.SuspectPenaltySelection) {
-                const selected = this.state.choice[index];
-                this.setState({
-                    choice: [],
-                    penalty: selected,
-                    status: InterviewStatus.ShowingPenalty,
-                });
-            }
+        this.connection.on('WaitForPenaltyChoice', () => {
+            this.setState({
+                choice: [],
+                status: InterviewStatus.PenaltySelection,
+            });
+        });
+
+        this.connection.on('SetPenalty', (penalty: string) => {
+            this.setState({
+                choice: [],
+                penalty,
+                status: InterviewStatus.ShowingPenalty,
+            });
         });
 
         this.connection.onclose((error?: Error) => {
