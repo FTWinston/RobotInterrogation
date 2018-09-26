@@ -208,7 +208,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                     />
                 }
                 else {
-                    const terminate = () => this.connection.invoke('TerminateInterviewer');
+                    const terminate = () => this.connection.invoke('KillInterviewer');
 
                     return <SuspectInProgress
                         duration={this.state.duration}
