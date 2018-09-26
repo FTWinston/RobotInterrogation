@@ -1,11 +1,15 @@
 import * as React from 'react';
 import { Redirect, RouteComponentProps } from 'react-router';
 import { connectSignalR } from '../Connectivity';
+import { Disconnected } from './interviewParts/Disconnected';
 import { ISuspectRole } from './interviewParts/elements/SuspectRole';
 import { InterviewerInProgress } from './interviewParts/InterviewerInProgress';
 import { InterviewerPenaltySelection } from './interviewParts/InterviewerPenaltySelection';
 import { InterviewerPositionSelection } from './interviewParts/InterviewerPositionSelection';
 import { InterviewerReadyToStart } from './interviewParts/InterviewerReadyToStart';
+import { InterviewFinished } from './interviewParts/InterviewFinished';
+import { NotYetConnected } from './interviewParts/NotYetConnected';
+import { OpponentDisconnected } from './interviewParts/OpponentDisconnected';
 import { PacketDisplay } from './interviewParts/PacketDisplay';
 import { PacketSelection } from './interviewParts/PacketSelection';
 import { PenaltyDisplay } from './interviewParts/PenaltyDisplay';
@@ -15,9 +19,10 @@ import { SuspectNoteSelection } from './interviewParts/SuspectNoteSelection';
 import { SuspectPenaltySelection } from './interviewParts/SuspectPenaltySelection';
 import { SuspectReadyToStart } from './interviewParts/SuspectReadyToStart';
 import { Wait } from './interviewParts/Wait';
+import { WaitingForOpponent } from './interviewParts/WaitingForOpponent';
 import { WaitingQuestionDisplay } from './interviewParts/WaitingQuestionDisplay';
 
-const enum InterviewStatus {
+export const enum InterviewStatus {
     NotConnected,
     Disconnected,
     InvalidSession,
@@ -37,11 +42,23 @@ const enum InterviewStatus {
 
     ReadyToStart,
     InProgress,
+
+    Finished,
+}
+
+export const enum InterviewOutcome {
+    Disconnected = 0,
+    CorrectlyGuessedHuman,
+    WronglyGuessedHuman,
+    CorrectlyGuessedRobot,
+    WronglyGuessedRobot,
+    KilledInterviewer,
 }
 
 interface IState {
     isInterviewer: boolean;
     status: InterviewStatus;
+    outcome?: InterviewOutcome;
     choice: string[];
     packet: string;
     penalty: string;
@@ -79,13 +96,13 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                 return <Redirect to="/join/invalid" />;
 
             case InterviewStatus.NotConnected:
-                return <div>You haven't yet connected.</div>;
+                return <NotYetConnected />;
 
             case InterviewStatus.Disconnected:
-                return <div>You have been disconnected</div>;
+                return <Disconnected />;
 
             case InterviewStatus.WaitingForOpponent:
-                return <div>Waiting for other player to join interview {this.props.match.params.id}</div>;
+                return <WaitingForOpponent interviewID={this.props.match.params.id} />;
 
             case InterviewStatus.SelectingPositions:
                 if (this.state.isInterviewer) {
@@ -202,6 +219,20 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                     />
                 }
 
+            case InterviewStatus.Finished:
+                if (this.state.outcome! === InterviewOutcome.Disconnected) {
+                    return <OpponentDisconnected />;
+                }
+
+                const playAgain = () => this.connection.invoke('NewInterview');
+
+                return <InterviewFinished
+                    isInterviewer={this.state.isInterviewer}
+                    role={this.state.role!}
+                    outcome={this.state.outcome!}
+                    playAgain={playAgain}
+                />
+
             default:
                 return <div>Unknown status</div>;
         }
@@ -231,6 +262,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                 // clear any data from previous game
                 choice: [],
                 duration: 0,
+                outcome: undefined,
                 packet: '',
                 penalty: '',
                 primaryQuestions: [],
@@ -329,10 +361,18 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
             });
         });
 
-        this.connection.on('StartTimer', (seconds: number) => {
+        this.connection.on('StartTimer', (duration: number) => {
             this.setState({
-                duration: seconds,
+                duration,
                 status: InterviewStatus.InProgress,
+            });
+        })
+
+        this.connection.on('EndGame', (outcome: InterviewOutcome, role: ISuspectRole) => {
+            this.setState({
+                outcome,
+                role,
+                status: InterviewStatus.Finished,
             });
         })
 

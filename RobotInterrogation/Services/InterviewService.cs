@@ -60,7 +60,13 @@ namespace RobotInterrogation.Services
         public void RemoveInterview(string interviewID)
         {
             int id = int.Parse(interviewID);
-            Interviews.TryRemove(id, out _);
+            if (!Interviews.TryRemove(id, out Interview interview))
+                return;
+
+            if (interview.Status == InterviewStatus.InProgress)
+            {
+                LogInterview(interview);
+            }
         }
 
         public Interview GetInterview(string interviewID)
@@ -132,6 +138,66 @@ namespace RobotInterrogation.Services
         public void AllocateSuspectNotes(Interview interview)
         {
             AllocateRandomValues(Configuration.SuspectNotes, interview.SuspectNotes, 2);
+        }
+
+        public InterviewOutcome GuessSuspectRole(Interview interview, bool guessIsRobot)
+        {
+            var actualRole = interview.Roles[0].Type;
+            InterviewOutcome outcome;
+
+            if (guessIsRobot)
+            {
+                outcome = actualRole == SuspectRoleType.Human
+                    ? InterviewOutcome.WronglyGuessedRobot
+                    : InterviewOutcome.CorrectlyGuessedRobot;
+            }
+            else
+            {
+                outcome = actualRole == SuspectRoleType.Human
+                    ? InterviewOutcome.CorrectlyGuessedHuman
+                    : InterviewOutcome.WronglyGuessedHuman;
+            }
+
+            interview.Status = InterviewStatus.Finished;
+            interview.Outcome = outcome;
+
+            LogInterview(interview);
+
+            return outcome;
+        }
+
+        public void KillInterviewer(Interview interview)
+        {
+            if (interview.Roles[0].Type != SuspectRoleType.ViolentRobot)
+            {
+                throw new Exception("Suspect is not a violent robot, so cannot kill interviewer");
+            }
+
+            interview.Status = InterviewStatus.Finished;
+            interview.Outcome = InterviewOutcome.KilledInterviewer;
+
+            LogInterview(interview);
+        }
+
+        public Interview ResetInterview(string interviewID)
+        {
+            var oldInterview = GetInterviewWithStatus(interviewID, InterviewStatus.Finished);
+
+            int id = int.Parse(interviewID);
+
+            var newInterview = new Interview();
+            Interviews[id] = newInterview;
+
+            newInterview.Status = InterviewStatus.SelectingPositions;
+            newInterview.InterviewerConnectionID = oldInterview.InterviewerConnectionID;
+            newInterview.SuspectConnectionID = oldInterview.SuspectConnectionID;
+
+            return newInterview;
+        }
+
+        private void LogInterview(Interview interview)
+        {
+            // TODO: save this data to somewhere here ... but not the connection IDs
         }
     }
 }

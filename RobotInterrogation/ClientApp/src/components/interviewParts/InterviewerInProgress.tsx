@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Countdown } from './Countdown';
+import { Countdown } from './elements/Countdown';
 import { InterviewQuestion } from './elements/InterviewQuestion';
 
 interface IProps {

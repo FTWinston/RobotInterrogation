@@ -10,7 +10,6 @@ export class Home extends React.PureComponent {
             <ul>
                 <li><Link to="/rules">Rules</Link></li>
                 <li><Link to="/host">Host a game</Link></li>
-                <li><Link to="/join">Join a game</Link></li>
             </ul>
         </div>;
     }

@@ -36,7 +36,7 @@ namespace RobotInterrogation.Hubs
 
         Task StartTimer(int duration);
 
-        Task EndGame(int endType);
+        Task EndGame(int endType, SuspectRole role);
     }
 
     public class InterviewHub : Hub<IInterviewMessages>
@@ -57,7 +57,7 @@ namespace RobotInterrogation.Hubs
         {
             await Clients
                 .GroupExcept(SessionID, Context.ConnectionId)
-                .EndGame(0);
+                .EndGame((int)InterviewOutcome.Disconnected, null);
 
             Service.RemoveInterview(SessionID);
             UserSessions.TryRemove(Context.ConnectionId, out _);
@@ -98,7 +98,7 @@ namespace RobotInterrogation.Hubs
             }
             else // must be suspect, then
             {
-                interview.Status = InterviewStatus.PositionSelection;
+                interview.Status = InterviewStatus.SelectingPositions;
 
                 await Clients
                     .Group(session)
@@ -110,7 +110,7 @@ namespace RobotInterrogation.Hubs
 
         public async Task ConfirmPositions()
         {
-            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.PositionSelection);
+            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.SelectingPositions);
 
             EnsureIsInterviewer(interview);
 
@@ -129,7 +129,7 @@ namespace RobotInterrogation.Hubs
 
         public async Task SwapPositions()
         {
-            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.PositionSelection);
+            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.SelectingPositions);
 
             EnsureIsInterviewer(interview);
 
@@ -295,6 +295,7 @@ namespace RobotInterrogation.Hubs
         public async Task StartInterview()
         {
             var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.ReadyToStart);
+            EnsureIsInterviewer(interview);
 
             await Clients
                 .Group(SessionID)
@@ -303,14 +304,37 @@ namespace RobotInterrogation.Hubs
             interview.Status = InterviewStatus.InProgress;
         }
 
-        public void ConcludeInterview(bool isRobot)
+        public async Task ConcludeInterview(bool isRobot)
         {
-            throw new NotImplementedException();
+            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.InProgress);
+            EnsureIsInterviewer(interview);
+
+            var outcome = Service.GuessSuspectRole(interview, isRobot);
+
+            await Clients
+                .Group(SessionID)
+                .EndGame((int)outcome, interview.Roles[0]);
         }
 
-        public void KillInterviewer()
+        public async Task KillInterviewer()
         {
-            throw new NotImplementedException();
+            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.InProgress);
+            EnsureIsSuspect(interview);
+
+            Service.KillInterviewer(interview);
+
+            await Clients
+                .Group(SessionID)
+                .EndGame((int)InterviewOutcome.KilledInterviewer, interview.Roles[0]);
+        }
+
+        public async Task NewInterview()
+        {
+            Service.ResetInterview(SessionID);
+
+            await Clients
+                .Group(SessionID)
+                .SetPlayersPresent();
         }
     }
 }

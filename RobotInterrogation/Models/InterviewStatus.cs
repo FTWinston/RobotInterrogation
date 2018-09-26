@@ -3,7 +3,7 @@
     public enum InterviewStatus
     {
         WaitingForConnections,
-        PositionSelection,
+        SelectingPositions,
 
         SelectingPenalty_Interviewer,
         SelectingPenalty_Suspect,

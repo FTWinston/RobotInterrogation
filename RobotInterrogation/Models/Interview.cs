@@ -1,12 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace RobotInterrogation.Models
 {
     public class Interview
     {
         public InterviewStatus Status { get; set; } = InterviewStatus.WaitingForConnections;
+        public InterviewOutcome? Outcome { get; set; }
 
+        [JsonIgnore]
         public string InterviewerConnectionID { get; set; }
+
+        [JsonIgnore]
         public string SuspectConnectionID { get; set; }
 
         public List<string> Penalties { get; } = new List<string>();
