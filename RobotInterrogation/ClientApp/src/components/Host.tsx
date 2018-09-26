@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Redirect } from 'react-router';
-import { query } from '../Connectivity';
+import { queryString } from '../Connectivity';
 
 interface IState {
     interviewID?: string;
@@ -27,8 +27,7 @@ export class Host extends React.PureComponent<{}, IState> {
     }
 
     private async query() {
-        const id = await query<string>('/api/Data/GetNextSessionID')
-
+        const id = await queryString('/api/Data/GetNextSessionID')
         this.setState({
             interviewID: id,
         });

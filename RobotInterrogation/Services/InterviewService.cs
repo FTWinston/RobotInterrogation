@@ -1,40 +1,69 @@
 ﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using RobotInterrogation.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace RobotInterrogation.Services
 {
     public class InterviewService
     {
-        private static ConcurrentDictionary<int, Interview> Interviews = new ConcurrentDictionary<int, Interview>();
+        private static ConcurrentDictionary<string, Interview> Interviews = new ConcurrentDictionary<string, Interview>();
 
-        private static int NextInterviewID = 1;
-        private static object IdLock = new object();
+        private static Random IdGenerator = new Random();
 
         private GameConfiguration Configuration { get; }
+        private IDGeneration IDs { get; }
 
-        public InterviewService(IOptions<GameConfiguration> configuration)
+        public InterviewService(IOptions<GameConfiguration> configuration, IOptions<IDGeneration> idWords)
         {
             Configuration = configuration.Value;
+            IDs = idWords.Value;
         }
 
-        public string GetNextInterviewID()
+        public string GetNewInterviewID()
         {
-            int id;
-
-            lock (IdLock)
+            lock (IdGenerator)
             {
-                id = NextInterviewID++;
+                string id = GenerateID();
+                Interviews[id.ToLower()] = new Interview();
+                return id;
             }
+        }
 
-            Interviews[id] = new Interview();
+        private string GenerateID()
+        {
+            if (IDs.WordCount <= 0)
+                return string.Empty;
 
-            return id.ToString();
+            string id;
+            do
+            {
+                int[] iWords = new int[IDs.WordCount];
+
+                for (int i = 0; i < IDs.WordCount; i++)
+                {
+                    do
+                    {
+                        int iWord = IdGenerator.Next(IDs.Words.Length);
+
+                        bool reused = iWords
+                            .Take(i)
+                            .Any(jWord => jWord == iWord);
+
+                        if (reused)
+                            continue;
+
+                        iWords[i] = iWord;
+                        break;
+                    } while (true);
+                }
+
+                id = string.Join("", iWords.Select(i => IDs.Words[i]));
+            } while (Interviews.ContainsKey(id.ToLower()));
+
+            return id;
         }
 
         public bool TryAddUser(Interview interview, string connectionID)
@@ -59,8 +88,7 @@ namespace RobotInterrogation.Services
 
         public void RemoveInterview(string interviewID)
         {
-            int id = int.Parse(interviewID);
-            if (!Interviews.TryRemove(id, out Interview interview))
+            if (!Interviews.TryRemove(interviewID.ToLower(), out Interview interview))
                 return;
 
             if (interview.Status == InterviewStatus.InProgress)
@@ -71,9 +99,7 @@ namespace RobotInterrogation.Services
 
         public Interview GetInterview(string interviewID)
         {
-            int id = int.Parse(interviewID);
-
-            if (!Interviews.TryGetValue(id, out Interview interview))
+            if (!Interviews.TryGetValue(interviewID.ToLower(), out Interview interview))
                 throw new Exception($"Invalid interview ID: {interviewID}");
 
             return interview;
@@ -183,10 +209,8 @@ namespace RobotInterrogation.Services
         {
             var oldInterview = GetInterviewWithStatus(interviewID, InterviewStatus.Finished);
 
-            int id = int.Parse(interviewID);
-
             var newInterview = new Interview();
-            Interviews[id] = newInterview;
+            Interviews[interviewID.ToLower()] = newInterview;
 
             newInterview.Status = InterviewStatus.SelectingPositions;
             newInterview.InterviewerConnectionID = oldInterview.InterviewerConnectionID;
