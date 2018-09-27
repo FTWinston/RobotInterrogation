@@ -6,7 +6,9 @@ export class OpponentDisconnected extends React.PureComponent {
         return <div>
             <p className="lead">Your opponent disconnected from the interview.</p>
 
-            <Link to="/">Go back</Link>
+            <div className="actionSet">
+                <Link to="/">Go back</Link>
+            </div>
         </div>
     }
 }
