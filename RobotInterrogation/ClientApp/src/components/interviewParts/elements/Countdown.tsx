@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { setInterval } from 'timers';
 import './Countdown.css';
 
 interface IProps {
@@ -11,7 +10,7 @@ interface IState {
 }
 
 export class Countdown extends React.PureComponent<IProps, IState> {
-    private interval: NodeJS.Timer;
+    private interval?: NodeJS.Timer;
 
     constructor(props: IProps) {
         super(props);
@@ -25,7 +24,7 @@ export class Countdown extends React.PureComponent<IProps, IState> {
         this.interval = setInterval(() => {
             this.setState(state => {
                 if (state.timeRemaining <= 1) {
-                    clearInterval(this.interval);
+                    this.stopTimer();
                 }
 
                 return {
@@ -33,6 +32,10 @@ export class Countdown extends React.PureComponent<IProps, IState> {
                 }
             })
         }, 1000);
+    }
+
+    public componentWillUnmount() {
+        this.stopTimer();
     }
 
     public render() {
@@ -51,5 +54,12 @@ export class Countdown extends React.PureComponent<IProps, IState> {
         return <div className="countdown countdown--expired">
             time expired
         </div>
+    }
+
+    private stopTimer() {
+        if (this.interval !== undefined) {
+            clearInterval(this.interval);
+            this.interval = undefined;
+        }
     }
 }
