@@ -8,9 +8,8 @@ interface IProps {
 export class InterviewerViolentKilled extends React.PureComponent<IProps> {
     public render() {
         return <div>
-            <h2>You are the interviewer.</h2>
             <p>The suspect was a violent robot who completed their obsession and killed you.</p>
-            <p>You lose.</p>
+            <h2>You lose.</h2>
 
             <SuspectRole role={this.props.role} />
         </div>
