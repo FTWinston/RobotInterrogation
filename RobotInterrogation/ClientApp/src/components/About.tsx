@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 
-export class Rules extends React.PureComponent {
+export class About extends React.PureComponent {
     public render() {
         return <div>
             <h1>Robot Interrogation</h1>

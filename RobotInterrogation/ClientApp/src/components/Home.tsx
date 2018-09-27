@@ -10,7 +10,7 @@ export class Home extends React.PureComponent {
             <p>Play with a friend, either in the same room or via video chat.</p>
 
             <div className="actionSet">
-                <Link to="/rules">View rules</Link>
+                <Link to="/about">Information</Link>
                 <Link to="/host">Start a game</Link>
             </div>
         </div>;
