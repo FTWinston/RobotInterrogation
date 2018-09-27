@@ -37,7 +37,7 @@ export class Countdown extends React.PureComponent<IProps, IState> {
     public render() {
         if (this.state.timeRemaining > 0) {
             return <div className="countdown">
-                {this.state.timeRemaining}
+                {this.state.timeRemaining}s remaining
             </div>
         }
 

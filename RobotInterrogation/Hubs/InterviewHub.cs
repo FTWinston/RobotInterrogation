@@ -78,7 +78,11 @@ namespace RobotInterrogation.Hubs
 
         public async Task<bool> Join(string session)
         {
-            var interview = Service.GetInterviewWithStatus(session, InterviewStatus.WaitingForConnections);
+            if (!Service.TryGetInterview(session, out Interview interview))
+                return false;
+
+            if (interview.Status != InterviewStatus.WaitingForConnections)
+                return false;
 
             if (!Service.TryAddUser(interview, Context.ConnectionId))
                 return false;

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import './GameLink.css';
 
 interface IProps {
     interviewID: string;
@@ -7,12 +8,13 @@ interface IProps {
 export class WaitingForOpponent extends React.PureComponent<IProps> {
     public render() {
         const fullLocation = document.location.toString();
+        const strippedProtocol = fullLocation.substr(fullLocation.indexOf('//') + 2);
 
-        let fixedLocation = fullLocation.substr(0, fullLocation.indexOf(this.props.interviewID));
+        let fixedLocation = strippedProtocol.substr(0, strippedProtocol.indexOf(this.props.interviewID));
         let detailLocation;
 
         if (fixedLocation.length === 0) {
-            fixedLocation = fullLocation;
+            fixedLocation = strippedProtocol;
             detailLocation = '';
         }
         else {
@@ -20,12 +22,18 @@ export class WaitingForOpponent extends React.PureComponent<IProps> {
         }
 
         return <div>
-            <p className="lead">Waiting for other player to join the interview.</p>
+            <h2>Waiting for opponent to&nbsp;join.</h2>
 
             <p>
-                Give them this link: <a className="link" href={fullLocation}>{fixedLocation}<span className="link__focus">{detailLocation}</span></a>
-                <br />
-                <strong>Don't</strong> visit the link yourself, or you will become your own opponent.
+                Invite a friend by giving them this link:
+            </p>
+
+            <p>
+                <a target="_new" className="gameLink" href={fullLocation}>{fixedLocation}<wbr/><span className="gameLink__focus">{detailLocation}</span></a>
+            </p>
+
+            <p>
+                <strong>Don't</strong> open the link yourself, or you will become your own opponent.
             </p>
         </div>
     }

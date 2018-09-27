@@ -9,8 +9,8 @@ interface IProps {
 export class InterviewerPenaltySelection extends React.PureComponent<IProps> {
     public render() {
         return <div>
-            <p className="lead">You are the interviewer.</p>
-            <p>Please select one of the following penalities to <strong>discard</strong>. The suspect will choose from the remaining two.</p>
+            <h2>You are the interviewer.</h2>
+            <p>Select one of the following penalities to <strong>discard</strong>. The suspect will choose from the remaining two.</p>
 
             {renderOptions(this.props.options, this.props.action)}
         </div>

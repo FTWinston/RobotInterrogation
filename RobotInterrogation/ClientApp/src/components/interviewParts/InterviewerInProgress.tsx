@@ -20,7 +20,8 @@ export class InterviewerInProgress extends React.PureComponent<IProps> {
         const isRobot = () => this.props.conclude(true);
 
         return <div>
-            <p className="lead">You are the interviewer. Ask questions and decide whether the suspect is human or a robot.</p>
+            <h2>You are the interviewer.</h2>
+            <p>Ask the suspect questions and decide whether they are human or a robot.</p>
             <div>
                 {primary}
                 {secondary}

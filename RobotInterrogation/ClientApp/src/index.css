@@ -1,0 +1,53 @@
+body {
+    background-color: #ccc;
+    background: linear-gradient(135deg, #cccccc 0%,#bbbbbb 100%);
+
+    color: #333;
+    font-family: Courier New, Courier, monospace;
+    font-size: 1.25rem;
+    min-height: 100vh;
+}
+
+a {
+    color: black;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
+}
+
+button {
+    background-color: transparent;
+    border-radius: 0.75em;
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+    cursor: pointer;
+    text-align: left;
+}
+
+button:active {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+#root {
+    margin: auto;
+    padding: 0.5em 1em;
+}
+
+@media (min-width: 600px) {
+    #root {
+        max-width: 600px;
+    }
+}
+
+@media (min-width: 700px) {
+    #root {
+        max-width: calc(100vw - 100px);
+    }
+}
+
+@media (min-width: 900px) {
+    #root {
+        max-width: 800px;
+    }
+}

@@ -15,7 +15,8 @@ export class InterviewerReadyToStart extends React.PureComponent<IProps> {
         const secondary = this.props.secondary.map((q, i) => <InterviewQuestion primary={false} question={q} key={i} />);
 
         return <div>
-            <p className="lead">You are the interviewer. When you are ready, ask the suspect to perform the penalty 3 times. When they have done so, confirm their suspect note, and start the timer.</p>
+            <h2>You are the interviewer.</h2>
+            <p>When you are ready, ask the suspect to perform the penalty 3 times. When they have done so, confirm their suspect note, and start the timer.</p>
             <div>
                 {primary}
                 {secondary}

@@ -9,7 +9,7 @@ interface IProps {
 export class PacketSelection extends React.PureComponent<IProps> {
     public render() {
         return <div>
-            <p className="lead">You are the interviewer.</p>
+            <h2>You are the interviewer.</h2>
             <p>Please select an interview packet to use for this interview.</p>
 
             {renderOptions(this.props.options, this.props.action)}

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export class Home extends React.PureComponent {
     public render() {
-        return <div>
+        return <div className="page">
             <h1>Robot Interrogation</h1>
             <p className="lead">Can <em>you</em> tell if someone is secretly a robot?</p>
 

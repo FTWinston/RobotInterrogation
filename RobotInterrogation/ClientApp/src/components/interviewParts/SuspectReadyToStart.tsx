@@ -10,7 +10,7 @@ interface IProps {
 export class SuspectReadyToStart extends React.PureComponent<IProps> {
     public render() {
         return <div>
-            <p className="lead">You are the suspect.</p>
+            <h2>You are the suspect.</h2>
             <p>When the interviewer is ready, the interview will start.</p>
 
             <SuspectRole role={this.props.role} />

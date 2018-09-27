@@ -1,4 +1,5 @@
 import * as React from 'react';
+import './SuspectRole.css';
 
 export interface ISuspectRole {
     type: string;

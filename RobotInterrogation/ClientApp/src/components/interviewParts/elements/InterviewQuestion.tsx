@@ -1,4 +1,5 @@
 import * as React from 'react';
+import './InterviewQuestion.css';
 
 interface IProps {
     primary: boolean;

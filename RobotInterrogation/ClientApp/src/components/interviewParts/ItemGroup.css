@@ -1,0 +1,4 @@
+.itemGroup {
+    display: flex;
+    flex-wrap: wrap;
+}

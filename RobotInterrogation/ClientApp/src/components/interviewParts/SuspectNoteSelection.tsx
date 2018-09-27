@@ -9,7 +9,8 @@ interface IProps {
 export class SuspectNoteSelection extends React.PureComponent<IProps> {
     public render() {
         return <div>
-            <p>Please select one of the following suspect notes.</p>
+            <h2>You are the suspect.</h2>
+            <p>Select one of the following suspect notes:</p>
 
             {renderOptions(this.props.options, this.props.action)}
         </div>

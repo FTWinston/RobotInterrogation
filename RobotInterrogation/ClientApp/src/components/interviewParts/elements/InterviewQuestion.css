@@ -1,0 +1,11 @@
+.interviewQuestion {
+    margin: 1em;
+}
+
+.interviewQuestion--primary {
+    background-color: #eee;
+}
+
+.interviewQuestion--secondary {
+    background-color: #aaa;
+}

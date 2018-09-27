@@ -97,6 +97,11 @@ namespace RobotInterrogation.Services
             }
         }
 
+        public bool TryGetInterview(string interviewID, out Interview interview)
+        {
+            return Interviews.TryGetValue(interviewID.ToLower(), out interview);
+        }
+
         public Interview GetInterview(string interviewID)
         {
             if (!Interviews.TryGetValue(interviewID.ToLower(), out Interview interview))

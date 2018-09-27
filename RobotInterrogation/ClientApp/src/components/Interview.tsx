@@ -93,7 +93,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
     public render() {
         switch (this.state.status) {
             case InterviewStatus.InvalidSession:
-                return <Redirect to="/join/invalid" />;
+                return <Redirect to="/" />;
 
             case InterviewStatus.NotConnected:
                 return <NotYetConnected />;

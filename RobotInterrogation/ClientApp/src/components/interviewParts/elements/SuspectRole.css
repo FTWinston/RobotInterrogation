@@ -1,0 +1,21 @@
+.suspectRole {
+    margin: 1em;
+}
+
+.suspectRole--Human {
+    background-color: #eee;
+}
+
+.suspectRole--PatientRobot {
+    background-color: #666;
+    color: #ccc;
+}
+
+.suspectRole--ViolentRobot {
+    background-color: #444;
+    color: #ccc;
+}
+
+.suspectRole__name {
+    font-size: 1.5em;
+}

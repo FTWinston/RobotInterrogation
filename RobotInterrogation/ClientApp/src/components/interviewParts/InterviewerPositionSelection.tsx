@@ -8,12 +8,13 @@ interface IProps {
 export class InterviewerPositionSelection extends React.PureComponent<IProps> {
     public render() {
         return <div>
-            <p className="lead">You are the interviewer.</p>
+            <h2>You are the interviewer.</h2>
 
             <p>Please select an option:</p>
 
-            <button className="btn btn-primary" onClick={this.props.stay}>Remain as the interviewer</button>
-            <button className="btn btn-secondary" onClick={this.props.swap}>Switch roles and become the suspect</button>
+            <button onClick={this.props.stay}>Remain as the interviewer</button>
+            <br />
+            <button onClick={this.props.swap}>Switch roles and become the suspect</button>
         </div>
     }
 }

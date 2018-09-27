@@ -17,7 +17,8 @@ export class SuspectInProgress extends React.PureComponent<IProps> {
             : undefined;
 
         return <div>
-            <p>You are the suspect. Answer the interviewer's questions.</p>
+            <h2>You are the suspect.</h2>
+            <p>Answer the interviewer's questions, try to convince them that you are human.</p>
 
             <SuspectRole role={this.props.role} />
             <p>Penalty: {this.props.penalty}</p>
