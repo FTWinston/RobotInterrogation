@@ -194,7 +194,7 @@ namespace RobotInterrogation.Hubs
             interview.Packet = Service.GetPacket(index);
 
             await Clients.Group(SessionID)
-                .SetPacket(interview.Packet.Name);
+                .SetPacket(interview.Packet.Description);
 
             interview.Status = InterviewStatus.SelectingRole;
         }
