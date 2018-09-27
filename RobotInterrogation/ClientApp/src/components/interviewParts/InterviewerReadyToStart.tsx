@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { InterviewQuestion } from './elements/InterviewQuestion';
+import { IInterviewQuestion, InterviewQuestion } from './elements/InterviewQuestion';
 
 interface IProps {
-    primary: string[],
-    secondary: string[],
+    primary: IInterviewQuestion[],
+    secondary: IInterviewQuestion[],
     suspectNote: string,
     penalty: string,
     ready: () => void,

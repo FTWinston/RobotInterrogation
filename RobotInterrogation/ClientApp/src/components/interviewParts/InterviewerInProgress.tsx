@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { Countdown } from './elements/Countdown';
-import { InterviewQuestion } from './elements/InterviewQuestion';
+import { IInterviewQuestion, InterviewQuestion } from './elements/InterviewQuestion';
 
 interface IProps {
-    primary: string[],
-    secondary: string[],
+    primary: IInterviewQuestion[],
+    secondary: IInterviewQuestion[],
     suspectNote: string,
     penalty: string,
     duration: number,

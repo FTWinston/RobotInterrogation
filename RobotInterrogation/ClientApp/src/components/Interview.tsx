@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Redirect, RouteComponentProps } from 'react-router';
 import { connectSignalR } from '../Connectivity';
 import { Disconnected } from './interviewParts/Disconnected';
+import { IInterviewQuestion } from './interviewParts/elements/InterviewQuestion';
 import { ISuspectRole } from './interviewParts/elements/SuspectRole';
 import { InterviewerInProgress } from './interviewParts/InterviewerInProgress';
 import { InterviewerPenaltySelection } from './interviewParts/InterviewerPenaltySelection';
@@ -62,8 +63,8 @@ interface IState {
     choice: string[];
     packet: string;
     penalty: string;
-    primaryQuestions: string[];
-    secondaryQuestions: string[];
+    primaryQuestions: IInterviewQuestion[];
+    secondaryQuestions: IInterviewQuestion[];
     suspectNote: string;
     role?: ISuspectRole;
     roles: ISuspectRole[];
@@ -332,7 +333,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
             });
         });
 
-        this.connection.on('ShowQuestions', (primary: string[], secondary: string[]) => {
+        this.connection.on('ShowQuestions', (primary: IInterviewQuestion[], secondary: IInterviewQuestion[]) => {
             this.setState({
                 primaryQuestions: primary,
                 secondaryQuestions: secondary,

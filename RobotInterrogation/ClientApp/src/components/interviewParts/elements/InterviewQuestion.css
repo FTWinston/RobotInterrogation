@@ -1,5 +1,11 @@
 .interviewQuestion {
     margin: 1em;
+    padding: 0.5em 0.75em;
+    border-radius: 0.75em;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .interviewQuestion--primary {
@@ -8,4 +14,30 @@
 
 .interviewQuestion--secondary {
     background-color: #aaa;
+}
+
+.interviewQuestion__wrapper, .interviewQuestion__secondaryWrapper {
+    opacity: 0.8;
+    text-transform: uppercase;
+}
+
+.interviewQuestion__wrapper {
+    font-weight: bold;
+}
+
+.interviewQuestion__secondaryWrapper {
+    font-style: italic;
+}
+
+.interviewQuestion__text {
+    align-self: flex-start;
+}
+
+.interviewQuestion__examples {
+    margin: 0;
+    align-self: flex-start;
+}
+
+.interviewQuestion__text::after {
+    content: ', e.g.';
 }

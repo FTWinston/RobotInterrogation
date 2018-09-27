@@ -5,8 +5,8 @@
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public string[] PrimaryQuestions { get; set; }
-        public string[] SecondaryQuestions { get; set; }
+        public Question[] PrimaryQuestions { get; set; }
+        public Question[] SecondaryQuestions { get; set; }
 
         public SuspectRole[] Roles { get; set; }
     }

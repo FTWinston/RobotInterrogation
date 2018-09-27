@@ -17,14 +17,19 @@ export class SuspectRole extends React.PureComponent<IProps, {}> {
             ? () => this.props.onClick!()
             : undefined;
 
-        const classes = 'suspectRole suspectRole--' + this.props.role.type;
-        const traits = this.props.role.traits.map((t, i) => <div className="suspectRole__trait" key={i}>{t}</div>);
+        let classes = 'suspectRole suspectRole--' + this.props.role.type;
+        if (this.props.onClick) {
+            classes += ' suspectRole--selectable';
+        }
+
+        const traits = this.props.role.traits.map((t, i) => <li className="suspectRole__trait" key={i}>{t}</li>);
+        const displayName = this.props.role.type.replace('Robot', ' Robot');
 
         return <div className={classes} onClick={onClick}>
-            <div className="suspectRole__name">{this.props.role.type}</div>
-            <div className="suspectRole__traits">
+            <div className="suspectRole__name">{displayName}</div>
+            <ul className="suspectRole__traits">
                 {traits}
-            </div>
+            </ul>
         </div>;
     }
 }

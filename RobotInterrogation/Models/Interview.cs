@@ -21,7 +21,7 @@ namespace RobotInterrogation.Models
 
         public List<SuspectRole> Roles { get; } = new List<SuspectRole>();
 
-        public List<string> PrimaryQuestions { get; } = new List<string>();
-        public List<string> SecondaryQuestions { get; } = new List<string>();
+        public List<Question> PrimaryQuestions { get; } = new List<Question>();
+        public List<Question> SecondaryQuestions { get; } = new List<Question>();
     }
 }

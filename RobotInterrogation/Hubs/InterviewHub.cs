@@ -28,7 +28,7 @@ namespace RobotInterrogation.Hubs
 
         Task ShowRoleSelection(List<SuspectRole> roles);
 
-        Task ShowQuestions(List<string> primary, List<string> secondary);
+        Task ShowQuestions(List<Question> primary, List<Question> secondary);
 
         Task ShowSuspectNoteChoice(List<string> notes);
         Task WaitForSuspectNoteChoice();

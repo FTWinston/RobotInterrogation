@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { InterviewQuestion } from './elements/InterviewQuestion';
+import { IInterviewQuestion, InterviewQuestion } from './elements/InterviewQuestion';
 import './ItemGroup.css';
 
 interface IProps {
-    primary: string[],
-    secondary: string[],
+    primary: IInterviewQuestion[],
+    secondary: IInterviewQuestion[],
     waitingFor: string,
 }
 
