@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { setInterval } from 'timers';
+import './Countdown.css';
 
 interface IProps {
     duration: number,
@@ -35,9 +36,15 @@ export class Countdown extends React.PureComponent<IProps, IState> {
     }
 
     public render() {
+        const minutes = Math.floor(this.state.timeRemaining / 60);
+        let seconds = (this.state.timeRemaining - minutes * 60).toString();
+        if (seconds.length < 2) {
+            seconds = '0' + seconds;
+        }
+
         if (this.state.timeRemaining > 0) {
             return <div className="countdown">
-                {this.state.timeRemaining}s remaining
+                {minutes}:{seconds} remaining
             </div>
         }
 
