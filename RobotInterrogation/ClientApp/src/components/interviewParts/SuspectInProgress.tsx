@@ -17,9 +17,16 @@ export class SuspectInProgress extends React.PureComponent<IProps> {
             ? <div className="actionSet"><button className="btn btn-danger" onClick={this.props.terminateInterviewer}>Kill interviewer</button></div>
             : undefined;
 
+        const robotPrompt = this.props.role.type === 'ViolentRobot'
+            ? <p>You must complete 2 of the 3 tasks listed before you can kill the interviewer.</p>
+            : this.props.role.type === 'PassiveRobot'
+                ? <p>You must perform the penalty each time you violate your vulnerability.</p>
+                : undefined;
+
         return <div>
             <h2>You are the suspect.</h2>
             <p>Answer the interviewer's questions, try to convince them that you are human.</p>
+            {robotPrompt}
 
             <SuspectRole role={this.props.role} />
             <p>Penalty: {this.props.penalty}</p>

@@ -33,8 +33,8 @@ export class InterviewerInProgress extends React.PureComponent<IProps> {
             <Countdown duration={this.props.duration} />
 
             <div className="actionSet">
-                <button onClick={isHuman}>Human</button>
-                <button onClick={isRobot}>Robot</button>
+                <button onClick={isHuman}>Suspect is Human</button>
+                <button onClick={isRobot}>Suspect is a Robot</button>
             </div>
         </div>
     }
