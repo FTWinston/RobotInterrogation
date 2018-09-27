@@ -146,7 +146,7 @@ namespace RobotInterrogation.Services
         public string[] GetAllPackets()
         {
             return Configuration.Packets
-                .Select(p => p.Name)
+                .Select(p => p.Description)
                 .ToArray();
         }
 
