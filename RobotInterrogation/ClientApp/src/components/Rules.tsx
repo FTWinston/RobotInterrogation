@@ -14,7 +14,7 @@ export class Rules extends React.PureComponent {
 
             <p>This app is based on <a href="https://www.kickstarter.com/projects/tommy-maranges/inhuman-conditions-a-game-of-cops-and-robots">Inhuman Conditions</a>, a game by Tommy Manarges and Cory O'Brien whose <a href="https://www.dropbox.com/s/sagi621ht1fnu2x/Inhuman%20Conditions%20Rules%20%28Public%20File%29.pdf">rules are available here</a>. Read them before you play.</p>
 
-            <p>If you're interested, you can <a href="https://github.com/FTWinston/RobotInterrogation">view the source</a> of this project on GitHub.</p>
+            <p>If you're interested, you can <a href="https://github.com/FTWinston/RobotInterrogation">view the source</a> of this project on GitHub. Report any problems there.</p>
 
             <div className="actionSet">
                 <Link to="/">Go back</Link>

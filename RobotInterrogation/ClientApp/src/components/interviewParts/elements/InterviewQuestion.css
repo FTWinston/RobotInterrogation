@@ -14,6 +14,7 @@
 
 .interviewQuestion--secondary {
     background-color: #aaa;
+    color: #000;
 }
 
 .interviewQuestion__wrapper, .interviewQuestion__secondaryWrapper {
