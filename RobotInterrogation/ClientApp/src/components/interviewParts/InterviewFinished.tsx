@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { InterviewOutcome } from '../Interview';
+import './ActionSet.css';
 import { ISuspectRole } from './elements/SuspectRole';
 import { InterviewerHumanCorrect } from './InterviewerHumanCorrect';
 import { InterviewerHumanIncorrect } from './InterviewerHumanIncorrect';
@@ -23,7 +24,9 @@ export class InterviewFinished extends React.PureComponent<IProps> {
     public render() {
         return <div>
             {this.renderOutcome()}
-            <button onClick={this.props.playAgain} className="btn btn-secondary">Play again</button>
+            <div className="actionSet">
+                <button onClick={this.props.playAgain} className="btn btn-secondary">Play again</button>
+            </div>
         </div>
     }
 

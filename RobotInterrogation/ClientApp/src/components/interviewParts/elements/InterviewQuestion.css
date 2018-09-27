@@ -38,6 +38,10 @@
     align-self: flex-start;
 }
 
+.interviewQuestion__example {
+    font-style: italic;
+}
+
 .interviewQuestion__text::after {
     content: ', e.g.';
 }

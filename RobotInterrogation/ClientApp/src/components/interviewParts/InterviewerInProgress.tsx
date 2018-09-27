@@ -1,4 +1,5 @@
 import * as React from 'react';
+import './ActionSet.css';
 import { Countdown } from './elements/Countdown';
 import { IInterviewQuestion, InterviewQuestion } from './elements/InterviewQuestion';
 
@@ -31,8 +32,10 @@ export class InterviewerInProgress extends React.PureComponent<IProps> {
 
             <Countdown duration={this.props.duration} />
 
-            <button onClick={isHuman} className="btn btn-success">Human</button>
-            <button onClick={isRobot} className="btn btn-danger">Robot</button>
+            <div className="actionSet">
+                <button onClick={isHuman} className="btn btn-success">Human</button>
+                <button onClick={isRobot} className="btn btn-danger">Robot</button>
+            </div>
         </div>
     }
 }

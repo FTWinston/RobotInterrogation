@@ -1,4 +1,5 @@
 import * as React from 'react';
+import './ActionSet.css';
 import { Countdown } from './elements/Countdown';
 import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
 
@@ -13,7 +14,7 @@ interface IProps {
 export class SuspectInProgress extends React.PureComponent<IProps> {
     public render() {
         const terminate = this.props.role.type === 'ViolentRobot'
-            ? <button className="btn btn-danger" onClick={this.props.terminateInterviewer}>Kill interviewer</button>
+            ? <div className="actionSet"><button className="btn btn-danger" onClick={this.props.terminateInterviewer}>Kill interviewer</button></div>
             : undefined;
 
         return <div>
