@@ -1,4 +1,5 @@
 import * as React from 'react';
+import './ActionSet.css';
 import { IInterviewQuestion, InterviewQuestion } from './elements/InterviewQuestion';
 
 interface IProps {
@@ -24,7 +25,9 @@ export class InterviewerReadyToStart extends React.PureComponent<IProps> {
             <p>Penalty: {this.props.penalty}</p>
             <p>Suspect Note: {this.props.suspectNote}</p>
 
-            <button onClick={this.props.ready} className="btn btn-primary">Start the Timer</button>
+            <div className="actionSet">
+                <button onClick={this.props.ready} className="btn btn-primary">Start the Timer</button>
+            </div>
         </div>
     }
 }
