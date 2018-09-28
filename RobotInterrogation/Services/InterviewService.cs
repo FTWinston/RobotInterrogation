@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using RobotInterrogation.Models;
 using System;
 using System.Collections.Concurrent;
@@ -15,11 +17,15 @@ namespace RobotInterrogation.Services
 
         private GameConfiguration Configuration { get; }
         private IDGeneration IDs { get; }
+        private ILogger Logger { get; }
 
-        public InterviewService(IOptions<GameConfiguration> configuration, IOptions<IDGeneration> idWords)
+        public const string LogName = "Interviews";
+
+        public InterviewService(IOptions<GameConfiguration> configuration, IOptions<IDGeneration> idWords, ILoggerFactory logger)
         {
             Configuration = configuration.Value;
             IDs = idWords.Value;
+            Logger = logger.CreateLogger(LogName);
         }
 
         public string GetNewInterviewID()
@@ -226,7 +232,30 @@ namespace RobotInterrogation.Services
 
         private void LogInterview(Interview interview)
         {
-            // TODO: save this data to somewhere here ... but not the connection IDs
+            var duration = interview.Started.HasValue
+                ? DateTime.Now - interview.Started.Value
+                : TimeSpan.Zero;
+
+            var interviewData = new
+            {
+                interview.Status,
+                interview.Outcome,
+                Duration = duration,
+                Packet = interview.Packet.Name,
+                PrimaryQuestions = interview.PrimaryQuestions.Select(q => q.Challenge).ToArray(),
+                SecondaryQuestions = interview.SecondaryQuestions.Select(q => q.Challenge).ToArray(),
+                SuspectNote = interview.SuspectNotes.First(),
+                SuspectType = interview.Roles.First().Type,
+                SuspectTraits = interview.Roles.First().Traits,
+            };
+
+            var strData = JsonConvert.SerializeObject(interviewData);
+
+            Logger.LogInformation(
+                "Interview completed at {Time}: {Data}",
+                DateTime.Now,
+                strData
+            );
         }
     }
 }

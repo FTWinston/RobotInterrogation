@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace RobotInterrogation.Models
@@ -8,10 +9,10 @@ namespace RobotInterrogation.Models
         public InterviewStatus Status { get; set; } = InterviewStatus.WaitingForConnections;
         public InterviewOutcome? Outcome { get; set; }
 
-        [JsonIgnore]
+        public DateTime? Started { get; set; }
+
         public string InterviewerConnectionID { get; set; }
 
-        [JsonIgnore]
         public string SuspectConnectionID { get; set; }
 
         public List<string> Penalties { get; } = new List<string>();

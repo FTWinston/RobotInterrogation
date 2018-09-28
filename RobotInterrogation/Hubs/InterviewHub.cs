@@ -306,6 +306,7 @@ namespace RobotInterrogation.Hubs
                 .StartTimer(Configuration.Duration);
 
             interview.Status = InterviewStatus.InProgress;
+            interview.Started = DateTime.Now;
         }
 
         public async Task ConcludeInterview(bool isRobot)
