@@ -1,8 +1,18 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import { inCompatibilityMode, setCompatibilityMode } from 'src/Connectivity';
 
 export class About extends React.PureComponent {
     public render() {
+        const toggleCompatibility = () => {
+            setCompatibilityMode(!inCompatibilityMode());
+            this.forceUpdate();
+        }
+
+        const toggleText = inCompatibilityMode()
+            ? 'Disable compatibility mode'
+            : 'Enable compatibility mode';
+
         return <div>
             <h1>Robot Interrogation</h1>
 
@@ -18,6 +28,11 @@ export class About extends React.PureComponent {
 
             <div className="actionSet">
                 <Link to="/">Go back</Link>
+            </div>
+
+            <div className="compatibilityPrompt">
+                Connection problems?&nbsp;
+                <button onClick={toggleCompatibility}>{toggleText}</button>
             </div>
         </div>;
     }

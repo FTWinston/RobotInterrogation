@@ -56,3 +56,7 @@ button:active {
         max-width: 800px;
     }
 }
+
+.compatibilityPrompt {
+    margin-top: 1em;
+}

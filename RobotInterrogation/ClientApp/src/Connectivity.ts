@@ -12,7 +12,19 @@ export async function queryJson<TResponse>(url: string) {
 }
 
 export function connectSignalR(url: string) {
+    const transportType = inCompatibilityMode()
+        ? signalR.HttpTransportType.LongPolling
+        : signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.ServerSentEvents | signalR.HttpTransportType.LongPolling
+
     return new signalR.HubConnectionBuilder()
-        .withUrl(url)
+        .withUrl(url, transportType)
         .build();
+}
+
+export function setCompatibilityMode(enabled: boolean) {
+    localStorage.setItem('compatiblity', enabled ? '1' : '0');
+}
+
+export function inCompatibilityMode() {
+    return localStorage.getItem('compatiblity') === '1';
 }
