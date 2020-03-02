@@ -7,6 +7,7 @@ using RobotInterrogation.Services;
 
 namespace RobotInterrogation.Controllers
 {
+    [ApiController]
     [Route("api/[controller]")]
     public class DataController : Controller
     {
