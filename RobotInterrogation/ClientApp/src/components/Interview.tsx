@@ -23,7 +23,7 @@ import { Wait } from './interviewParts/Wait';
 import { WaitingForOpponent } from './interviewParts/WaitingForOpponent';
 import { WaitingQuestionDisplay } from './interviewParts/WaitingQuestionDisplay';
 
-export const enum InterviewStatus {
+export enum InterviewStatus {
     NotConnected,
     Disconnected,
     InvalidSession,
@@ -47,7 +47,7 @@ export const enum InterviewStatus {
     Finished,
 }
 
-export const enum InterviewOutcome {
+export enum InterviewOutcome {
     Disconnected = 0,
     CorrectlyGuessedHuman,
     WronglyGuessedHuman,
@@ -72,7 +72,7 @@ interface IState {
 }
 
 export class Interview extends React.PureComponent<RouteComponentProps<{ id: string }>, IState> {
-    private connection: signalR.HubConnection;
+    private connection?: signalR.HubConnection;
 
     constructor(props: RouteComponentProps<{ id: string }>) {
         super(props);
@@ -107,8 +107,8 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
 
             case InterviewStatus.SelectingPositions:
                 if (this.state.isInterviewer) {
-                    const confirm = () => this.connection.invoke('ConfirmPositions');
-                    const swap = () => this.connection.invoke('SwapPositions');
+                    const confirm = () => this.connection!.invoke('ConfirmPositions');
+                    const swap = () => this.connection!.invoke('SwapPositions');
 
                     return <InterviewerPositionSelection stay={confirm} swap={swap} />;
                 }
@@ -118,7 +118,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
 
             case InterviewStatus.PenaltySelection:
                 if (this.state.choice.length > 0) {
-                    const selectPenalty = (index: number) => this.connection.invoke('Select', index);
+                    const selectPenalty = (index: number) => this.connection!.invoke('Select', index);
 
                     return this.state.isInterviewer
                         ? <InterviewerPenaltySelection options={this.state.choice} action={selectPenalty} />
@@ -134,7 +134,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                 return <PenaltyDisplay role={this.state.isInterviewer ? 'interviewer' : 'suspect'} penalty={this.state.penalty} />;
 
             case InterviewStatus.PacketSelection:
-                const selectPacket = (index: number) => this.connection.invoke('Select', index);
+                const selectPacket = (index: number) => this.connection!.invoke('Select', index);
 
                 return this.state.isInterviewer
                     ? <PacketSelection options={this.state.choice} action={selectPacket} />
@@ -153,7 +153,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                 }
                 else {
                     const selectRole = (index: number) => {
-                        this.connection.invoke('Select', index);
+                        this.connection!.invoke('Select', index);
                         this.setState({
                             role: this.state.roles[index],
                             roles: [],
@@ -171,13 +171,13 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                     />;
                 }
                 else {
-                    const selectNote = (index: number) => this.connection.invoke('Select', index);
+                    const selectNote = (index: number) => this.connection!.invoke('Select', index);
                     return <SuspectNoteSelection options={this.state.choice} action={selectNote} />
                 }
 
             case InterviewStatus.ReadyToStart:
                 if (this.state.isInterviewer) {
-                    const ready = () => this.connection.invoke('StartInterview');
+                    const ready = () => this.connection!.invoke('StartInterview');
 
                     return <InterviewerReadyToStart
                         primary={this.state.primaryQuestions}
@@ -197,7 +197,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
 
             case InterviewStatus.InProgress:
                 if (this.state.isInterviewer) {
-                    const conclude = (isRobot: boolean) => this.connection.invoke('ConcludeInterview', isRobot);
+                    const conclude = (isRobot: boolean) => this.connection!.invoke('ConcludeInterview', isRobot);
 
                     return <InterviewerInProgress
                         conclude={conclude}
@@ -209,7 +209,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                     />
                 }
                 else {
-                    const terminate = () => this.connection.invoke('KillInterviewer');
+                    const terminate = () => this.connection!.invoke('KillInterviewer');
 
                     return <SuspectInProgress
                         duration={this.state.duration}
@@ -225,7 +225,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                     return <OpponentDisconnected />;
                 }
 
-                const playAgain = () => this.connection.invoke('NewInterview');
+                const playAgain = () => this.connection!.invoke('NewInterview');
 
                 return <InterviewFinished
                     isInterviewer={this.state.isInterviewer}
