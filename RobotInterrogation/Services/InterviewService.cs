@@ -163,7 +163,7 @@ namespace RobotInterrogation.Services
 
         public void AllocateRoles(Interview interview)
         {
-            AllocateRandomValues(interview.Packet.Roles, interview.Roles, 3);
+            AllocateRandomValues(interview.Packet.Roles, interview.Roles, 1);
         }
 
         public void AllocateQuestions(Interview interview)
@@ -174,7 +174,7 @@ namespace RobotInterrogation.Services
 
         public void AllocateSuspectNotes(Interview interview)
         {
-            AllocateRandomValues(Configuration.SuspectNotes, interview.SuspectNotes, 2);
+            AllocateRandomValues(Configuration.SuspectNotes, interview.SuspectNotes, 3);
         }
 
         public InterviewOutcome GuessSuspectRole(Interview interview, bool guessIsRobot)
