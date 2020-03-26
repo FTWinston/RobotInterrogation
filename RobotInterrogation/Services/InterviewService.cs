@@ -246,6 +246,7 @@ namespace RobotInterrogation.Services
                 SecondaryQuestions = interview.SecondaryQuestions.Select(q => q.Challenge).ToArray(),
                 SuspectNote = interview.SuspectNotes.First(),
                 SuspectType = interview.Roles.First().Type,
+                SuspectFault = interview.Roles.First().Fault,
                 SuspectTraits = interview.Roles.First().Traits,
             };
 

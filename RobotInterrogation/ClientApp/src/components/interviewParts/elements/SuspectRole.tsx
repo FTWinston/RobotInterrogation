@@ -3,6 +3,7 @@ import './SuspectRole.css';
 
 export interface ISuspectRole {
     type: string;
+    fault: string;
     traits: string[],
 }
 
@@ -23,7 +24,10 @@ export class SuspectRole extends React.PureComponent<IProps, {}> {
         }
 
         const traits = this.props.role.traits.map((t, i) => <li className="suspectRole__trait" key={i}>{t}</li>);
-        const displayName = this.props.role.type.replace('Robot', ' Robot');
+        let displayName = this.props.role.type.replace('Robot', ' Robot');
+        if (this.props.role.type !== "Human") {
+          displayName += `(${this.props.role.fault})`;
+		}
 
         return <div className={classes} onClick={onClick}>
             <div className="suspectRole__name">{displayName}</div>
