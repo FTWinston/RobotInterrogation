@@ -168,8 +168,8 @@ namespace RobotInterrogation.Services
 
         public void AllocateQuestions(Interview interview)
         {
-            AllocateRandomValues(interview.Packet.PrimaryQuestions, interview.PrimaryQuestions, 2);
-            AllocateRandomValues(interview.Packet.SecondaryQuestions, interview.SecondaryQuestions, 2);
+            AllocateRandomValues(interview.Packet.PrimaryQuestions, interview.PrimaryQuestions, 3);
+            AllocateRandomValues(interview.Packet.SecondaryQuestions, interview.SecondaryQuestions, 3);
         }
 
         public void AllocateSuspectNotes(Interview interview)
@@ -242,6 +242,7 @@ namespace RobotInterrogation.Services
                 interview.Outcome,
                 Duration = duration,
                 Packet = interview.Packet.Name,
+                Prompt = interview.Packet.Prompt,
                 PrimaryQuestions = interview.PrimaryQuestions.Select(q => q.Challenge).ToArray(),
                 SecondaryQuestions = interview.SecondaryQuestions.Select(q => q.Challenge).ToArray(),
                 SuspectNote = interview.SuspectNotes.First(),

@@ -24,7 +24,7 @@ namespace RobotInterrogation.Hubs
 
         Task ShowPacketChoice(string[] options);
         Task WaitForPacketChoice();
-        Task SetPacket(string packetName);
+        Task SetPacket(string packetName, string packetPrompt);
 
         Task ShowRoleSelection(List<SuspectRole> roles);
 
@@ -194,7 +194,7 @@ namespace RobotInterrogation.Hubs
             interview.Packet = Service.GetPacket(index);
 
             await Clients.Group(SessionID)
-                .SetPacket(interview.Packet.Description);
+                .SetPacket(interview.Packet.Description, interview.Packet.Prompt);
 
             interview.Status = InterviewStatus.SelectingRole;
         }

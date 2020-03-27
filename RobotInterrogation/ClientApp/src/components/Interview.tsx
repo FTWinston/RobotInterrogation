@@ -62,6 +62,7 @@ interface IState {
     outcome?: InterviewOutcome;
     choice: string[];
     packet: string;
+    prompt: string;
     penalty: string;
     primaryQuestions: IInterviewQuestion[];
     secondaryQuestions: IInterviewQuestion[];
@@ -84,6 +85,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
             packet: '',
             penalty: '',
             primaryQuestions: [],
+            prompt: '',
             roles: [],
             secondaryQuestions: [],
             status: InterviewStatus.NotConnected,
@@ -181,6 +183,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
 
                     return <InterviewerReadyToStart
                         primary={this.state.primaryQuestions}
+                        prompt={this.state.prompt}
                         secondary={this.state.secondaryQuestions}
                         suspectNote={this.state.suspectNote}
                         penalty={this.state.penalty}
@@ -203,6 +206,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                         conclude={conclude}
                         duration={this.state.duration}
                         penalty={this.state.penalty}
+                        prompt={this.state.prompt}
                         primary={this.state.primaryQuestions}
                         secondary={this.state.secondaryQuestions}
                         suspectNote={this.state.suspectNote}
@@ -267,6 +271,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                 packet: '',
                 penalty: '',
                 primaryQuestions: [],
+                prompt: '',
                 role: undefined,
                 roles: [],
                 secondaryQuestions: [],
@@ -319,9 +324,10 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
             });
         });
 
-        this.connection.on('SetPacket', (packet: string) => {
+        this.connection.on('SetPacket', (packet: string, prompt: string) => {
             this.setState({
                 packet,
+                prompt,
                 status: InterviewStatus.ShowingPacket,
             });
         });
