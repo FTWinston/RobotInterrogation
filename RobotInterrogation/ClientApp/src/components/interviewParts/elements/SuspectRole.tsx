@@ -26,7 +26,7 @@ export class SuspectRole extends React.PureComponent<IProps, {}> {
         const traits = this.props.role.traits.map((t, i) => <li className="suspectRole__trait" key={i}>{t}</li>);
         let displayName = this.props.role.type.replace('Robot', ' Robot');
         if (this.props.role.type !== "Human") {
-          displayName += `(${this.props.role.fault})`;
+          displayName += ` (${this.props.role.fault})`;
 		}
 
         return <div className={classes} onClick={onClick}>
