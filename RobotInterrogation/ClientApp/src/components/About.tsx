@@ -22,7 +22,7 @@ export class About extends React.PureComponent {
 
             <p>Robots have strange personality quirks, but then so do humans under pressure...</p>
 
-            <p>This app is based on <a href="https://www.kickstarter.com/projects/tommy-maranges/inhuman-conditions-a-game-of-cops-and-robots">Inhuman Conditions</a>, a game by Tommy Manarges and Cory O'Brien whose <a href="https://www.dropbox.com/s/kunnob8lcr9qy7k/Inhuman%20Conditions%20Rules%20%28Public%20File%29.pdf?dl=0">rules are available here</a>. Read them before you play.</p>
+            <p>This app is based on <a href="https://robots.management">Inhuman Conditions</a>, a game by Tommy Manarges and Cory O'Brien whose <a href="https://www.dropbox.com/s/9ledq11mc3nd15f/Inhuman%20Conditions%20Rulebooks%20%28Public%20File%29.pdf?dl=0">rules are available here</a>. Read them before you play.</p>
 
             <p>If you're interested, you can <a href="https://github.com/FTWinston/RobotInterrogation">view the source</a> of this project on GitHub. Report any problems there.</p>
 
