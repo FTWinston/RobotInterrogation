@@ -1,65 +1,57 @@
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import './Countdown.css';
 
 interface IProps {
     duration: number,
+    onElapsed?: () => void;
 }
 
-interface IState {
-    timeRemaining: number,
-}
+export const Countdown: React.FunctionComponent<IProps> = props => {
+    const [timeRemaining, setTimeRemaining] = useState(props.duration);
 
-export class Countdown extends React.PureComponent<IProps, IState> {
-    private interval?: NodeJS.Timer;
+    useEffect(
+        () => {
+            let interval: NodeJS.Timeout | undefined = setInterval(() => {
+                setTimeRemaining(val => {
+                    if (interval !== undefined && val <= 1) {
+                        clearInterval(interval);
+                        interval = undefined;
 
-    constructor(props: IProps) {
-        super(props);
+                        if (props.onElapsed) {
+                            props.onElapsed();
+                        }
+                    }
+                    return val - 1;
+                });
+            }, 1000);
 
-        this.state = {
-            timeRemaining: props.duration,
-        };
-    }
-
-    public componentWillMount() {
-        this.interval = setInterval(() => {
-            this.setState(state => {
-                if (state.timeRemaining <= 1) {
-                    this.stopTimer();
+            return () => {
+                if (interval !== undefined) {
+                    clearInterval(interval);
                 }
+            }
+        },
+        []
+    );
 
-                return {
-                    timeRemaining: state.timeRemaining - 1,
-                }
-            })
-        }, 1000);
-    }
-
-    public componentWillUnmount() {
-        this.stopTimer();
-    }
-
-    public render() {
-        const minutes = Math.floor(this.state.timeRemaining / 60);
-        let seconds = (this.state.timeRemaining - minutes * 60).toString();
+    if (timeRemaining > 0) {
+        const minutes = Math.floor(timeRemaining / 60);
+        let seconds = (timeRemaining - minutes * 60).toString();
         if (seconds.length < 2) {
-            seconds = '0' + seconds;
+            seconds = `0${seconds}`;
         }
 
-        if (this.state.timeRemaining > 0) {
-            return <div className="countdown">
+        return (
+            <div className="countdown">
                 {minutes}:{seconds} remaining
             </div>
-        }
+        );
+    }
 
-        return <div className="countdown countdown--expired">
+    return (
+        <div className="countdown countdown--expired">
             time expired
         </div>
-    }
-
-    private stopTimer() {
-        if (this.interval !== undefined) {
-            clearInterval(this.interval);
-            this.interval = undefined;
-        }
-    }
+    );
 }

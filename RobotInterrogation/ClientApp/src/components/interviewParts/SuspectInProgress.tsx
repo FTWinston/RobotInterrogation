@@ -2,39 +2,55 @@ import * as React from 'react';
 import './ActionSet.css';
 import { Countdown } from './elements/Countdown';
 import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
+import { useState } from 'react';
 
 interface IProps {
-    suspectNote: string,
-    penalty: string,
-    role: ISuspectRole,
-    duration: number,
-    terminateInterviewer: () => void,
+    suspectNote: string;
+    penalty: string;
+    role: ISuspectRole;
+    duration: number;
+    terminateInterviewer: () => void;
 }
 
-export class SuspectInProgress extends React.PureComponent<IProps> {
-    public render() {
-        const terminate = this.props.role.type === 'ViolentRobot'
-            ? <div className="actionSet"><button className="btn btn-danger" onClick={this.props.terminateInterviewer}>Kill interviewer</button></div>
+export const SuspectInProgress: React.FunctionComponent<IProps> = props => {
+    const terminate = props.role.type === 'ViolentRobot'
+        ? (
+            <div className="actionSet">
+                <button onClick={props.terminateInterviewer}>Kill interviewer</button>
+            </div>
+        )
+        : undefined;
+    
+    const robotPrompt = props.role.type === 'ViolentRobot'
+        ? <p>You must complete 2 of the 3 tasks listed below, <em>and then wait 10 seconds</em> before you can kill the interviewer.</p>
+        : props.role.type === 'PassiveRobot'
+            ? <p>You must perform the penalty each time you violate your vulnerability.</p>
             : undefined;
 
-        const robotPrompt = this.props.role.type === 'ViolentRobot'
-            ? <p>You must complete 2 of the 3 tasks listed before you can kill the interviewer.</p>
-            : this.props.role.type === 'PassiveRobot'
-                ? <p>You must perform the penalty each time you violate your vulnerability.</p>
-                : undefined;
+    const [elapsed, setElapsed] = useState(false);
 
-        return <div>
-            <h2>You are the suspect.</h2>
-            <p>Answer the interviewer's questions, try to convince them that you are human.</p>
-            {robotPrompt}
+    const elapsedPrompt = elapsed
+        ? <p>The interviewer can ask one final question.</p>
+        : <p/>;
 
-            <SuspectRole role={this.props.role} />
-            <p>Penalty: {this.props.penalty}</p>
-            <p>Your background: {this.props.suspectNote}</p>
+    return <div>
+        <h2>You are the suspect.</h2>
+        <p>Answer the interviewer's questions, try to convince them that you are human.</p>
+        {robotPrompt}
 
-            <Countdown duration={this.props.duration} />
+        <SuspectRole role={props.role} />
+        
+        <p>Penalty: {props.penalty}</p>
+        
+        <p>Your background: {props.suspectNote}</p>
 
-            {terminate}
-        </div>
-    }
+        <Countdown
+            duration={props.duration}
+            onElapsed={() => setElapsed(true)}
+        />
+
+        {elapsedPrompt}
+
+        {terminate}
+    </div>
 }

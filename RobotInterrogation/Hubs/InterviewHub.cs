@@ -297,6 +297,10 @@ namespace RobotInterrogation.Hubs
             var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.InProgress);
             EnsureIsInterviewer(interview);
 
+            // Cannot record the suspect as human before the time has elapsed.
+            if (!isRobot && !Service.HasTimeElapsed(interview))
+                return;
+
             var outcome = Service.GuessSuspectRole(interview, isRobot);
 
             await Clients

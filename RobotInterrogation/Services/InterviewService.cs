@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using RobotInterrogation.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RobotInterrogation.Services
 {
@@ -124,6 +125,15 @@ namespace RobotInterrogation.Services
                 throw new Exception($"Interview doesn't have the required status {status} - it is actually {interview.Status}");
 
             return interview;
+        }
+
+        public bool HasTimeElapsed(Interview interview)
+        {
+            if (!interview.Started.HasValue)
+                return false;
+
+            return interview.Started.Value + TimeSpan.FromSeconds(Configuration.Duration)
+                <= DateTime.Now;
         }
 
         private void AllocateRandomValues<T>(IList<T> source, IList<T> destination, int targetNum)
@@ -256,7 +266,9 @@ namespace RobotInterrogation.Services
                 SuspectTraits = interview.Role.Traits,
             };
 
-            var strData = JsonConvert.SerializeObject(interviewData);
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new JsonStringEnumConverter());
+            var strData = JsonSerializer.Serialize(interviewData, options);
 
             Logger.LogInformation(
                 "Interview completed at {Time}: {Data}",

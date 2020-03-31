@@ -10,7 +10,7 @@ interface IProps {
 export class SuspectReadyToStart extends React.PureComponent<IProps> {
     public render() {
         const robotPrompt = this.props.role.type === 'ViolentRobot'
-            ? <p>You must complete 2 of the 3 tasks listed before you can kill the interviewer.</p>
+            ? <p>You must complete 2 of the 3 tasks listed below, <em>and then wait 10 seconds</em> before you can kill the interviewer.</p>
             : this.props.role.type === 'PassiveRobot'
                 ? <p>You must perform the penalty each time you violate your vulnerability.</p>
                 : undefined;
