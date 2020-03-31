@@ -30,7 +30,7 @@ export class InterviewerInProgress extends React.PureComponent<IProps> {
                 {secondary}
             </div>
             <p>Penalty: {this.props.penalty}</p>
-            <p>Suspect Identity: {this.props.suspectNote}</p>
+            <p>Suspect background: {this.props.suspectNote}</p>
 
             <Countdown duration={this.props.duration} />
 

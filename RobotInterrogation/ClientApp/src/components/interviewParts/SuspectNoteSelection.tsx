@@ -15,7 +15,7 @@ export class SuspectNoteSelection extends React.PureComponent<IProps> {
 
             <SuspectRole role={this.props.role} />
 
-            <p>Select one of the following suspect notes:</p>
+            <p>Select one of the following backgrounds:</p>
 
             {renderOptions(this.props.options, this.props.action)}
         </div>

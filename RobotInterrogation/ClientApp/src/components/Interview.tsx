@@ -146,7 +146,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                     return <WaitingQuestionDisplay
                         primary={this.state.primaryQuestions}
                         secondary={this.state.secondaryQuestions}
-                        waitingFor="character note"
+                        waitingFor="background"
                     />;
                 }
                 else {

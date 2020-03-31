@@ -22,7 +22,7 @@ export class SuspectReadyToStart extends React.PureComponent<IProps> {
 
             <SuspectRole role={this.props.role} />
             <p>Penalty: {this.props.penalty}</p>
-            <p>Suspect Note: {this.props.suspectNote}</p>
+            <p>Suspect background: {this.props.suspectNote}</p>
         </div>
     }
 }

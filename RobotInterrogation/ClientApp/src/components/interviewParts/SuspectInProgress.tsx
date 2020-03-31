@@ -30,7 +30,7 @@ export class SuspectInProgress extends React.PureComponent<IProps> {
 
             <SuspectRole role={this.props.role} />
             <p>Penalty: {this.props.penalty}</p>
-            <p>Suspect Note: {this.props.suspectNote}</p>
+            <p>Your background: {this.props.suspectNote}</p>
 
             <Countdown duration={this.props.duration} />
 
