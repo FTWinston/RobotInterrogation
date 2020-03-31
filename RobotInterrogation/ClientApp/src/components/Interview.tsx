@@ -14,7 +14,6 @@ import { OpponentDisconnected } from './interviewParts/OpponentDisconnected';
 import { PacketDisplay } from './interviewParts/PacketDisplay';
 import { PacketSelection } from './interviewParts/PacketSelection';
 import { PenaltyDisplay } from './interviewParts/PenaltyDisplay';
-import { RoleSelection } from './interviewParts/RoleSelection';
 import { SuspectInProgress } from './interviewParts/SuspectInProgress';
 import { SuspectNoteSelection } from './interviewParts/SuspectNoteSelection';
 import { SuspectPenaltySelection } from './interviewParts/SuspectPenaltySelection';
@@ -38,7 +37,6 @@ export enum InterviewStatus {
     PacketSelection,
     ShowingPacket,
 
-    RoleSelection,
     SuspectNoteSelection,
 
     ReadyToStart,
@@ -68,7 +66,6 @@ interface IState {
     secondaryQuestions: IInterviewQuestion[];
     suspectNote: string;
     role?: ISuspectRole;
-    roles: ISuspectRole[];
     duration: number;
 }
 
@@ -86,7 +83,6 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
             penalty: '',
             primaryQuestions: [],
             prompt: '',
-            roles: [],
             secondaryQuestions: [],
             status: InterviewStatus.NotConnected,
             suspectNote: '',
@@ -145,25 +141,6 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
             case InterviewStatus.ShowingPacket:
                 return <PacketDisplay role={this.state.isInterviewer ? 'interviewer' : 'suspect'} packet={this.state.packet} />;
 
-            case InterviewStatus.RoleSelection:
-                if (this.state.isInterviewer) {
-                    return <WaitingQuestionDisplay
-                        primary={this.state.primaryQuestions}
-                        secondary={this.state.secondaryQuestions}
-                        waitingFor="role"
-                    />;
-                }
-                else {
-                    const selectRole = (index: number) => {
-                        this.connection!.invoke('Select', index);
-                        this.setState({
-                            role: this.state.roles[index],
-                            roles: [],
-                        });
-                    }
-                    return <RoleSelection options={this.state.roles} action={selectRole} />
-                }
-
             case InterviewStatus.SuspectNoteSelection:
                 if (this.state.isInterviewer) {
                     return <WaitingQuestionDisplay
@@ -174,7 +151,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                 }
                 else {
                     const selectNote = (index: number) => this.connection!.invoke('Select', index);
-                    return <SuspectNoteSelection options={this.state.choice} action={selectNote} />
+                    return <SuspectNoteSelection options={this.state.choice} role={this.state.role!} action={selectNote} />
                 }
 
             case InterviewStatus.ReadyToStart:
@@ -273,7 +250,6 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                 primaryQuestions: [],
                 prompt: '',
                 role: undefined,
-                roles: [],
                 secondaryQuestions: [],
                 status: InterviewStatus.SelectingPositions,
                 suspectNote: '',
@@ -332,10 +308,9 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
             });
         });
 
-        this.connection.on('ShowRoleSelection', (options: ISuspectRole[]) => {
+        this.connection.on('ShowRole', (role: ISuspectRole) => {
             this.setState({
-                roles: options,
-                status: InterviewStatus.RoleSelection, 
+                role,
             });
         });
 
@@ -343,7 +318,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
             this.setState({
                 primaryQuestions: primary,
                 secondaryQuestions: secondary,
-                status: InterviewStatus.RoleSelection,
+                status: InterviewStatus.SuspectNoteSelection,
             });
         });
 

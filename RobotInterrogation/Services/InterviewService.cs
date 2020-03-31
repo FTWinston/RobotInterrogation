@@ -161,9 +161,13 @@ namespace RobotInterrogation.Services
             return Configuration.Packets[index];
         }
 
-        public void AllocateRoles(Interview interview)
+        public void AllocateRole(Interview interview)
         {
-            AllocateRandomValues(interview.Packet.Roles, interview.Roles, 1);
+            var roles = new List<SuspectRole>();
+
+            AllocateRandomValues(interview.Packet.Roles, roles, 1);
+
+            interview.Role = roles.First();
         }
 
         public void AllocateQuestions(Interview interview)
@@ -179,7 +183,8 @@ namespace RobotInterrogation.Services
 
         public InterviewOutcome GuessSuspectRole(Interview interview, bool guessIsRobot)
         {
-            var actualRole = interview.Roles[0].Type;
+            var actualRole = interview.Role.Type;
+
             InterviewOutcome outcome;
 
             if (guessIsRobot)
@@ -205,7 +210,7 @@ namespace RobotInterrogation.Services
 
         public void KillInterviewer(Interview interview)
         {
-            if (interview.Roles[0].Type != SuspectRoleType.ViolentRobot)
+            if (interview.Role.Type != SuspectRoleType.ViolentRobot)
             {
                 throw new Exception("Suspect is not a violent robot, so cannot kill interviewer");
             }
@@ -246,9 +251,9 @@ namespace RobotInterrogation.Services
                 PrimaryQuestions = interview.PrimaryQuestions.Select(q => q.Challenge).ToArray(),
                 SecondaryQuestions = interview.SecondaryQuestions.Select(q => q.Challenge).ToArray(),
                 SuspectNote = interview.SuspectNotes.First(),
-                SuspectType = interview.Roles.First().Type,
-                SuspectFault = interview.Roles.First().Fault,
-                SuspectTraits = interview.Roles.First().Traits,
+                SuspectType = interview.Role.Type,
+                SuspectFault = interview.Role.Fault,
+                SuspectTraits = interview.Role.Traits,
             };
 
             var strData = JsonConvert.SerializeObject(interviewData);
