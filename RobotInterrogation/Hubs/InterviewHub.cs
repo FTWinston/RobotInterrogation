@@ -26,7 +26,7 @@ namespace RobotInterrogation.Hubs
         Task WaitForPacketChoice();
         Task SetPacket(string packetName, string packetPrompt);
 
-        Task ShowRoleSelection(List<SuspectRole> roles);
+        Task ShowRole(SuspectRole role);
 
         Task ShowQuestions(List<Question> primary, List<Question> secondary);
 
@@ -169,15 +169,11 @@ namespace RobotInterrogation.Hubs
 
                 await Task.Delay(3000);
 
-                await ShowRoleSelection(interview);
+                await SetSuspectRole(interview);
                 await ShowQuestions(interview);
-            }
-            else if (interview.Status == InterviewStatus.SelectingRole)
-            {
-                EnsureIsSuspect(interview);
-                AllocateRole(interview, index);
-
                 await ShowSuspectNotes(interview);
+
+                interview.Status = InterviewStatus.SelectingSuspectNote;
             }
             else if (interview.Status == InterviewStatus.SelectingSuspectNote)
             {
@@ -195,28 +191,15 @@ namespace RobotInterrogation.Hubs
 
             await Clients.Group(SessionID)
                 .SetPacket(interview.Packet.Description, interview.Packet.Prompt);
-
-            interview.Status = InterviewStatus.SelectingRole;
         }
 
-        private async Task ShowRoleSelection(Interview interview)
+        private async Task SetSuspectRole(Interview interview)
         {
-            Service.AllocateRoles(interview);
+            Service.AllocateRole(interview);
 
             await Clients
                 .Client(interview.SuspectConnectionID)
-                .ShowRoleSelection(interview.Roles);
-        }
-
-        private static void AllocateRole(Interview interview, int index)
-        {
-            var role = interview.Roles[index];
-
-            for (int i = interview.Roles.Count - 1; i >= 0; i--)
-            {
-                if (i != index)
-                    interview.Roles.RemoveAt(i);
-            }
+                .ShowRole(interview.Role);
         }
 
         private async Task ShowQuestions(Interview interview)
@@ -278,11 +261,11 @@ namespace RobotInterrogation.Hubs
             interview.Status = InterviewStatus.SelectingSuspectNote;
 
             await Clients
-                .Caller
+                .Client(interview.SuspectConnectionID)
                 .ShowSuspectNoteChoice(interview.SuspectNotes);
 
             await Clients
-                .GroupExcept(SessionID, Context.ConnectionId)
+                .GroupExcept(SessionID, interview.SuspectConnectionID)
                 .WaitForSuspectNoteChoice();
         }
 
@@ -318,7 +301,7 @@ namespace RobotInterrogation.Hubs
 
             await Clients
                 .Group(SessionID)
-                .EndGame((int)outcome, interview.Roles[0]);
+                .EndGame((int)outcome, interview.Role);
         }
 
         public async Task KillInterviewer()
@@ -330,7 +313,7 @@ namespace RobotInterrogation.Hubs
 
             await Clients
                 .Group(SessionID)
-                .EndGame((int)InterviewOutcome.KilledInterviewer, interview.Roles[0]);
+                .EndGame((int)InterviewOutcome.KilledInterviewer, interview.Role);
         }
 
         public async Task NewInterview()
