@@ -1,9 +1,6 @@
 import * as React from 'react';
 import { Redirect, RouteComponentProps } from 'react-router';
-import { connectSignalR } from '../Connectivity';
 import { Disconnected } from './interviewParts/Disconnected';
-import { IInterviewQuestion } from './interviewParts/elements/InterviewQuestion';
-import { ISuspectRole } from './interviewParts/elements/SuspectRole';
 import { InterviewerInProgress } from './interviewParts/InterviewerInProgress';
 import { InterviewerPenaltySelection } from './interviewParts/InterviewerPenaltySelection';
 import { InterviewerPositionSelection } from './interviewParts/InterviewerPositionSelection';
@@ -21,368 +18,165 @@ import { SuspectReadyToStart } from './interviewParts/SuspectReadyToStart';
 import { Wait } from './interviewParts/Wait';
 import { WaitingForOpponent } from './interviewParts/WaitingForOpponent';
 import { WaitingQuestionDisplay } from './interviewParts/WaitingQuestionDisplay';
+import { InterviewStatus, InterviewOutcome, interviewReducer, initialState, InterviewAction } from './interviewReducer';
+import { useReducer, useEffect, useState } from 'react';
+import { connectInterview } from './connectInterview';
 
-export enum InterviewStatus {
-    NotConnected,
-    Disconnected,
-    InvalidSession,
-    WaitingForOpponent,
+export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string }>> = props => {
+    const [state, dispatch] = useReducer(interviewReducer, initialState);
 
-    SelectingPositions,
-    RoleConfirmed,
+    const [connection, setConnection] = useState<signalR.HubConnection>();
 
-    PenaltySelection,
-    ShowingPenalty,
+    useEffect(
+        () => {
+            const connect = async () => {
+                const newConnection = await connectInterview(props.match.params.id, dispatch);
+                setConnection(newConnection);
+            }
 
-    PacketSelection,
-    ShowingPacket,
+            connect();
+        },
+        []
+    );
 
-    SuspectNoteSelection,
+    switch (state.status) {
+        case InterviewStatus.InvalidSession:
+            return <Redirect to="/" />;
 
-    ReadyToStart,
-    InProgress,
+        case InterviewStatus.NotConnected:
+            return <NotYetConnected />;
 
-    Finished,
-}
+        case InterviewStatus.Disconnected:
+            return <Disconnected />;
 
-export enum InterviewOutcome {
-    Disconnected = 0,
-    CorrectlyGuessedHuman,
-    WronglyGuessedHuman,
-    CorrectlyGuessedRobot,
-    WronglyGuessedRobot,
-    KilledInterviewer,
-}
+        case InterviewStatus.WaitingForOpponent:
+            return <WaitingForOpponent interviewID={props.match.params.id} />;
 
-interface IState {
-    isInterviewer: boolean;
-    status: InterviewStatus;
-    outcome?: InterviewOutcome;
-    choice: string[];
-    packet: string;
-    prompt: string;
-    penalty: string;
-    primaryQuestions: IInterviewQuestion[];
-    secondaryQuestions: IInterviewQuestion[];
-    suspectNote: string;
-    role?: ISuspectRole;
-    duration: number;
-}
+        case InterviewStatus.SelectingPositions:
+            if (state.isInterviewer) {
+                const confirm = () => connection!.invoke('ConfirmPositions');
+                const swap = () => connection!.invoke('SwapPositions');
 
-export class Interview extends React.PureComponent<RouteComponentProps<{ id: string }>, IState> {
-    private connection?: signalR.HubConnection;
-
-    constructor(props: RouteComponentProps<{ id: string }>) {
-        super(props);
-
-        this.state = {
-            choice: [],
-            duration: 0,
-            isInterviewer: false,
-            packet: '',
-            penalty: '',
-            primaryQuestions: [],
-            prompt: '',
-            secondaryQuestions: [],
-            status: InterviewStatus.NotConnected,
-            suspectNote: '',
-        };
-    }
-
-    public render() {
-        switch (this.state.status) {
-            case InterviewStatus.InvalidSession:
-                return <Redirect to="/" />;
-
-            case InterviewStatus.NotConnected:
-                return <NotYetConnected />;
-
-            case InterviewStatus.Disconnected:
-                return <Disconnected />;
-
-            case InterviewStatus.WaitingForOpponent:
-                return <WaitingForOpponent interviewID={this.props.match.params.id} />;
-
-            case InterviewStatus.SelectingPositions:
-                if (this.state.isInterviewer) {
-                    const confirm = () => this.connection!.invoke('ConfirmPositions');
-                    const swap = () => this.connection!.invoke('SwapPositions');
-
-                    return <InterviewerPositionSelection stay={confirm} swap={swap} />;
-                }
-                else {
-                    return <Wait role="suspect" waitFor="the interviewer to confirm your respective roles" />;
-                }
-
-            case InterviewStatus.PenaltySelection:
-                if (this.state.choice.length > 0) {
-                    const selectPenalty = (index: number) => this.connection!.invoke('Select', index);
-
-                    return this.state.isInterviewer
-                        ? <InterviewerPenaltySelection options={this.state.choice} action={selectPenalty} />
-                        : <SuspectPenaltySelection options={this.state.choice} action={selectPenalty} />
-                }
-                else {
-                    return this.state.isInterviewer
-                        ? <Wait role="interviewer" waitFor="the suspect to choose a penalty" />
-                        : <Wait role="suspect" waitFor="the interviewer to discard a penalty" />;
-                }
-
-            case InterviewStatus.ShowingPenalty:
-                return <PenaltyDisplay role={this.state.isInterviewer ? 'interviewer' : 'suspect'} penalty={this.state.penalty} />;
-
-            case InterviewStatus.PacketSelection:
-                const selectPacket = (index: number) => this.connection!.invoke('Select', index);
-
-                return this.state.isInterviewer
-                    ? <PacketSelection options={this.state.choice} action={selectPacket} />
-                    : <Wait role="suspect" waitFor="the interviewer select an interview packet" />;
-
-            case InterviewStatus.ShowingPacket:
-                return <PacketDisplay role={this.state.isInterviewer ? 'interviewer' : 'suspect'} packet={this.state.packet} />;
-
-            case InterviewStatus.SuspectNoteSelection:
-                if (this.state.isInterviewer) {
-                    return <WaitingQuestionDisplay
-                        primary={this.state.primaryQuestions}
-                        secondary={this.state.secondaryQuestions}
-                        waitingFor="background"
-                    />;
-                }
-                else {
-                    const selectNote = (index: number) => this.connection!.invoke('Select', index);
-                    return <SuspectBackgroundSelection options={this.state.choice} role={this.state.role!} action={selectNote} />
-                }
-
-            case InterviewStatus.ReadyToStart:
-                if (this.state.isInterviewer) {
-                    const ready = () => this.connection!.invoke('StartInterview');
-
-                    return <InterviewerReadyToStart
-                        primary={this.state.primaryQuestions}
-                        prompt={this.state.prompt}
-                        secondary={this.state.secondaryQuestions}
-                        suspectNote={this.state.suspectNote}
-                        penalty={this.state.penalty}
-                        ready={ready}
-                    />
-                }
-                else {
-                    return <SuspectReadyToStart
-                        role={this.state.role!}
-                        suspectNote={this.state.suspectNote}
-                        penalty={this.state.penalty}
-                    />
-                }
-
-            case InterviewStatus.InProgress:
-                if (this.state.isInterviewer) {
-                    const conclude = (isRobot: boolean) => this.connection!.invoke('ConcludeInterview', isRobot);
-
-                    return <InterviewerInProgress
-                        conclude={conclude}
-                        duration={this.state.duration}
-                        penalty={this.state.penalty}
-                        prompt={this.state.prompt}
-                        primary={this.state.primaryQuestions}
-                        secondary={this.state.secondaryQuestions}
-                        suspectNote={this.state.suspectNote}
-                    />
-                }
-                else {
-                    const terminate = () => this.connection!.invoke('KillInterviewer');
-
-                    return <SuspectInProgress
-                        duration={this.state.duration}
-                        penalty={this.state.penalty}
-                        role={this.state.role!}
-                        suspectNote={this.state.suspectNote}
-                        terminateInterviewer={terminate}
-                    />
-                }
-
-            case InterviewStatus.Finished:
-                if (this.state.outcome! === InterviewOutcome.Disconnected) {
-                    return <OpponentDisconnected />;
-                }
-
-                const playAgain = () => this.connection!.invoke('NewInterview');
-
-                return <InterviewFinished
-                    isInterviewer={this.state.isInterviewer}
-                    role={this.state.role!}
-                    outcome={this.state.outcome!}
-                    playAgain={playAgain}
-                />
-
-            default:
-                return <div>Unknown status</div>;
-        }
-    }
-
-    public componentWillMount() {
-        this.connect();
-    }
-
-    private async connect() {
-        this.connection = connectSignalR('/hub/Interview');
-
-        this.connection.on('SetRole', (isInterviewer: boolean) => {
-            this.setState({
-                isInterviewer,
-            });
-        });
-
-        this.connection.on('SetWaitingForPlayer', () => {
-            this.setState({
-                status: InterviewStatus.WaitingForOpponent,
-            });
-        });
-
-        this.connection.on('SetPlayersPresent', () => {
-            this.setState({
-                // clear any data from previous game
-                choice: [],
-                duration: 0,
-                outcome: undefined,
-                packet: '',
-                penalty: '',
-                primaryQuestions: [],
-                prompt: '',
-                role: undefined,
-                secondaryQuestions: [],
-                status: InterviewStatus.SelectingPositions,
-                suspectNote: '',
-            });
-        });
-
-        this.connection.on('SwapPositions', () => {
-            this.setState(state => {
-                return {
-                    isInterviewer: !state.isInterviewer,
-                }
-            });
-        });
-
-        this.connection.on('ShowPenaltyChoice', (options: string[]) => {
-            this.setState({
-                choice: options,
-                status: InterviewStatus.PenaltySelection,
-            });
-        });
-
-        this.connection.on('WaitForPenaltyChoice', () => {
-            this.setState({
-                choice: [],
-                status: InterviewStatus.PenaltySelection,
-            });
-        });
-
-        this.connection.on('SetPenalty', (penalty: string) => {
-            this.setState({
-                choice: [],
-                penalty,
-                status: InterviewStatus.ShowingPenalty,
-            });
-        });
-
-        this.connection.on('ShowPacketChoice', (options: string[]) => {
-            this.setState({
-                choice: options,
-                status: InterviewStatus.PacketSelection,
-            });
-        });
-
-        this.connection.on('WaitForPacketChoice', () => {
-            this.setState({
-                choice: [],
-                status: InterviewStatus.PacketSelection,
-            });
-        });
-
-        this.connection.on('SetPacket', (packet: string, prompt: string) => {
-            this.setState({
-                packet,
-                prompt,
-                status: InterviewStatus.ShowingPacket,
-            });
-        });
-
-        this.connection.on('ShowRole', (role: ISuspectRole) => {
-            this.setState({
-                role,
-            });
-        });
-
-        this.connection.on('ShowQuestions', (primary: IInterviewQuestion[], secondary: IInterviewQuestion[]) => {
-            this.setState({
-                primaryQuestions: primary,
-                secondaryQuestions: secondary,
-                status: InterviewStatus.SuspectNoteSelection,
-            });
-        });
-
-        this.connection.on('ShowSuspectNoteChoice', (options: string[]) => {
-            this.setState({
-                choice: options,
-                status: InterviewStatus.SuspectNoteSelection,
-            });
-        });
-
-        this.connection.on('WaitForSuspectNoteChoice', () => {
-            this.setState({
-                choice: [],
-                status: InterviewStatus.SuspectNoteSelection,
-            });
-        });
-
-        this.connection.on('SetSuspectNote', (note: string) => {
-            this.setState({
-                status: InterviewStatus.ReadyToStart,
-                suspectNote: note,
-            });
-        });
-
-        this.connection.on('StartTimer', (duration: number) => {
-            this.setState({
-                duration,
-                status: InterviewStatus.InProgress,
-            });
-        })
-
-        this.connection.on('EndGame', (outcome: InterviewOutcome, role: ISuspectRole) => {
-            this.setState({
-                outcome,
-                role,
-                status: InterviewStatus.Finished,
-            });
-        })
-
-        this.connection.onclose((error?: Error) => {
-            /*
-            if (error !== undefined) {
-                console.log('Connection error:', error);
+                return <InterviewerPositionSelection stay={confirm} swap={swap} />;
             }
             else {
-                console.log('Unspecified connection error');
+                return <Wait role="suspect" waitFor="the interviewer to confirm your respective roles" />;
             }
-            */
-            
-            this.setState({
-                status: InterviewStatus.Disconnected,
-            });
-        });
 
-        await this.connection.start();
+        case InterviewStatus.PenaltySelection:
+            if (state.choice.length > 0) {
+                const selectPenalty = (index: number) => connection!.invoke('Select', index);
 
-        const ok = await this.connection.invoke('Join', this.props.match.params.id)
+                return state.isInterviewer
+                    ? <InterviewerPenaltySelection options={state.choice} action={selectPenalty} />
+                    : <SuspectPenaltySelection options={state.choice} action={selectPenalty} />
+            }
+            else {
+                return state.isInterviewer
+                    ? <Wait role="interviewer" waitFor="the suspect to choose a penalty" />
+                    : <Wait role="suspect" waitFor="the interviewer to discard a penalty" />;
+            }
 
-        if (!ok) {
-            this.setState({
-                status: InterviewStatus.InvalidSession,
-            });
+        case InterviewStatus.ShowingPenalty:
+            return <PenaltyDisplay role={state.isInterviewer ? 'interviewer' : 'suspect'} penalty={state.penalty} />;
 
-            await this.connection.stop();
-        }
+        case InterviewStatus.PacketSelection:
+            const selectPacket = (index: number) => connection!.invoke('Select', index);
+
+            return state.isInterviewer
+                ? <PacketSelection options={state.choice} action={selectPacket} />
+                : <Wait role="suspect" waitFor="the interviewer select an interview packet" />;
+
+        case InterviewStatus.ShowingPacket:
+            return <PacketDisplay role={state.isInterviewer ? 'interviewer' : 'suspect'} packet={state.packet} />;
+
+        case InterviewStatus.BackgroundSelection:
+            if (state.isInterviewer) {
+                return (
+                    <WaitingQuestionDisplay
+                        primary={state.primaryQuestions}
+                        secondary={state.secondaryQuestions}
+                        waitingFor="background"
+                    />
+                );
+            }
+            else {
+                const selectNote = (index: number) => connection!.invoke('Select', index);
+                return <SuspectBackgroundSelection options={state.choice} role={state.role!} action={selectNote} />
+            }
+
+        case InterviewStatus.ReadyToStart:
+            if (state.isInterviewer) {
+                const ready = () => connection!.invoke('StartInterview');
+
+                return (
+                    <InterviewerReadyToStart
+                        primary={state.primaryQuestions}
+                        prompt={state.prompt}
+                        secondary={state.secondaryQuestions}
+                        suspectNote={state.suspectNote}
+                        penalty={state.penalty}
+                        ready={ready}
+                    />
+                );
+            }
+            else {
+                return (
+                    <SuspectReadyToStart
+                        role={state.role!}
+                        suspectNote={state.suspectNote}
+                        penalty={state.penalty}
+                    />
+                );
+            }
+
+        case InterviewStatus.InProgress:
+            if (state.isInterviewer) {
+                const conclude = (isRobot: boolean) => connection!.invoke('ConcludeInterview', isRobot);
+
+                return (
+                    <InterviewerInProgress
+                        conclude={conclude}
+                        duration={state.duration}
+                        penalty={state.penalty}
+                        prompt={state.prompt}
+                        primary={state.primaryQuestions}
+                        secondary={state.secondaryQuestions}
+                        suspectNote={state.suspectNote}
+                    />
+                );
+            }
+            else {
+                const terminate = () => connection!.invoke('KillInterviewer');
+
+                return (
+                    <SuspectInProgress
+                        duration={state.duration}
+                        penalty={state.penalty}
+                        role={state.role!}
+                        suspectNote={state.suspectNote}
+                        terminateInterviewer={terminate}
+                    />
+                );
+            }
+
+        case InterviewStatus.Finished:
+            if (state.outcome! === InterviewOutcome.Disconnected) {
+                return <OpponentDisconnected />;
+            }
+
+            const playAgain = () => connection!.invoke('NewInterview');
+
+            return (
+                <InterviewFinished
+                    isInterviewer={state.isInterviewer}
+                    role={state.role!}
+                    outcome={state.outcome!}
+                    playAgain={playAgain}
+                />
+            );
+
+        default:
+            return <div>Unknown status</div>;
     }
 }

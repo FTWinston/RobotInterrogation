@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { InterviewOutcome } from '../Interview';
+import { InterviewOutcome } from '../interviewReducer';
 import './ActionSet.css';
 import { ISuspectRole } from './elements/SuspectRole';
 import { InterviewerHumanCorrect } from './InterviewerHumanCorrect';
