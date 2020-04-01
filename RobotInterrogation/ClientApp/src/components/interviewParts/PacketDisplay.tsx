@@ -6,13 +6,13 @@ interface IProps {
     packet: string;
 }
 
-export class PacketDisplay extends React.PureComponent<IProps> {
-    public render() {
-        return <div>
-            <h2>You are the {this.props.role}.</h2>
+export const PacketDisplay: React.FunctionComponent<IProps> = props => {
+    return (
+        <div>
+            <h2>You are the {props.role}.</h2>
 
             <p>The chosen interview packet is:</p>
-            <p className="valueDisplay">{this.props.packet}</p>
+            <p className="valueDisplay">{props.packet}</p>
         </div>
-    }
+    )
 }

@@ -5,11 +5,11 @@ interface IProps {
     waitFor: string,
 }
 
-export class Wait extends React.PureComponent<IProps> {
-    public render() {
-        return <div>
-            <h2>You are the {this.props.role}.</h2>
-            <p>Wait for {this.props.waitFor}.</p>
+export const Wait: React.FunctionComponent<IProps> = props => {
+    return (
+        <div>
+            <h2>You are the {props.role}.</h2>
+            <p>Wait for {props.waitFor}.</p>
         </div>
-    }
+    );
 }

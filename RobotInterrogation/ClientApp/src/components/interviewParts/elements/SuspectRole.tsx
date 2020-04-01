@@ -12,28 +12,28 @@ interface IProps {
     onClick?: () => void;
 }
 
-export class SuspectRole extends React.PureComponent<IProps, {}> {
-    public render() {
-        const onClick = this.props.onClick !== undefined
-            ? () => this.props.onClick!()
-            : undefined;
+export const SuspectRole: React.FunctionComponent<IProps> = props => {
+    const onClick = props.onClick !== undefined
+        ? () => props.onClick!()
+        : undefined;
 
-        let classes = 'suspectRole suspectRole--' + this.props.role.type;
-        if (this.props.onClick) {
-            classes += ' suspectRole--selectable';
-        }
+    let classes = 'suspectRole suspectRole--' + props.role.type;
+    if (props.onClick) {
+        classes += ' suspectRole--selectable';
+    }
 
-        const traits = this.props.role.traits.map((t, i) => <li className="suspectRole__trait" key={i}>{t}</li>);
-        let displayName = this.props.role.type.replace('Robot', ' Robot');
-        if (this.props.role.type !== "Human") {
-          displayName += ` (${this.props.role.fault})`;
-		}
+    const traits = props.role.traits.map((t, i) => <li className="suspectRole__trait" key={i}>{t}</li>);
+    let displayName = props.role.type.replace('Robot', ' Robot');
+    if (props.role.type !== "Human") {
+        displayName += ` (${props.role.fault})`;
+    }
 
-        return <div className={classes} onClick={onClick}>
+    return (
+        <div className={classes} onClick={onClick}>
             <div className="suspectRole__name">{displayName}</div>
             <ul className="suspectRole__traits">
                 {traits}
             </ul>
-        </div>;
-    }
+        </div>
+    )
 }

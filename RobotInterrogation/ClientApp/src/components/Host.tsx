@@ -1,35 +1,29 @@
 import * as React from 'react';
 import { Redirect } from 'react-router';
 import { queryString } from '../Connectivity';
+import { useState, useEffect } from 'react';
 
-interface IState {
-    interviewID?: string;
-}
-
-export class Host extends React.PureComponent<{}, IState> {
-    constructor(props: {}) {
-        super(props);
-        this.state = {};
+export const Host: React.FunctionComponent = () => {
+    const [interviewId, setInterviewId] = useState<string>();
+    
+    useEffect(
+        () => {
+            const query = async () => {
+                const id = await queryString('/api/Data/GetNextSessionID')
+                setInterviewId(id);
+            }
+            query();
+        },
+        []
+    );
+    
+    if (interviewId !== undefined) {
+        return <Redirect to={`/interview/${interviewId}`} />
     }
 
-    public componentWillMount() {
-        this.query();
-    }
-
-    public render() {
-        if (this.state.interviewID !== undefined) {
-            return <Redirect to={`/interview/${this.state.interviewID}`} />
-        }
-
-        return <div>
+    return (
+        <div>
             Please wait...
-        </div>;
-    }
-
-    private async query() {
-        const id = await queryString('/api/Data/GetNextSessionID')
-        this.setState({
-            interviewID: id,
-        });
-    }
+        </div>
+    );
 }

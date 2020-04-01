@@ -5,13 +5,13 @@ interface IProps {
     role: ISuspectRole;
 }
 
-export class InterviewerHumanIncorrect extends React.PureComponent<IProps> {
-    public render() {
-        return <div>
+export const InterviewerHumanIncorrect: React.FunctionComponent<IProps> = props => {
+    return (
+        <div>
             <p>You wrongly identified the suspect as a human.<br/>They are acutally a robot.</p>
             <h2>You lose.</h2>
 
-            <SuspectRole role={this.props.role} />
+            <SuspectRole role={props.role} />
         </div>
-    }
+    );
 }

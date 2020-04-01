@@ -5,13 +5,13 @@ interface IProps {
     role: ISuspectRole;
 }
 
-export class SuspectViolentKilled extends React.PureComponent<IProps> {
-    public render() {
-        return <div>
+export const SuspectViolentKilled: React.FunctionComponent<IProps> = props => {
+    return (
+        <div>
             <p>You completed your obsession and killed the interviewer.</p>
             <h2>You win.</h2>
 
-            <SuspectRole role={this.props.role} />
+            <SuspectRole role={props.role} />
         </div>
-    }
+    )
 }

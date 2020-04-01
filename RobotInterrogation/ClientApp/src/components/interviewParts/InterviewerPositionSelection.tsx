@@ -5,16 +5,16 @@ interface IProps {
     swap: () => void,
 }
 
-export class InterviewerPositionSelection extends React.PureComponent<IProps> {
-    public render() {
-        return <div>
+export const InterviewerPositionSelection: React.FunctionComponent<IProps> = props => {
+    return (
+        <div>
             <h2>You are the interviewer.</h2>
 
             <p>Please select an option:</p>
 
-            <button onClick={this.props.stay}>Remain as the interviewer</button>
+            <button onClick={props.stay}>Remain as the interviewer</button>
             <br />
-            <button onClick={this.props.swap}>Switch roles and become the suspect</button>
+            <button onClick={props.swap}>Switch roles and become the suspect</button>
         </div>
-    }
+    );
 }

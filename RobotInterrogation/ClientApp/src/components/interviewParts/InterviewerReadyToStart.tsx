@@ -11,25 +11,25 @@ interface IProps {
     ready: () => void,
 }
 
-export class InterviewerReadyToStart extends React.PureComponent<IProps> {
-    public render() {
-        const primary = this.props.primary.map((q, i) => <InterviewQuestion primary={true} question={q} key={i} />);
-        const secondary = this.props.secondary.map((q, i) => <InterviewQuestion primary={false} question={q} key={i} />);
+export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props => {
+    const primary = props.primary.map((q, i) => <InterviewQuestion primary={true} question={q} key={i} />);
+    const secondary = props.secondary.map((q, i) => <InterviewQuestion primary={false} question={q} key={i} />);
 
-        return <div>
+    return (
+        <div>
             <h2>You are the interviewer.</h2>
             <p>When you are ready, ask the suspect to perform the penalty 3 times. When they have done so, confirm their background, read them the prompt, and start the timer at the bottom of the page.</p>
-            <p>Prompt: {this.props.prompt}</p>
+            <p>Prompt: {props.prompt}</p>
             <div>
                 {primary}
                 {secondary}
             </div>
-            <p>Penalty: {this.props.penalty}</p>
-            <p>Suspect background: {this.props.suspectNote}</p>
+            <p>Penalty: {props.penalty}</p>
+            <p>Suspect background: {props.suspectNote}</p>
 
             <div className="actionSet">
-                <button onClick={this.props.ready} className="btn btn-primary">Start the Timer</button>
+                <button onClick={props.ready} className="btn btn-primary">Start the Timer</button>
             </div>
         </div>
-    }
+    );
 }

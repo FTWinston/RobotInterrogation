@@ -20,45 +20,45 @@ interface IProps {
     playAgain: () => void;
 }
 
-export class InterviewFinished extends React.PureComponent<IProps> {
-    public render() {
-        return <div>
-            {this.renderOutcome()}
-            <div className="actionSet">
-                <button onClick={this.props.playAgain} className="btn btn-secondary">Play again</button>
-            </div>
-        </div>
-    }
-
-    private renderOutcome() {
-        switch (this.props.outcome) {
+export const InterviewFinished: React.FunctionComponent<IProps> = props => {
+    function renderOutcome() {
+        switch (props.outcome) {
             case InterviewOutcome.CorrectlyGuessedHuman:
-                return this.props.isInterviewer
+                return props.isInterviewer
                     ? <InterviewerHumanCorrect />
                     : <SuspectHumanCorrect />;
 
             case InterviewOutcome.CorrectlyGuessedRobot:
-                return this.props.isInterviewer
-                    ? <InterviewerRobotCorrect role={this.props.role} />
-                    : <SuspectRobotCorrect role={this.props.role} />;
+                return props.isInterviewer
+                    ? <InterviewerRobotCorrect role={props.role} />
+                    : <SuspectRobotCorrect role={props.role} />;
 
             case InterviewOutcome.WronglyGuessedHuman:
-                return this.props.isInterviewer
-                    ? <InterviewerHumanIncorrect role={this.props.role} />
-                    : <SuspectHumanIncorrect role={this.props.role} />;
+                return props.isInterviewer
+                    ? <InterviewerHumanIncorrect role={props.role} />
+                    : <SuspectHumanIncorrect role={props.role} />;
 
             case InterviewOutcome.WronglyGuessedRobot:
-                return this.props.isInterviewer
+                return props.isInterviewer
                     ? <InterviewerRobotIncorrect />
                     : <SuspectRobotIncorrect />;
 
             case InterviewOutcome.KilledInterviewer:
-                return this.props.isInterviewer
-                    ? <InterviewerViolentKilled role={this.props.role} />
-                    : <SuspectViolentKilled role={this.props.role} />;
+                return props.isInterviewer
+                    ? <InterviewerViolentKilled role={props.role} />
+                    : <SuspectViolentKilled role={props.role} />;
 
             default:
                 return <div>Unknown outcome</div>;
         }
     }
+
+    return (
+        <div>
+            {renderOutcome()}
+            <div className="actionSet">
+                <button onClick={props.playAgain} className="btn btn-secondary">Play again</button>
+            </div>
+        </div>
+    );
 }

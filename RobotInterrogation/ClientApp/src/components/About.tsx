@@ -1,19 +1,22 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { inCompatibilityMode, setCompatibilityMode } from 'src/Connectivity';
+import { useState } from 'react';
 
-export class About extends React.PureComponent {
-    public render() {
-        const toggleCompatibility = () => {
-            setCompatibilityMode(!inCompatibilityMode());
-            this.forceUpdate();
-        }
+export const About: React.FunctionComponent = () => {
+    const [toggle, setToggle] = useState(false);
 
-        const toggleText = inCompatibilityMode()
-            ? 'Disable compatibility mode'
-            : 'Enable compatibility mode';
+    const toggleCompatibility = () => {
+        setCompatibilityMode(!inCompatibilityMode());
+        setToggle(!toggle);
+    }
 
-        return <div>
+    const toggleText = inCompatibilityMode()
+        ? 'Disable compatibility mode'
+        : 'Enable compatibility mode';
+
+    return (
+        <div>
             <h1>Robot Interrogation</h1>
 
             <p>This game is a conversation between two players, an interviewer and a suspect. It is best played by two people in the same room, though playing via video chat also works.</p>
@@ -34,6 +37,6 @@ export class About extends React.PureComponent {
                 Connection problems?&nbsp;
                 <button onClick={toggleCompatibility}>{toggleText}</button>
             </div>
-        </div>;
-    }
+        </div>
+    )
 }
