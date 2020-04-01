@@ -15,7 +15,7 @@ import { PacketDisplay } from './interviewParts/PacketDisplay';
 import { PacketSelection } from './interviewParts/PacketSelection';
 import { PenaltyDisplay } from './interviewParts/PenaltyDisplay';
 import { SuspectInProgress } from './interviewParts/SuspectInProgress';
-import { SuspectNoteSelection } from './interviewParts/SuspectNoteSelection';
+import { SuspectBackgroundSelection } from './interviewParts/SuspectBackgroundSelection';
 import { SuspectPenaltySelection } from './interviewParts/SuspectPenaltySelection';
 import { SuspectReadyToStart } from './interviewParts/SuspectReadyToStart';
 import { Wait } from './interviewParts/Wait';
@@ -151,7 +151,7 @@ export class Interview extends React.PureComponent<RouteComponentProps<{ id: str
                 }
                 else {
                     const selectNote = (index: number) => this.connection!.invoke('Select', index);
-                    return <SuspectNoteSelection options={this.state.choice} role={this.state.role!} action={selectNote} />
+                    return <SuspectBackgroundSelection options={this.state.choice} role={this.state.role!} action={selectNote} />
                 }
 
             case InterviewStatus.ReadyToStart:

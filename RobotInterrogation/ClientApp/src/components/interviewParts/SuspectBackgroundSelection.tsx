@@ -8,16 +8,16 @@ interface IProps {
     action: (index: number) => void,
 }
 
-export class SuspectNoteSelection extends React.PureComponent<IProps> {
-    public render() {
-        return <div>
+export const SuspectBackgroundSelection: React.FunctionComponent<IProps> = props => {
+    return (
+        <div>
             <h2>You are the suspect.</h2>
 
-            <SuspectRole role={this.props.role} />
+            <SuspectRole role={props.role} />
 
             <p>Select one of the following backgrounds:</p>
 
-            {renderOptions(this.props.options, this.props.action)}
+            {renderOptions(props.options, props.action)}
         </div>
-    }
+    );
 }
