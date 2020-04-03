@@ -1,5 +1,5 @@
-import { ISuspectRole } from "./interviewParts/elements/SuspectRole";
-import { IInterviewQuestion } from "./interviewParts/elements/InterviewQuestion";
+import { ISuspectRole } from './interviewParts/elements/SuspectRole';
+import { IInterviewQuestion } from './interviewParts/elements/InterviewQuestion';
 
 export enum InterviewStatus {
     NotConnected,
