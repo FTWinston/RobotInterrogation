@@ -5,7 +5,7 @@ import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
 import { useState } from 'react';
 
 interface IProps {
-    suspectNote: string;
+    suspectBackground: string;
     penalty: string;
     role: ISuspectRole;
     duration: number;
@@ -42,7 +42,7 @@ export const SuspectInProgress: React.FunctionComponent<IProps> = props => {
         
         <p>Penalty: {props.penalty}</p>
         
-        <p>Your background: {props.suspectNote}</p>
+        <p>Your background: {props.suspectBackground}</p>
 
         <Countdown
             duration={props.duration}

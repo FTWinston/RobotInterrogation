@@ -43,7 +43,7 @@ export interface IInterviewState {
     penalty: string;
     primaryQuestions: IInterviewQuestion[];
     secondaryQuestions: IInterviewQuestion[];
-    suspectNote: string;
+    suspectBackground: string;
     role?: ISuspectRole;
     duration: number;
 }
@@ -58,7 +58,7 @@ export const initialState: IInterviewState = {
     prompt: '',
     secondaryQuestions: [],
     status: InterviewStatus.NotConnected,
-    suspectNote: '',
+    suspectBackground: '',
 };
 
 export type InterviewAction = {
@@ -144,7 +144,7 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
                 prompt: '',
                 role: undefined,
                 secondaryQuestions: [],
-                suspectNote: '',
+                suspectBackground: '',
             };
             
         case 'set penalty choice':
@@ -203,7 +203,7 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
             return {
                 ...state,
                 status: InterviewStatus.ReadyToStart,
-                suspectNote: action.background,
+                suspectBackground: action.background,
             };
 
         case 'start timer':

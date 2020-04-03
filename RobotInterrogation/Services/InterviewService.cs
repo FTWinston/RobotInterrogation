@@ -186,9 +186,9 @@ namespace RobotInterrogation.Services
             AllocateRandomValues(interview.Packet.SecondaryQuestions, interview.SecondaryQuestions, 3);
         }
 
-        public void AllocateSuspectNotes(Interview interview)
+        public void AllocateSuspectBackgrounds(Interview interview)
         {
-            AllocateRandomValues(Configuration.SuspectNotes, interview.SuspectNotes, 3);
+            AllocateRandomValues(Configuration.SuspectBackgrounds, interview.SuspectBackgrounds, 3);
         }
 
         public InterviewOutcome GuessSuspectRole(Interview interview, bool guessIsRobot)
@@ -260,7 +260,7 @@ namespace RobotInterrogation.Services
                 Prompt = interview.Packet.Prompt,
                 PrimaryQuestions = interview.PrimaryQuestions.Select(q => q.Challenge).ToArray(),
                 SecondaryQuestions = interview.SecondaryQuestions.Select(q => q.Challenge).ToArray(),
-                SuspectNote = interview.SuspectNotes.First(),
+                SuspectBackground = interview.SuspectBackgrounds.First(),
                 SuspectType = interview.Role.Type,
                 SuspectFault = interview.Role.Fault,
                 SuspectTraits = interview.Role.Traits,

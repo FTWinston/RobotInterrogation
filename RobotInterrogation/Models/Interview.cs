@@ -17,7 +17,7 @@ namespace RobotInterrogation.Models
 
         public List<string> Penalties { get; } = new List<string>();
         
-        public List<string> SuspectNotes { get; } = new List<string>();
+        public List<string> SuspectBackgrounds { get; } = new List<string>();
 
         public Packet Packet { get; set; }
 

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
 
 interface IProps {
-    suspectNote: string,
+    suspectBackground: string,
     penalty: string,
     role: ISuspectRole,
 }
@@ -22,7 +22,7 @@ export const SuspectReadyToStart: React.FunctionComponent<IProps> = props => {
 
             <SuspectRole role={props.role} />
             <p>Penalty: {props.penalty}</p>
-            <p>Suspect background: {props.suspectNote}</p>
+            <p>Suspect background: {props.suspectBackground}</p>
         </div>
     );
 }

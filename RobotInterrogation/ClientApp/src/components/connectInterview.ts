@@ -90,21 +90,21 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         });
     });
 
-    connection.on('ShowSuspectNoteChoice', (options: string[]) => {
+    connection.on('ShowSuspectBackgroundChoice', (options: string[]) => {
         dispatch({
             type: 'set background choice',
             options,
         });
     });
 
-    connection.on('WaitForSuspectNoteChoice', () => {
+    connection.on('WaitForSuspectBackgroundChoice', () => {
         dispatch({
             type: 'set background choice',
             options: [],
         });
     });
 
-    connection.on('SetSuspectNote', (note: string) => {
+    connection.on('SetSuspectBackground', (note: string) => {
         dispatch({
             type: 'set background',
             background: note,

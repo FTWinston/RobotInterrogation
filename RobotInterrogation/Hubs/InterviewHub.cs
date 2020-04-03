@@ -30,9 +30,9 @@ namespace RobotInterrogation.Hubs
 
         Task ShowQuestions(List<Question> primary, List<Question> secondary);
 
-        Task ShowSuspectNoteChoice(List<string> notes);
-        Task WaitForSuspectNoteChoice();
-        Task SetSuspectNote(string note);
+        Task ShowSuspectBackgroundChoice(List<string> notes);
+        Task WaitForSuspectBackgroundChoice();
+        Task SetSuspectBackground(string note);
 
         Task StartTimer(int duration);
 
@@ -171,14 +171,14 @@ namespace RobotInterrogation.Hubs
 
                 await SetSuspectRole(interview);
                 await ShowQuestions(interview);
-                await ShowSuspectNotes(interview);
+                await ShowSuspectBackgrounds(interview);
 
-                interview.Status = InterviewStatus.SelectingSuspectNote;
+                interview.Status = InterviewStatus.SelectingSuspectBackground;
             }
-            else if (interview.Status == InterviewStatus.SelectingSuspectNote)
+            else if (interview.Status == InterviewStatus.SelectingSuspectBackground)
             {
                 EnsureIsSuspect(interview);
-                await SetSuspectNote(interview, index);
+                await SetSuspectBackground(interview, index);
                 interview.Status = InterviewStatus.ReadyToStart;
             }
             else
@@ -255,28 +255,29 @@ namespace RobotInterrogation.Hubs
                 .WaitForPacketChoice();
         }
 
-        private async Task ShowSuspectNotes(Interview interview)
+        private async Task ShowSuspectBackgrounds(Interview interview)
         {
-            Service.AllocateSuspectNotes(interview);
-            interview.Status = InterviewStatus.SelectingSuspectNote;
+            Service.AllocateSuspectBackgrounds(interview);
+            interview.Status = InterviewStatus.SelectingSuspectBackground;
 
             await Clients
                 .Client(interview.SuspectConnectionID)
-                .ShowSuspectNoteChoice(interview.SuspectNotes);
+                .ShowSuspectBackgroundChoice(interview.SuspectBackgrounds);
 
             await Clients
                 .GroupExcept(SessionID, interview.SuspectConnectionID)
-                .WaitForSuspectNoteChoice();
+                .WaitForSuspectBackgroundChoice();
         }
 
-        private async Task SetSuspectNote(Interview interview, int index)
+        private async Task SetSuspectBackground(Interview interview, int index)
         {
-            int removeIndex = index == 0 ? 1 : 0;
-            interview.SuspectNotes.RemoveAt(removeIndex);
+            var background = interview.SuspectBackgrounds[index];
+            interview.SuspectBackgrounds.Clear();
+            interview.SuspectBackgrounds.Add(background);
 
             await Clients
                 .Group(SessionID)
-                .SetSuspectNote(interview.SuspectNotes[0]);
+                .SetSuspectBackground(interview.SuspectBackgrounds[0]);
         }
 
         public async Task StartInterview()

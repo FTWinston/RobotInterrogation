@@ -101,8 +101,8 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                 );
             }
             else {
-                const selectNote = (index: number) => connection!.invoke('Select', index);
-                return <SuspectBackgroundSelection options={state.choice} role={state.role!} action={selectNote} />
+                const selectBackground = (index: number) => connection!.invoke('Select', index);
+                return <SuspectBackgroundSelection options={state.choice} role={state.role!} action={selectBackground} />
             }
 
         case InterviewStatus.ReadyToStart:
@@ -114,7 +114,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         primary={state.primaryQuestions}
                         prompt={state.prompt}
                         secondary={state.secondaryQuestions}
-                        suspectNote={state.suspectNote}
+                        suspectBackground={state.suspectBackground}
                         penalty={state.penalty}
                         ready={ready}
                     />
@@ -124,7 +124,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                 return (
                     <SuspectReadyToStart
                         role={state.role!}
-                        suspectNote={state.suspectNote}
+                        suspectBackground={state.suspectBackground}
                         penalty={state.penalty}
                     />
                 );
@@ -142,7 +142,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         prompt={state.prompt}
                         primary={state.primaryQuestions}
                         secondary={state.secondaryQuestions}
-                        suspectNote={state.suspectNote}
+                        suspectBackground={state.suspectBackground}
                     />
                 );
             }
@@ -154,7 +154,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         duration={state.duration}
                         penalty={state.penalty}
                         role={state.role!}
-                        suspectNote={state.suspectNote}
+                        suspectBackground={state.suspectBackground}
                         terminateInterviewer={terminate}
                     />
                 );

@@ -8,7 +8,7 @@ interface IProps {
     prompt: string;
     primary: IInterviewQuestion[];
     secondary: IInterviewQuestion[];
-    suspectNote: string;
+    suspectBackground: string;
     penalty: string;
     duration: number;
     conclude: (isRobot: boolean) => void;
@@ -39,7 +39,7 @@ export const InterviewerInProgress: React.FunctionComponent<IProps> = props => {
 
         <p>Penalty: {props.penalty}</p>
 
-        <p>Suspect background: {props.suspectNote}</p>
+        <p>Suspect background: {props.suspectBackground}</p>
 
         <Countdown
             duration={props.duration}

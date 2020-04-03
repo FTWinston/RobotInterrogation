@@ -14,7 +14,7 @@ namespace RobotInterrogation.Models
 
         SelectingPacket,
 
-        SelectingSuspectNote,
+        SelectingSuspectBackground,
 
         ReadyToStart,
 

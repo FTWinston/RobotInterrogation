@@ -6,7 +6,7 @@ interface IProps {
     prompt: string,
     primary: IInterviewQuestion[],
     secondary: IInterviewQuestion[],
-    suspectNote: string,
+    suspectBackground: string,
     penalty: string,
     ready: () => void,
 }
@@ -25,7 +25,7 @@ export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props =>
                 {secondary}
             </div>
             <p>Penalty: {props.penalty}</p>
-            <p>Suspect background: {props.suspectNote}</p>
+            <p>Suspect background: {props.suspectBackground}</p>
 
             <div className="actionSet">
                 <button onClick={props.ready} className="btn btn-primary">Start the Timer</button>
