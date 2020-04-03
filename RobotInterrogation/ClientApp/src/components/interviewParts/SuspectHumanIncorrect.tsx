@@ -6,12 +6,20 @@ interface IProps {
 }
 
 export const SuspectHumanIncorrect: React.FunctionComponent<IProps> = props => {
+    const winOrLose = props.role.type === 'ViolentRobot'
+        ? <h2>You both lose.</h2>
+        : <h2>You win.</h2>
+
+    const extra = props.role.type === 'ViolentRobot'
+        ? <p>(Violent robots cannot win by being certified as human. They only win by completing their tasks.)</p>
+        : undefined;
+
     return (
         <div>
             <p>The interviewer wrongly identified you as a human.</p>
-            <h2>You win.</h2>
-
+            {winOrLose}
             <SuspectRole role={props.role} />
+            {extra}
         </div>
     );
 }

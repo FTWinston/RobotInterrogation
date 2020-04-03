@@ -22,7 +22,10 @@ export const SuspectInProgress: React.FunctionComponent<IProps> = props => {
         : undefined;
     
     const robotPrompt = props.role.type === 'ViolentRobot'
-        ? <p>You must complete 2 of the 3 tasks listed below, <em>and then wait 10 seconds</em> before you can kill the interviewer.</p>
+        ? <p>
+            You must complete 2 of the 3 tasks listed below, <em>and then wait 10 seconds</em> before you can kill the interviewer.<br/>
+            If you cannot kill the interviewer before finishing answering their final question, you must visibly malfunction.
+        </p>
         : props.role.type === 'PassiveRobot'
             ? <p>You must perform the penalty each time you violate your vulnerability.</p>
             : undefined;
