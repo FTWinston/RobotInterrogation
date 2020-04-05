@@ -6,8 +6,19 @@ namespace RobotInterrogation.Services
 {
     public class InterferenceService
     {
+        public InterferencePattern Generate(Random random, int simpleWidth, int simpleHeight)
+        {
+            var simplePattern = GenerateSimple(random, simpleWidth, simpleHeight);
+            var doublePattern = DoubleUp(simplePattern);
+
+
+
+            return doublePattern;
+        }
+
         private struct Coord
         {
+
             public Coord(int x, int y, InterferencePattern.Direction direction, InterferencePattern.Direction opposite)
             {
                 Direction = direction;
@@ -33,7 +44,7 @@ namespace RobotInterrogation.Services
             new Coord(0, -1, InterferencePattern.Direction.North, InterferencePattern.Direction.South),
         };
 
-        public InterferencePattern GenerateSimple(Random random, int width, int height)
+        private InterferencePattern GenerateSimple(Random random, int width, int height)
         {
             var pattern = new InterferencePattern(width, height);
             GeneratePassagesFrom(0, 0, pattern, random);
@@ -65,7 +76,7 @@ namespace RobotInterrogation.Services
             }
         }
 
-        public InterferencePattern DoubleUp(InterferencePattern source)
+        private InterferencePattern DoubleUp(InterferencePattern source)
         {
             var result = new InterferencePattern(source.Width * 2, source.Height * 2);
 
