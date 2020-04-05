@@ -37,6 +37,7 @@ namespace RobotInterrogation
             services.Configure<IDGeneration>(options => Configuration.GetSection("IDGeneration").Bind(options));
 
             services.AddScoped<InterviewService>();
+            services.AddScoped<InterferenceService>();
 
             services.AddSignalR()
                     .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
