@@ -1,24 +1,51 @@
 ﻿using RobotInterrogation.Models;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 
 namespace RobotInterrogation.Services
 {
     public class InterferenceService
     {
-        public InterferencePattern Generate(Random random, int simpleWidth, int simpleHeight)
+        public InterferencePattern Generate(Random random, int simpleWidth, int simpleHeight, int numMarkers)
         {
+            // Generate a simple maze pattern.
             var simplePattern = GenerateSimple(random, simpleWidth, simpleHeight);
-            var doublePattern = DoubleUp(simplePattern);
 
+            // Convert each cell of the maze into 2x2 cell squares, and add lines down the middle of each squares.
+            var pattern = DoubleUp(simplePattern);
 
+            // Place more than the required number of markers, initially.
+            List<Point> markerPositions = PlaceMarkers(random, pattern, numMarkers * 2);
 
-            return doublePattern;
+            // Determine the path through the maze.
+            var markerData = SolveSequence(random, markerPositions, pattern.Connections);
+
+            // Remove markers from this path that are too close together, leaving us with numMarkers.
+            RemoveClosestMarkers(markerData, numMarkers);
+
+            // TODO: ensure that direction arrows (form sequenceSteps) are rendered ... only one per marker
+
+            // Save the marker positions, in "display" order.
+            pattern.Markers.AddRange
+            (
+                markerData
+                    .OrderBy(step => step.SortOrder)
+                    .Select(step => step.Cell)
+            );
+
+            // Now save the solution.
+            pattern.MarkerSequence.AddRange
+            (
+                markerData.Select(step => step.SortOrder) // TODO: these will be wrong, as there will be gaps
+            );
+
+            return pattern;
         }
 
         private struct Coord
         {
-
             public Coord(int x, int y, InterferencePattern.Direction direction, InterferencePattern.Direction opposite)
             {
                 Direction = direction;
@@ -137,6 +164,158 @@ namespace RobotInterrogation.Services
                 list[k] = list[n];
                 list[n] = value;
             }
+        }
+
+        private List<Point> PlaceMarkers(Random random, InterferencePattern pattern, int numMarkers)
+        {
+            var results = new List<Point>();
+
+            for (int i = 0; i < numMarkers; i++)
+            {
+                Point point;
+
+                do
+                {
+                    point = new Point(random.Next(pattern.Width), random.Next(pattern.Height));
+                } while (pattern.Markers.Contains(point));
+
+                results.Add(point);
+            }
+
+            return results;
+        }
+
+        private class SequenceMarker
+        {
+            public int SortOrder { get; set; }
+
+            public Point Cell { get; set; }
+            public int StepsToNextMarker { get; set; }
+
+            public Point PreviousCell { get; set; }
+            public Point SubsequentCell { get; set; }
+
+            public InterferencePattern.Direction PreviousCellDirection { get; set; }
+            public InterferencePattern.Direction SubsequentCellDirection { get; set; }
+        }
+
+        private List<SequenceMarker> SolveSequence(Random random, List<Point> markers, InterferencePattern.Direction[,] connections)
+        {
+            var directions = new List<Coord>(CardinalOffsets);
+            Shuffle(directions, random);
+
+            var results = new List<SequenceMarker>();
+            var startPosition = markers.First();
+            var currentPosition = startPosition;
+            var prevPosition = startPosition;
+            var prevDirection = InterferencePattern.Direction.None;
+
+            var currentMarkerId = 0;
+            var stepsToNextMarker = 0;
+
+            SequenceMarker prevStep = null;
+
+            do
+            {
+                var currentConnections = connections[currentPosition.X, currentPosition.Y];
+
+                foreach (var direction in directions)
+                    if (currentConnections.HasFlag(direction.Direction) && direction.OppositeDirection != prevDirection)
+                    {
+                        // We can move this way and it isn't right back where we came from. Use it.
+                        stepsToNextMarker++;
+                        prevPosition = currentPosition;
+                        currentPosition.Offset(direction.X, direction.Y);
+                        prevDirection = direction.Direction;
+
+                        if (prevStep != null)
+                        {
+                            prevStep.SubsequentCell = currentPosition;
+                            prevStep.SubsequentCellDirection = prevDirection;
+                            prevStep = null;
+                        }
+
+                        var nextMarkerId = markers.IndexOf(currentPosition);
+                        if (nextMarkerId != -1)
+                        {
+                            // We've reached a new marker, so add the previous one (and # steps) to the results.
+                            prevStep = new SequenceMarker
+                            {
+                                SortOrder = currentMarkerId,
+                                Cell = markers[currentMarkerId],
+                                StepsToNextMarker = stepsToNextMarker,
+                                PreviousCell = prevPosition,
+                                PreviousCellDirection = prevDirection,
+                            };
+
+                            results.Add(prevStep);
+
+                            currentMarkerId = nextMarkerId;
+                            stepsToNextMarker = 0;
+                        }
+
+                        break; // We've moved, so are done with this cell.
+                    }
+            } while (currentPosition != startPosition);
+
+            var firstStep = results.First();
+            firstStep.PreviousCell = prevPosition;
+            firstStep.PreviousCellDirection = prevDirection;
+
+            return results;
+        }
+
+        private void RemoveClosestMarkers(List<SequenceMarker> markerData, int targetNumMarkers)
+        {
+            // For each marker, determine how man steps are present before and after it.
+            var stepLengths = markerData
+                .Select(step => step.StepsToNextMarker)
+                .ToList();
+
+            for (int i = 1; i < markerData.Count; i++)
+                stepLengths[i] += markerData[i - 1].StepsToNextMarker;
+
+            stepLengths[0] += markerData[markerData.Count - 1].StepsToNextMarker;
+
+            // Remove the marker with the shortest overall distance, until we have targetNumMarkers.
+            while (markerData.Count > targetNumMarkers)
+            {
+                int removeIndex = FindMinIndex(stepLengths, out int removeLength);
+
+                int prevIndex = removeIndex == 0
+                    ? markerData.Count - 1
+                    : removeIndex - 1;
+
+                int nextIndex = removeIndex < markerData.Count - 1
+                    ? removeIndex + 1
+                    : 0;
+
+                // The removed item's length gets split between the ones on either side.
+                var halfLength = removeLength / 2;
+                stepLengths[prevIndex] += halfLength;
+                stepLengths[nextIndex] += removeLength - halfLength;
+
+                stepLengths.RemoveAt(removeIndex);
+                markerData.RemoveAt(removeIndex);
+            }
+        }
+
+        private int FindMinIndex(List<int> values, out int minValue)
+        {
+            int index = 0;
+            minValue = int.MaxValue;
+
+            for (int i = 0; i < values.Count; i++)
+            {
+                var value = values[i];
+                if (value < minValue)
+                {
+                    index = i;
+                    minValue = value;
+                }
+            }
+
+            return index;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +31,12 @@ namespace RobotInterrogation.Models
             East = 1 << 2,
             West = 1 << 3,
         }
+
+        public List<Point> Markers { get; } = new List<Point>();
+
+        public List<int> MarkerSequence { get; } = new List<int>();
+
+        #region serialization
         public override string ToString()
         {
             var output = new StringBuilder();
@@ -55,7 +62,7 @@ namespace RobotInterrogation.Models
                     rowTop.Append(DetermineVerticalCharacter(thisCell));
 
                     rowMid.Append(DetermineHorizontalCharacter(thisCell));
-                    rowMid.Append(" "); // TODO: cell content, e.g. letter or arrow
+                    rowMid.Append(DetermineContentCharacter(x, y));
                 }
 
                 var aboveLastCell = y > 0
@@ -169,7 +176,17 @@ namespace RobotInterrogation.Models
                     return '┼';
             }
         }
+        private char DetermineContentCharacter(int x, int y)
+        {
+            var point = new Point(x, y);
+            var index = Markers.IndexOf(point);
+
+            return index == -1
+                ? ' '
+                : (char)('A' + index);
+        }
 
         // ─ │ ┌ ┐ └ ┘ ├ ┤ ┬ ┴ ┼ ← ↑ → ↓ ░ ▒ ▓
+        #endregion serialization
     }
 }
