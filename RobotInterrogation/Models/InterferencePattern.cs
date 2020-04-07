@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace RobotInterrogation.Models
 {
@@ -35,6 +34,8 @@ namespace RobotInterrogation.Models
         public List<Point> Markers { get; } = new List<Point>();
 
         public List<int> MarkerSequence { get; } = new List<int>();
+
+        public List<Tuple<Point, Direction>> Arrows = new List<Tuple<Point, Direction>>();
 
         #region serialization
         public override string ToString()
@@ -179,14 +180,30 @@ namespace RobotInterrogation.Models
         private char DetermineContentCharacter(int x, int y)
         {
             var point = new Point(x, y);
+
             var index = Markers.IndexOf(point);
+            if (index != -1)
+                return (char)('A' + index);
 
-            return index == -1
-                ? ' '
-                : (char)('A' + index);
+            var matchingArrow = Arrows.FirstOrDefault(arr => arr.Item1 == point);
+
+            if (matchingArrow != null)
+            {
+                switch (matchingArrow.Item2)
+                {
+                    case Direction.North:
+                        return '↑';
+                    case Direction.South:
+                        return '↓';
+                    case Direction.East:
+                        return '→';
+                    case Direction.West:
+                        return '←';
+                }
+            }
+
+            return ' ';
         }
-
-        // ─ │ ┌ ┐ └ ┘ ├ ┤ ┬ ┴ ┼ ← ↑ → ↓ ░ ▒ ▓
         #endregion serialization
     }
 }
