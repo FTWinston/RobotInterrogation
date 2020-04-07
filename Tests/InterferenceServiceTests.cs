@@ -1,5 +1,6 @@
 ﻿using RobotInterrogation.Services;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace Tests
@@ -7,7 +8,7 @@ namespace Tests
     public class InterferenceServiceTests
     {
         [Theory]
-        [InlineData(1, @"
+        [InlineData(1, "ACBEFD", @"
 ┌───┬───────────┐
 │   │           │
 │ │ │ ────┬───┐ │
@@ -42,7 +43,7 @@ namespace Tests
 │               │
 └───────────────┘
 ")]
-        [InlineData(2, @"
+        [InlineData(2, "CFEBDA", @"
 ┌───┬───────────┐
 │   │           │
 │ │ │ ┌───────┐ │
@@ -77,7 +78,7 @@ namespace Tests
 │               │
 └───────────────┘
 ")]
-        [InlineData(3, @"
+        [InlineData(3, "AFCBDE", @"
 ┌───────┬───────┐
 │       │       │
 │ ────┐ │ ────┐ │
@@ -112,7 +113,7 @@ namespace Tests
 │              A│
 └───────────────┘
 ")]
-        public void GeneratePattern(int seed, string expected)
+        public void GeneratePattern(int seed, string expectedSequence, string expectedLayout)
         {
             var random = new Random(seed);
             var service = new InterferenceService();
@@ -122,7 +123,16 @@ namespace Tests
 
             var display = pattern.ToString();
             Assert.NotNull(display);
-            Assert.Equal(expected.Trim(), display.Trim());
+            Assert.Equal(expectedLayout.Trim(), display.Trim());
+
+            string actualSequence = string.Join
+            (
+                "",
+                pattern.MarkerSequence
+                    .Select(i => (char)('A' + i))
+            );
+
+            Assert.Equal(expectedSequence, actualSequence);
         }
     }
 }

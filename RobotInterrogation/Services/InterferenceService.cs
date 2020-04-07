@@ -38,7 +38,7 @@ namespace RobotInterrogation.Services
             // Now save the solution.
             pattern.MarkerSequence.AddRange
             (
-                markerData.Select(step => step.SortOrder) // TODO: these will be wrong, as there will be gaps
+                markerData.Select(step => step.SortOrder)
             );
 
             return pattern;
@@ -296,7 +296,11 @@ namespace RobotInterrogation.Services
                 stepLengths[nextIndex] += removeLength - halfLength;
 
                 stepLengths.RemoveAt(removeIndex);
+                var removeMarker = markerData[removeIndex];
                 markerData.RemoveAt(removeIndex);
+                
+                foreach (var step in markerData.Where(step => step.SortOrder > removeMarker.SortOrder))
+                    step.SortOrder--;
             }
         }
 
