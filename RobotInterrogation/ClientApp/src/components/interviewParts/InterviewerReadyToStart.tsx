@@ -20,8 +20,7 @@ export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props =>
     return (
         <div>
             <PositionHeader position={InterviewPosition.Interviewer} />
-            <p>When you are ready, confirm the suspect's background, read them the prompt, and start the timer at the bottom of the page.</p>
-            <p>Prompt: {props.prompt}</p>
+            <p>Ask the suspect their name and confirm their background. When you are ready, read them the prompt then start the timer (at the bottom of the page).</p>
             <div>
                 {primary}
                 {secondary}
@@ -29,6 +28,8 @@ export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props =>
             <p>Penalty: {props.penalty}</p>
             <p>Suspect background: {props.suspectBackground}</p>
 
+            <p>Prompt: {props.prompt}</p>
+            
             <div className="actionSet">
                 <button onClick={props.ready} className="btn btn-primary">Start the Timer</button>
             </div>
