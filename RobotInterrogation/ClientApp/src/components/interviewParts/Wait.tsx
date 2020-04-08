@@ -1,14 +1,16 @@
 import * as React from 'react';
+import { InterviewPosition } from '../interviewReducer';
+import { PositionHeader } from './elements/PositionHeader';
 
 interface IProps {
-    role: string,
+    position: InterviewPosition,
     waitFor: string,
 }
 
 export const Wait: React.FunctionComponent<IProps> = props => {
     return (
         <div>
-            <h2>You are the {props.role}.</h2>
+            <PositionHeader position={props.position} />
             <p>Wait for {props.waitFor}.</p>
         </div>
     );

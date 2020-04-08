@@ -1,6 +1,8 @@
 import * as React from 'react';
 import './ActionSet.css';
 import { IInterviewQuestion, InterviewQuestion } from './elements/InterviewQuestion';
+import { PositionHeader } from './elements/PositionHeader';
+import { InterviewPosition } from '../interviewReducer';
 
 interface IProps {
     prompt: string,
@@ -17,7 +19,7 @@ export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props =>
 
     return (
         <div>
-            <h2>You are the interviewer.</h2>
+            <PositionHeader position={InterviewPosition.Interviewer} />
             <p>When you are ready, ask the suspect to perform the penalty 3 times. When they have done so, confirm their background, read them the prompt, and start the timer at the bottom of the page.</p>
             <p>Prompt: {props.prompt}</p>
             <div>

@@ -3,6 +3,8 @@ import './ActionSet.css';
 import { Countdown } from './elements/Countdown';
 import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
 import { useState } from 'react';
+import { PositionHeader } from './elements/PositionHeader';
+import { InterviewPosition } from '../interviewReducer';
 
 interface IProps {
     suspectBackground: string;
@@ -37,7 +39,7 @@ export const SuspectInProgress: React.FunctionComponent<IProps> = props => {
         : <p/>;
 
     return <div>
-        <h2>You are the suspect.</h2>
+        <PositionHeader position={InterviewPosition.Suspect} />
         <p>Answer the interviewer's questions, try to convince them that you are human.</p>
         {robotPrompt}
 

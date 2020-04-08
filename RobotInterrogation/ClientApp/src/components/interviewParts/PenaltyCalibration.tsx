@@ -5,16 +5,16 @@ import { PositionHeader } from './elements/PositionHeader';
 
 interface IProps {
     position: InterviewPosition;
-    packet: string;
+    penalty: string;
 }
 
-export const PacketDisplay: React.FunctionComponent<IProps> = props => {
+export const PenaltyCalibration: React.FunctionComponent<IProps> = props => {
     return (
         <div>
             <PositionHeader position={props.position} />
 
-            <p>The chosen interview packet is:</p>
-            <p className="valueDisplay">{props.packet}</p>
+            <p>The chosen penality is:</p>
+            <p className="valueDisplay">{props.penalty}</p>
         </div>
     )
 }
