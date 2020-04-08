@@ -85,7 +85,17 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
             }
 
         case InterviewStatus.PenaltyCalibration:
-            return <PenaltyCalibration position={state.position} penalty={state.penalty} />;
+            const confirmPenalty = state.position === InterviewPosition.Interviewer
+                ? () => connection!.invoke('Select', 0)
+                : undefined;
+
+            return (
+                <PenaltyCalibration
+                    position={state.position}
+                    penalty={state.penalty}
+                    confirm={confirmPenalty}
+                />
+            );
 
         case InterviewStatus.PacketSelection:
             const selectPacket = (index: number) => connection!.invoke('Select', index);

@@ -20,7 +20,7 @@ export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props =>
     return (
         <div>
             <PositionHeader position={InterviewPosition.Interviewer} />
-            <p>When you are ready, ask the suspect to perform the penalty 3 times. When they have done so, confirm their background, read them the prompt, and start the timer at the bottom of the page.</p>
+            <p>When you are ready, confirm the suspect's background, read them the prompt, and start the timer at the bottom of the page.</p>
             <p>Prompt: {props.prompt}</p>
             <div>
                 {primary}

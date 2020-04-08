@@ -7,6 +7,7 @@
 
         SelectingPenalty_Interviewer,
         SelectingPenalty_Suspect,
+        CalibratingPenalty,
 
         SelectingPacket,
 

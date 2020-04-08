@@ -150,39 +150,46 @@ namespace RobotInterrogation.Hubs
         {
             var interview = Service.GetInterview(SessionID);
 
-            if (interview.Status == InterviewStatus.SelectingPenalty_Interviewer)
+            switch (interview.Status)
             {
-                await DiscardSinglePenalty(index, interview);
+                case InterviewStatus.SelectingPenalty_Interviewer:
+                    await DiscardSinglePenalty(index, interview);
+                    break;
+
+                case InterviewStatus.SelectingPenalty_Suspect:
+                    await AllocatePenalty(index, interview);
+                    break;
+
+                case InterviewStatus.CalibratingPenalty:
+                    EnsureIsInterviewer(interview);
+
+                    interview.Status = InterviewStatus.SelectingPacket;
+
+                    await ShowPacketChoice(interview);
+                    break;
+
+                case InterviewStatus.SelectingPacket:
+                    EnsureIsInterviewer(interview);
+                    await SetPacket(interview, index);
+
+                    await Task.Delay(3000);
+
+                    await SetSuspectRole(interview);
+                    await ShowQuestions(interview);
+                    await ShowSuspectBackgrounds(interview);
+
+                    interview.Status = InterviewStatus.SelectingSuspectBackground;
+                    break;
+
+                case InterviewStatus.SelectingSuspectBackground:
+                    EnsureIsSuspect(interview);
+                    await SetSuspectBackground(interview, index);
+                    interview.Status = InterviewStatus.ReadyToStart;
+                    break;
+
+                default:
+                    throw new Exception("Invalid command for current status of session " + SessionID);
             }
-            else if (interview.Status == InterviewStatus.SelectingPenalty_Suspect)
-            {
-                await AllocatePenalty(index, interview);
-
-                await Task.Delay(3000);
-
-                await ShowPacketChoice(interview);
-            }
-            else if (interview.Status == InterviewStatus.SelectingPacket)
-            {
-                EnsureIsInterviewer(interview);
-                await SetPacket(interview, index);
-
-                await Task.Delay(3000);
-
-                await SetSuspectRole(interview);
-                await ShowQuestions(interview);
-                await ShowSuspectBackgrounds(interview);
-
-                interview.Status = InterviewStatus.SelectingSuspectBackground;
-            }
-            else if (interview.Status == InterviewStatus.SelectingSuspectBackground)
-            {
-                EnsureIsSuspect(interview);
-                await SetSuspectBackground(interview, index);
-                interview.Status = InterviewStatus.ReadyToStart;
-            }
-            else
-                throw new Exception("Invalid command for current status of session " + SessionID);
         }
 
         private async Task SetPacket(Interview interview, int index)
@@ -231,7 +238,7 @@ namespace RobotInterrogation.Hubs
 
         private async Task AllocatePenalty(int index, Interview interview)
         {
-            interview.Status = InterviewStatus.SelectingPacket;
+            interview.Status = InterviewStatus.CalibratingPenalty;
 
             // the specified index is the one to keep
             int removeIndex = index == 0 ? 1 : 0;
