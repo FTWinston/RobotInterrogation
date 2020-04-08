@@ -25,13 +25,13 @@ export const InducerPrompt: React.FunctionComponent<IProps> = props => {
                 <br/>
             </p>
 
-            <p>
+            <div>
                 Example questions:
                 <ul>
                     <li>What letters come between A and D?</li>
                     <li>What letter follows B?</li>
                 </ul>
-            </p>
+            </div>
             
             <div className="actionSet">
                 <button onClick={() => props.continue()}>Continue</button>

@@ -7,13 +7,31 @@ interface IProps {
 
 export const InterferenceSolution: React.FunctionComponent<IProps> = props => {
 
-    const text = props.solution.join('→');
-    const spacing = Array(text.length).fill('─').join('');
+    const splitAt = Math.ceil(props.solution.length / 2);
+
+    const firstHalf = props.solution
+        .slice(0, splitAt);
+    
+    const secondHalf = props.solution
+        .slice(splitAt)
+        .reverse()
+    
+    if (secondHalf.length < firstHalf.length) {
+        secondHalf.splice(1, 0, '');
+    }
+
+    const firstLine = firstHalf.join(' → ');
+    const lastLine = secondHalf.join(' ← ');
+
+    const midLine = Array(firstLine.length - 2)
+        .fill(' ')
+        .join('');
 
     return (
         <div className="interference">
-            ┌→{text}→┐<br/>
-            └←{spacing}←┘
-        </div>
+{firstLine}<br/>
+↑{midLine}↓<br/>
+{lastLine}
+</div>
     )
 }
