@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { renderOptions } from './renderOptions';
+import { PositionHeader } from './elements/PositionHeader';
+import { InterviewPosition } from '../interviewReducer';
 
 interface IProps {
     options: string[],
@@ -9,7 +11,7 @@ interface IProps {
 export const InterviewerPenaltySelection: React.FunctionComponent<IProps> = props => {
     return (
         <div>
-            <h2>You are the interviewer.</h2>
+            <PositionHeader position={InterviewPosition.Interviewer} />
             <p>Select one of the following penalities to <strong>discard</strong>. The suspect will choose from the remaining two.</p>
 
             {renderOptions(props.options, props.action)}

@@ -11,10 +11,12 @@ export enum InterviewStatus {
     RoleConfirmed,
 
     PenaltySelection,
-    ShowingPenalty,
+    PenaltyCalibration,
 
     PacketSelection,
-    ShowingPacket,
+    
+    InducerPrompt,
+    ShowingInducer,
 
     BackgroundSelection,
 
@@ -33,14 +35,22 @@ export enum InterviewOutcome {
     KilledInterviewer,
 }
 
+export enum InterviewPosition {
+    None,
+    Interviewer,
+    Suspect,
+}
+
 export interface IInterviewState {
-    isInterviewer: boolean;
+    position: InterviewPosition;
     status: InterviewStatus;
     outcome?: InterviewOutcome;
     choice: string[];
     packet: string;
     prompt: string;
     penalty: string;
+    interferencePattern?: string;
+    patternSolution?: string[];
     primaryQuestions: IInterviewQuestion[];
     secondaryQuestions: IInterviewQuestion[];
     suspectBackground: string;
@@ -51,7 +61,7 @@ export interface IInterviewState {
 export const initialState: IInterviewState = {
     choice: [],
     duration: 0,
-    isInterviewer: false,
+    position: InterviewPosition.None,
     packet: '',
     penalty: '',
     primaryQuestions: [],
@@ -84,8 +94,18 @@ export type InterviewAction = {
     packet: string;
     prompt: string;
 } | {
-    type: 'set role';
+    type: 'prompt inducer';
+    solution: string[];
+} | {
+    type: 'set waiting for inducer';
+} | {
+    type: 'set role and pattern';
     role: ISuspectRole;
+    pattern: string;
+} | {
+    type: 'set role and solution';
+    role: ISuspectRole;
+    solution: string[];
 } | {
     type: 'set questions';
     primary: IInterviewQuestion[];
@@ -114,13 +134,19 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
         case 'set position':
             return {
                 ...state,
-                isInterviewer: action.isInterviewer,
+                position: action.isInterviewer
+                    ? InterviewPosition.Interviewer
+                    : InterviewPosition.Suspect,
             };
 
         case 'swap position':
             return {
                 ...state,
-                isInterviewer: !state.isInterviewer,
+                position: state.position === InterviewPosition.Interviewer
+                    ? InterviewPosition.Suspect
+                    : InterviewPosition.Suspect
+                        ? InterviewPosition.Interviewer
+                        : InterviewPosition.None,
             };
             
         case 'set waiting for opponent':
@@ -142,6 +168,8 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
                 penalty: '',
                 primaryQuestions: [],
                 prompt: '',
+                interferencePattern: undefined,
+                patternSolution: undefined,
                 role: undefined,
                 secondaryQuestions: [],
                 suspectBackground: '',
@@ -157,7 +185,7 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
         case 'set penalty':
             return {
                 ...state,
-                status: InterviewStatus.ShowingPenalty,
+                status: InterviewStatus.PenaltyCalibration,
                 penalty: action.penalty,
                 choice: [],
             };
@@ -172,22 +200,44 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
         case 'set packet':
             return {
                 ...state,
-                status: InterviewStatus.ShowingPacket,
                 packet: action.packet,
                 prompt: action.prompt,
                 choice: [],
             };
 
-        case 'set role':
+        case 'prompt inducer':
             return {
                 ...state,
+                status: InterviewStatus.InducerPrompt,
+                patternSolution: action.solution,
+            };
+
+        case 'set waiting for inducer':
+            return {
+                ...state,
+                status: InterviewStatus.InducerPrompt,
+            };
+
+        case 'set role and pattern':
+            return {
+                ...state,
+                status: InterviewStatus.ShowingInducer,
                 role: action.role,
+                interferencePattern: action.pattern,
+            };
+        
+        case 'set role and solution':
+            return {
+                ...state,
+                status: InterviewStatus.ShowingInducer,
+                role: action.role,
+                patternSolution: action.solution,
             };
         
         case 'set questions':
             return {
                 ...state,
-                status: InterviewStatus.BackgroundSelection,
+                status: InterviewStatus.ShowingInducer,
                 primaryQuestions: action.primary,
                 secondaryQuestions: action.secondary,
             };

@@ -1,9 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
-namespace RobotInterrogation.Models
+﻿namespace RobotInterrogation.Models
 {
-    [JsonConverter(typeof(StringEnumConverter))]
     public enum InterviewStatus
     {
         WaitingForConnections,
@@ -11,8 +7,12 @@ namespace RobotInterrogation.Models
 
         SelectingPenalty_Interviewer,
         SelectingPenalty_Suspect,
+        CalibratingPenalty,
 
         SelectingPacket,
+
+        PromptingInducer,
+        SolvingInducer,
 
         SelectingSuspectBackground,
 

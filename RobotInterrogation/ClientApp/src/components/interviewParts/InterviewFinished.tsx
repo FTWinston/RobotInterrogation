@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { InterviewOutcome } from '../interviewReducer';
+import { InterviewOutcome, InterviewPosition } from '../interviewReducer';
 import './ActionSet.css';
 import { ISuspectRole } from './elements/SuspectRole';
 import { InterviewerHumanCorrect } from './InterviewerHumanCorrect';
@@ -14,7 +14,7 @@ import { SuspectRobotIncorrect } from './SuspectRobotIncorrect';
 import { SuspectViolentKilled } from './SuspectViolentKilled';
 
 interface IProps {
-    isInterviewer: boolean;
+    position: InterviewPosition;
     role: ISuspectRole;
     outcome: InterviewOutcome;
     playAgain: () => void;
@@ -24,27 +24,27 @@ export const InterviewFinished: React.FunctionComponent<IProps> = props => {
     function renderOutcome() {
         switch (props.outcome) {
             case InterviewOutcome.CorrectlyGuessedHuman:
-                return props.isInterviewer
+                return props.position === InterviewPosition.Interviewer
                     ? <InterviewerHumanCorrect />
                     : <SuspectHumanCorrect />;
 
             case InterviewOutcome.CorrectlyGuessedRobot:
-                return props.isInterviewer
+                return props.position === InterviewPosition.Interviewer
                     ? <InterviewerRobotCorrect role={props.role} />
                     : <SuspectRobotCorrect role={props.role} />;
 
             case InterviewOutcome.WronglyGuessedHuman:
-                return props.isInterviewer
+                return props.position === InterviewPosition.Interviewer
                     ? <InterviewerHumanIncorrect role={props.role} />
                     : <SuspectHumanIncorrect role={props.role} />;
 
             case InterviewOutcome.WronglyGuessedRobot:
-                return props.isInterviewer
+                return props.position === InterviewPosition.Interviewer
                     ? <InterviewerRobotIncorrect />
                     : <SuspectRobotIncorrect />;
 
             case InterviewOutcome.KilledInterviewer:
-                return props.isInterviewer
+                return props.position === InterviewPosition.Interviewer
                     ? <InterviewerViolentKilled role={props.role} />
                     : <SuspectViolentKilled role={props.role} />;
 

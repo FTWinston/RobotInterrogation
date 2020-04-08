@@ -7,7 +7,7 @@ import { IInterviewQuestion } from './interviewParts/elements/InterviewQuestion'
 export async function connectInterview(session: string, dispatch: Dispatch<InterviewAction>) {
     const connection = connectSignalR('/hub/Interview');
 
-    connection.on('SetRole', (isInterviewer: boolean) => {
+    connection.on('SetPosition', (isInterviewer: boolean) => {
         dispatch({
             type: 'set position',
             isInterviewer,
@@ -75,10 +75,32 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         });
     });
 
-    connection.on('ShowRole', (role: ISuspectRole) => {
+    connection.on('ShowInducerPrompt', (solution: string[]) => {
         dispatch({
-            type: 'set role',
+            type: 'prompt inducer',
+            solution,
+        });
+    });
+
+    connection.on('WaitForInducer', () => {
+        dispatch({
+            type: 'set waiting for inducer',
+        });
+    });
+
+    connection.on('ShowRoleWithPattern', (role: ISuspectRole, pattern: string) => {
+        dispatch({
+            type: 'set role and pattern',
             role,
+            pattern,
+        });
+    });
+
+    connection.on('ShowRoleWithSolution', (role: ISuspectRole, solution: string[]) => {
+        dispatch({
+            type: 'set role and solution',
+            role,
+            solution,
         });
     });
 

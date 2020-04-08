@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
+import { PositionHeader } from './elements/PositionHeader';
+import { InterviewPosition } from '../interviewReducer';
 
 interface IProps {
     suspectBackground: string,
@@ -16,7 +18,7 @@ export const SuspectReadyToStart: React.FunctionComponent<IProps> = props => {
 
     return (
         <div>
-            <h2>You are the suspect.</h2>
+            <PositionHeader position={InterviewPosition.Suspect} />
             <p>When the interviewer is ready, the interview will start.</p>
             {robotPrompt}
 
