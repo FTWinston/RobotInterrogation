@@ -8,7 +8,7 @@ namespace RobotInterrogation.Services
 {
     public class InterferenceService
     {
-        public InterferencePattern Generate(Random random, int simpleWidth, int simpleHeight, int numMarkers)
+        public InterferencePattern Generate(Random random, int simpleWidth = 4, int simpleHeight = 8, int numMarkers = 6)
         {
             // Generate a simple maze pattern.
             var simplePattern = GenerateSimple(random, simpleWidth, simpleHeight);

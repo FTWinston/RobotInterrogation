@@ -11,6 +11,9 @@
 
         SelectingPacket,
 
+        PromptingInducer,
+        SolvingInducer,
+
         SelectingSuspectBackground,
 
         ReadyToStart,

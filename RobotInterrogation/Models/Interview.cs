@@ -24,6 +24,8 @@ namespace RobotInterrogation.Models
         public SuspectRole Role { get; set; }
 
         public string Prompt { get; set;  }
+
+        public InterferencePattern InterferencePattern { get; set; }
         
         public List<Question> PrimaryQuestions { get; } = new List<Question>();
         

@@ -35,6 +35,10 @@ namespace RobotInterrogation.Models
 
         public List<int> MarkerSequence { get; } = new List<int>();
 
+        public List<string> SolutionSequence => MarkerSequence
+            .Select(index => ((char)('A' + index)).ToString())
+            .ToList();
+
         public List<Tuple<Point, Direction>> Arrows = new List<Tuple<Point, Direction>>();
 
         #region serialization

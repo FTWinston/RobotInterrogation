@@ -18,14 +18,16 @@ namespace RobotInterrogation.Services
 
         private GameConfiguration Configuration { get; }
         private IDGeneration IDs { get; }
+        private InterferenceService InterferenceService { get; }
         private ILogger Logger { get; }
 
         public const string LogName = "Interviews";
 
-        public InterviewService(IOptions<GameConfiguration> configuration, IOptions<IDGeneration> idWords, ILoggerFactory logger)
+        public InterviewService(IOptions<GameConfiguration> configuration, IOptions<IDGeneration> idWords, InterferenceService interferenceService, ILoggerFactory logger)
         {
             Configuration = configuration.Value;
             IDs = idWords.Value;
+            InterferenceService = interferenceService;
             Logger = logger.CreateLogger(LogName);
         }
 
@@ -180,15 +182,21 @@ namespace RobotInterrogation.Services
             interview.Role = roles.First();
         }
 
+        public void SetPacketAndInducer(Interview interview, int packetIndex)
+        {
+            interview.Packet = GetPacket(packetIndex);
+            interview.InterferencePattern = InterferenceService.Generate(new Random());
+        }
+
         public void AllocateQuestions(Interview interview)
         {
             AllocateRandomValues(interview.Packet.PrimaryQuestions, interview.PrimaryQuestions, 3);
             AllocateRandomValues(interview.Packet.SecondaryQuestions, interview.SecondaryQuestions, 3);
         }
 
-        public void AllocateSuspectBackgrounds(Interview interview)
+        public void AllocateSuspectBackgrounds(Interview interview, int numOptions)
         {
-            AllocateRandomValues(Configuration.SuspectBackgrounds, interview.SuspectBackgrounds, 3);
+            AllocateRandomValues(Configuration.SuspectBackgrounds, interview.SuspectBackgrounds, numOptions);
         }
 
         public InterviewOutcome GuessSuspectRole(Interview interview, bool guessIsRobot)
@@ -257,7 +265,8 @@ namespace RobotInterrogation.Services
                 interview.Outcome,
                 Duration = duration,
                 Packet = interview.Packet.Name,
-                Prompt = interview.Packet.Prompt,
+                InterferencePattern = interview.InterferencePattern.ToString(),
+                InterferenceSolution = string.Join(",", interview.InterferencePattern.SolutionSequence),
                 PrimaryQuestions = interview.PrimaryQuestions.Select(q => q.Challenge).ToArray(),
                 SecondaryQuestions = interview.SecondaryQuestions.Select(q => q.Challenge).ToArray(),
                 SuspectBackground = interview.SuspectBackgrounds.First(),

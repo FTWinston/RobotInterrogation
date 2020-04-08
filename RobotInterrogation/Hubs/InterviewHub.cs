@@ -11,7 +11,7 @@ namespace RobotInterrogation.Hubs
 {
     public interface IInterviewMessages
     {
-        Task SetRole(bool isInterviewer);
+        Task SetPosition(bool isInterviewer);
 
         Task SetWaitingForPlayer();
         Task SetPlayersPresent();
@@ -26,7 +26,11 @@ namespace RobotInterrogation.Hubs
         Task WaitForPacketChoice();
         Task SetPacket(string packetName, string packetPrompt);
 
-        Task ShowRole(SuspectRole role);
+        Task ShowInducerPrompt(List<string> solution);
+        Task WaitForInducer();
+
+        Task ShowRoleWithPattern(SuspectRole role, string interferencePattern);
+        Task ShowRoleWithSolution(SuspectRole role, List<string> solution);
 
         Task ShowQuestions(List<Question> primary, List<Question> secondary);
 
@@ -92,7 +96,7 @@ namespace RobotInterrogation.Hubs
 
             bool isInterviewer = interview.InterviewerConnectionID == Context.ConnectionId;
 
-            await Clients.Caller.SetRole(isInterviewer);
+            await Clients.Caller.SetPosition(isInterviewer);
 
             if (isInterviewer)
             {
@@ -171,13 +175,20 @@ namespace RobotInterrogation.Hubs
                 case InterviewStatus.SelectingPacket:
                     EnsureIsInterviewer(interview);
                     await SetPacket(interview, index);
+                    await ShowInducerPrompt(interview);
+                    interview.Status = InterviewStatus.PromptingInducer;
+                    break;
 
-                    await Task.Delay(3000);
-
+                case InterviewStatus.PromptingInducer:
                     await SetSuspectRole(interview);
                     await ShowQuestions(interview);
-                    await ShowSuspectBackgrounds(interview);
+                    interview.Status = InterviewStatus.SolvingInducer;
+                    break;
 
+                case InterviewStatus.SolvingInducer:
+                    EnsureIsInterviewer(interview);
+
+                    await ShowSuspectBackgrounds(interview, index == 0);
                     interview.Status = InterviewStatus.SelectingSuspectBackground;
                     break;
 
@@ -194,7 +205,7 @@ namespace RobotInterrogation.Hubs
 
         private async Task SetPacket(Interview interview, int index)
         {
-            interview.Packet = Service.GetPacket(index);
+            Service.SetPacketAndInducer(interview, index);
 
             await Clients.Group(SessionID)
                 .SetPacket(interview.Packet.Description, interview.Packet.Prompt);
@@ -204,9 +215,21 @@ namespace RobotInterrogation.Hubs
         {
             Service.AllocateRole(interview);
 
-            await Clients
-                .Client(interview.SuspectConnectionID)
-                .ShowRole(interview.Role);
+            var suspectClient = Clients
+                .Client(interview.SuspectConnectionID);
+
+            var pattern = interview.InterferencePattern;
+
+            if (interview.Role.Type == SuspectRoleType.Human)
+            {
+                await suspectClient
+                    .ShowRoleWithPattern(interview.Role, pattern.ToString());
+            }
+            else
+            {
+                await suspectClient
+                    .ShowRoleWithSolution(interview.Role, pattern.SolutionSequence);
+            }
         }
 
         private async Task ShowQuestions(Interview interview)
@@ -262,9 +285,20 @@ namespace RobotInterrogation.Hubs
                 .WaitForPacketChoice();
         }
 
-        private async Task ShowSuspectBackgrounds(Interview interview)
+        private async Task ShowInducerPrompt(Interview interview)
         {
-            Service.AllocateSuspectBackgrounds(interview);
+            await Clients
+                .Client(interview.InterviewerConnectionID)
+                .ShowInducerPrompt(interview.InterferencePattern.SolutionSequence);
+
+            await Clients
+                .GroupExcept(SessionID, interview.InterviewerConnectionID)
+                .WaitForInducer();
+        }
+
+        private async Task ShowSuspectBackgrounds(Interview interview, bool suspectCanChoose)
+        {
+            Service.AllocateSuspectBackgrounds(interview, suspectCanChoose ? 3 : 1);
             interview.Status = InterviewStatus.SelectingSuspectBackground;
 
             await Clients

@@ -118,19 +118,14 @@ namespace Tests
             var random = new Random(seed);
             var service = new InterferenceService();
 
-            var pattern = service.Generate(random, 4, 8, 6);
+            var pattern = service.Generate(random);
             Assert.NotNull(pattern);
 
             var display = pattern.ToString();
             Assert.NotNull(display);
             Assert.Equal(expectedLayout.Trim(), display.Trim());
 
-            string actualSequence = string.Join
-            (
-                "",
-                pattern.MarkerSequence
-                    .Select(i => (char)('A' + i))
-            );
+            string actualSequence = string.Join(string.Empty, pattern.SolutionSequence);
 
             Assert.Equal(expectedSequence, actualSequence);
         }
