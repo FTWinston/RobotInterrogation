@@ -118,7 +118,7 @@ namespace Tests
             var random = new Random(seed);
             var service = new InterferenceService();
 
-            var pattern = service.Generate(random);
+            var pattern = service.Generate(random, 4, 8, 6);
             Assert.NotNull(pattern);
 
             var display = pattern.ToString();
