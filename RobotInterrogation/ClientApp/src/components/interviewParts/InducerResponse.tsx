@@ -22,12 +22,12 @@ export const InducerResponse: React.FunctionComponent<IProps> = props => {
             <InterferenceSolution solution={props.solution} />
 
             <p>
-                Wait for the suspect to respond to your question, then indicate whether their response was correct
+                Wait for the suspect to respond to your question, then indicate whether their response is correct.
             </p>
 
             <div className="actionSet">
-                <button onClick={() => props.correct()}>Suspect was correct</button>
-                <button onClick={() => props.incorrect()}>Suspect was wrong</button>
+                <button onClick={() => props.correct()}>Correct response</button>
+                <button onClick={() => props.incorrect()}>Incorrect response</button>
             </div>
         </div>
     )
