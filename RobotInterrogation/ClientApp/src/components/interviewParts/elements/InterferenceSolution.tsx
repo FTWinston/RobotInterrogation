@@ -28,7 +28,7 @@ export const InterferenceSolution: React.FunctionComponent<IProps> = props => {
         .join('');
 
     return (
-        <div className="interference">
+        <div className="interference interference--solution">
 {firstLine}<br/>
 ↑{midLine}↓<br/>
 {lastLine}

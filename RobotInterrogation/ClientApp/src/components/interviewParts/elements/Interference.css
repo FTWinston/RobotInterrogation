@@ -5,3 +5,11 @@
     text-align: center;
     line-height: 1em;
 }
+
+.interference--pattern {
+    line-height: 0.8em;
+}
+
+.interference--solution {
+    font-size: 1.25em;
+}

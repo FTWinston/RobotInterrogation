@@ -7,7 +7,7 @@ interface IProps {
 
 export const InterferencePattern: React.FunctionComponent<IProps> = props => {
     return (
-        <div className="interference">
+        <div className="interference interference--pattern">
             {props.pattern}
         </div>
     )
