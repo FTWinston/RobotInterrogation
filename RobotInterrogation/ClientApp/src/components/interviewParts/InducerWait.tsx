@@ -16,11 +16,9 @@ export const InducerWait: React.FunctionComponent<IProps> = props => {
 
             <PacketDisplay packet={props.packet} />
 
-            <p>
-                The interviewer will shortly ask you a question, and then administer the inducer.
-                <br/>You will see your role for this interview, and an inteference task.
-                <br/>Answer the interviewer's question correctly to be able to choose your background.
-            </p>
+            <p>The interviewer will shortly ask you a question, and then administer the inducer.</p>
+            <p>You will see your role for this interview, and an inteference task.</p>
+            <p>Answer the interviewer's question correctly to be able to choose your background.</p>
         </div>
     )
 }
