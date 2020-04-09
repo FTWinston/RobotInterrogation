@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { InterviewPosition } from '../interviewReducer';
+import { InterviewPosition, Direction } from '../interviewReducer';
 import './ValueDisplay.css';
 import { PositionHeader } from './elements/PositionHeader';
 import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
@@ -11,15 +11,16 @@ interface IProps {
     position: InterviewPosition;
     packet: string;
     role: ISuspectRole;
-    pattern?: string;
+    connections?: Direction[][];
+    content?: string[][];
     solution?: string[];
 }
 
 export const InducerDisplay: React.FunctionComponent<IProps> = props => {
     const patternOrSolution = props.solution !== undefined
         ? <InterferenceSolution solution={props.solution} />
-        : props.pattern !== undefined
-            ? <InterferencePattern pattern={props.pattern} />
+        : props.connections !== undefined && props.content !== undefined
+            ? <InterferencePattern connections={props.connections} content={props.content} />
             : undefined;
 
     return (
@@ -32,7 +33,7 @@ export const InducerDisplay: React.FunctionComponent<IProps> = props => {
 
             {patternOrSolution}
 
-            <p>Answer the interviewer's question correctly to be able to choose your background.</p>
+            <p>Answer the interviewer's question based on the above diagram.<br/>If you answer correctly, you can choose your background.</p>
         </div>
     )
 }

@@ -88,11 +88,12 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         });
     });
 
-    connection.on('ShowRoleWithPattern', (role: ISuspectRole, pattern: string) => {
+    connection.on('ShowRoleWithPattern', (role: ISuspectRole, connections: number[][], contents: string[][]) => {
         dispatch({
             type: 'set role and pattern',
             role,
-            pattern,
+            patternConnections: connections,
+            patternContent: contents,
         });
     });
 

@@ -6,10 +6,36 @@
     line-height: 1em;
 }
 
+
 .interference--pattern {
-    line-height: 0.8em;
+    display: flex;
+    justify-content: center;
 }
 
 .interference--solution {
     font-size: 1.25em;
+}
+
+.interference__cell {
+    border: solid transparent 1px;
+    width: 1.25em;
+    height: 1.25em;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.interference__cell--northBorder {
+    border-top-color: black;
+}
+
+.interference__cell--southBorder {
+    border-bottom-color: black;
+}
+
+.interference__cell--eastBorder {
+    border-right-color: black;
+}
+
+.interference__cell--westBorder {
+    border-left-color: black;
 }

@@ -135,7 +135,8 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         position={state.position}
                         packet={state.packet}
                         role={state.role!}
-                        pattern={state.interferencePattern}
+                        connections={state.patternConnections}
+                        content={state.patternContent}
                         solution={state.patternSolution}
                     />
                 )

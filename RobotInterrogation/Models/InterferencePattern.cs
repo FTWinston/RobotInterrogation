@@ -41,6 +41,47 @@ namespace RobotInterrogation.Models
 
         public List<Tuple<Point, Direction>> Arrows = new List<Tuple<Point, Direction>>();
 
+        public string[,] CellContents
+        {
+            get
+            {
+                var results = new string[Width, Height];
+
+                foreach (var arrow in Arrows)
+                    results[arrow.Item1.X, arrow.Item1.Y] = GetArrowForDirection(arrow.Item2).ToString();
+
+                for (int index = 0; index < Markers.Count; index++)
+                {
+                    var marker = Markers[index];
+                    results[marker.X, marker.Y] = GetSymbolForMarker(index).ToString();
+                }
+
+                return results;
+            }
+        }
+
+        private static char GetArrowForDirection(Direction dir)
+        {
+            switch (dir)
+            {
+                case Direction.North:
+                    return '↑';
+                case Direction.South:
+                    return '↓';
+                case Direction.East:
+                    return '→';
+                case Direction.West:
+                    return '←';
+                default:
+                    return ' ';
+            }
+        }
+
+        private static char GetSymbolForMarker(int index)
+        {
+            return (char)('A' + index);
+        }
+
         #region serialization
         public override string ToString()
         {
@@ -187,24 +228,12 @@ namespace RobotInterrogation.Models
 
             var index = Markers.IndexOf(point);
             if (index != -1)
-                return (char)('A' + index);
+                return GetSymbolForMarker(index);
 
             var matchingArrow = Arrows.FirstOrDefault(arr => arr.Item1 == point);
 
             if (matchingArrow != null)
-            {
-                switch (matchingArrow.Item2)
-                {
-                    case Direction.North:
-                        return '↑';
-                    case Direction.South:
-                        return '↓';
-                    case Direction.East:
-                        return '→';
-                    case Direction.West:
-                        return '←';
-                }
-            }
+                return GetArrowForDirection(matchingArrow.Item2);
 
             return ' ';
         }

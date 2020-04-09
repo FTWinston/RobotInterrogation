@@ -29,7 +29,7 @@ namespace RobotInterrogation.Hubs
         Task ShowInducerPrompt(List<string> solution);
         Task WaitForInducer();
 
-        Task ShowRoleWithPattern(SuspectRole role, string interferencePattern);
+        Task ShowRoleWithPattern(SuspectRole role, int[][] connections, string[][] contents);
         Task ShowRoleWithSolution(SuspectRole role, List<string> solution);
 
         Task ShowQuestions(List<Question> primary, List<Question> secondary);
@@ -223,7 +223,11 @@ namespace RobotInterrogation.Hubs
             if (interview.Role.Type == SuspectRoleType.Human)
             {
                 await suspectClient
-                    .ShowRoleWithPattern(interview.Role, pattern.ToString());
+                    .ShowRoleWithPattern(
+                        interview.Role,
+                        pattern.Connections.ToJaggedArray(val => (int)val),
+                        pattern.CellContents.ToJaggedArray(val => val ?? string.Empty)
+                    );
             }
             else
             {

@@ -41,6 +41,14 @@ export enum InterviewPosition {
     Suspect,
 }
 
+export enum Direction {
+    None = 0,
+    North = 1 << 0,
+    South = 1 << 1,
+    East = 1 << 2,
+    West = 1 << 3,
+}
+
 export interface IInterviewState {
     position: InterviewPosition;
     status: InterviewStatus;
@@ -49,7 +57,8 @@ export interface IInterviewState {
     packet: string;
     prompt: string;
     penalty: string;
-    interferencePattern?: string;
+    patternConnections?: Direction[][];
+    patternContent?: string[][];
     patternSolution?: string[];
     primaryQuestions: IInterviewQuestion[];
     secondaryQuestions: IInterviewQuestion[];
@@ -101,7 +110,8 @@ export type InterviewAction = {
 } | {
     type: 'set role and pattern';
     role: ISuspectRole;
-    pattern: string;
+    patternConnections: Direction[][];
+    patternContent: string[][];
 } | {
     type: 'set role and solution';
     role: ISuspectRole;
@@ -168,7 +178,8 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
                 penalty: '',
                 primaryQuestions: [],
                 prompt: '',
-                interferencePattern: undefined,
+                patternConnections: undefined,
+                patternContent: undefined,
                 patternSolution: undefined,
                 role: undefined,
                 secondaryQuestions: [],
@@ -223,7 +234,8 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
                 ...state,
                 status: InterviewStatus.ShowingInducer,
                 role: action.role,
-                interferencePattern: action.pattern,
+                patternConnections: action.patternConnections,
+                patternContent: action.patternContent,
             };
         
         case 'set role and solution':
