@@ -5,6 +5,7 @@ import { PositionHeader } from './elements/PositionHeader';
 import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
 import { InterferenceSolution } from './elements/InterferenceSolution';
 import { InterferencePattern } from './elements/InterferencePattern';
+import { PacketDisplay } from './elements/PacketDisplay';
 
 interface IProps {
     position: InterviewPosition;
@@ -25,8 +26,7 @@ export const InducerDisplay: React.FunctionComponent<IProps> = props => {
         <div>
             <PositionHeader position={props.position} />
 
-            <p>The chosen interview packet is:</p>
-            <p className="valueDisplay">{props.packet}</p>
+            <PacketDisplay packet={props.packet} />
 
             <SuspectRole role={props.role} />
 

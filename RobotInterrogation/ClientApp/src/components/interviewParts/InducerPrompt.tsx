@@ -3,6 +3,7 @@ import { InterviewPosition } from '../interviewReducer';
 import './ValueDisplay.css';
 import { PositionHeader } from './elements/PositionHeader';
 import { InterferenceSolution } from './elements/InterferenceSolution';
+import { PacketDisplay } from './elements/PacketDisplay';
 
 interface IProps {
     solution: string[];
@@ -15,8 +16,7 @@ export const InducerPrompt: React.FunctionComponent<IProps> = props => {
         <div>
             <PositionHeader position={InterviewPosition.Interviewer} />
 
-            <p>The chosen interview packet is:</p>
-            <p className="valueDisplay">{props.packet}</p>
+            <PacketDisplay packet={props.packet} />
 
             <InterferenceSolution solution={props.solution} />
 

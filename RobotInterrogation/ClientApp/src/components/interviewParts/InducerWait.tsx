@@ -2,6 +2,7 @@ import * as React from 'react';
 import { InterviewPosition } from '../interviewReducer';
 import './ValueDisplay.css';
 import { PositionHeader } from './elements/PositionHeader';
+import { PacketDisplay } from './elements/PacketDisplay';
 
 interface IProps {
     position: InterviewPosition;
@@ -13,8 +14,7 @@ export const InducerWait: React.FunctionComponent<IProps> = props => {
         <div>
             <PositionHeader position={props.position} />
 
-            <p>The chosen interview packet is:</p>
-            <p className="valueDisplay">{props.packet}</p>
+            <PacketDisplay packet={props.packet} />
 
             <p>
                 The interviewer will shortly ask you a question, and then administer the inducer.
