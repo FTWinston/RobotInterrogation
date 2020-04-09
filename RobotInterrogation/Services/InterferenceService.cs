@@ -8,7 +8,7 @@ namespace RobotInterrogation.Services
 {
     public class InterferenceService
     {
-        public InterferencePattern Generate(Random random, int simpleWidth = 4, int simpleHeight = 7, int numMarkers = 6)
+        public InterferencePattern Generate(Random random, int simpleWidth = 7, int simpleHeight = 4, int numMarkers = 6)
         {
             // Generate a simple maze pattern.
             var simplePattern = GenerateSimple(random, simpleWidth, simpleHeight);
@@ -17,7 +17,7 @@ namespace RobotInterrogation.Services
             var pattern = DoubleUp(simplePattern);
 
             // Place more than the required number of markers, initially.
-            List<Point> markerPositions = PlaceMarkers(random, pattern.Width, pattern.Height, numMarkers * 3);
+            List<Point> markerPositions = PlaceMarkers(random, pattern.Width, pattern.Height, numMarkers * 4);
 
             // Determine the path through the maze.
             var markerData = SolveSequence(random, markerPositions, pattern.Connections);
