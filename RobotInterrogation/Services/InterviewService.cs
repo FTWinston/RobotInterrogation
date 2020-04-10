@@ -264,7 +264,7 @@ namespace RobotInterrogation.Services
                 interview.Status,
                 interview.Outcome,
                 Duration = duration,
-                Packet = interview.Packet.Name,
+                Packet = interview.Packet.Description,
                 InterferencePattern = interview.InterferencePattern.ToString(),
                 InterferenceSolution = interview.InterferencePattern.SolutionSequence,
                 PrimaryQuestions = interview.PrimaryQuestions.Select(q => q.Challenge).ToArray(),
