@@ -200,12 +200,6 @@ namespace RobotInterrogation.Services
             interview.InterferencePattern = InterferenceService.Generate(new Random());
         }
 
-        public void AllocateQuestions(Interview interview)
-        {
-            AllocateRandomValues(interview.Packet.PrimaryQuestions, interview.PrimaryQuestions, 3);
-            AllocateRandomValues(interview.Packet.SecondaryQuestions, interview.SecondaryQuestions, 3);
-        }
-
         public void AllocateSuspectBackgrounds(Interview interview, int numOptions)
         {
             AllocateRandomValues(Configuration.SuspectBackgrounds, interview.SuspectBackgrounds, numOptions);
@@ -279,8 +273,6 @@ namespace RobotInterrogation.Services
                 Packet = interview.Packet.Description,
                 InterferencePattern = interview.InterferencePattern.ToString(),
                 InterferenceSolution = interview.InterferencePattern.SolutionSequence,
-                PrimaryQuestions = interview.PrimaryQuestions.Select(q => q.Challenge).ToArray(),
-                SecondaryQuestions = interview.SecondaryQuestions.Select(q => q.Challenge).ToArray(),
                 SuspectBackground = interview.SuspectBackgrounds.First(),
                 SuspectType = interview.Role.Type,
                 SuspectFault = interview.Role.Fault,

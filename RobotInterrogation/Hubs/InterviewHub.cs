@@ -32,7 +32,7 @@ namespace RobotInterrogation.Hubs
         Task ShowRoleWithPattern(SuspectRole role, int[][] connections, string[][] contents);
         Task ShowRoleWithSolution(SuspectRole role, List<string> solution);
 
-        Task ShowQuestions(List<Question> primary, List<Question> secondary);
+        Task ShowQuestions(IList<Question> primary, IList<Question> secondary);
 
         Task ShowSuspectBackgroundChoice(List<string> notes);
         Task WaitForSuspectBackgroundChoice();
@@ -238,11 +238,9 @@ namespace RobotInterrogation.Hubs
 
         private async Task ShowQuestions(Interview interview)
         {
-            Service.AllocateQuestions(interview);
-
             await Clients
                 .Client(interview.InterviewerConnectionID)
-                .ShowQuestions(interview.PrimaryQuestions, interview.SecondaryQuestions);
+                .ShowQuestions(interview.Packet.PrimaryQuestions, interview.Packet.SecondaryQuestions);
         }
 
         private async Task DiscardSinglePenalty(int index, Interview interview)
