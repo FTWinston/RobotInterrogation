@@ -175,17 +175,12 @@ namespace RobotInterrogation.Services
 
         public void AllocateRole(Interview interview)
         {
-            var possibleRoles = new List<SuspectRole>
-            {
-                Configuration.HumanRole,
-                Configuration.HumanRole,
-                Configuration.HumanRole,
-                Configuration.HumanRole,
-                Configuration.HumanRole,
-                Configuration.HumanRole,
-            };
+            var possibleRoles = new List<SuspectRole>(interview.Packet.Roles);
 
-            possibleRoles.AddRange(interview.Packet.Roles);
+            // Always have a 50% chance of being human.
+            possibleRoles.AddRange(
+                interview.Packet.Roles.Select(role => Configuration.HumanRole)
+            );
 
             var roles = new List<SuspectRole>();
 
