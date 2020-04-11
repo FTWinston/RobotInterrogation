@@ -9,16 +9,14 @@ export const WaitingForOpponent: React.FunctionComponent<IProps> = props => {
     const fullLocation = document.location.toString();
     const strippedProtocol = fullLocation.substr(fullLocation.indexOf('//') + 2);
 
-    let fixedLocation = strippedProtocol.substr(0, strippedProtocol.indexOf(props.interviewID));
-    let detailLocation;
-
-    if (fixedLocation.length === 0) {
-        fixedLocation = strippedProtocol;
-        detailLocation = '';
-    }
-    else {
-        detailLocation = props.interviewID;
-    }
+    const fixedLocation = addWordBreaks(
+        strippedProtocol.substr(0, strippedProtocol.indexOf(props.interviewID)),
+        char => char === '/' || char === '.'
+    );
+    const detailLocation = addWordBreaks(
+        props.interviewID,
+        char => char === char.toUpperCase()
+    );
 
     return (
         <div>
@@ -37,4 +35,45 @@ export const WaitingForOpponent: React.FunctionComponent<IProps> = props => {
             </p>
         </div>
     );
+}
+
+function addWordBreaks(text: string, shouldBreak: (char: string) => boolean) {
+    const results: JSX.Element[] = [];
+
+    let word = '';
+
+    for (const char of text) {
+        if (shouldBreak(char) && word.length > 0) {
+            if (results.length > 0) {
+                results.push(
+                    <>
+                        <wbr/>
+                        {word}
+                    </>
+                )
+            }
+            else {
+                results.push(
+                    <>
+                        {word}
+                    </>
+                )
+            }
+            
+            word = '';
+        }
+
+        word = word + char;
+    }
+    
+    if (word.length > 0) {
+        results.push(
+            <>
+                <wbr/>
+                {word}
+            </>
+        );
+    }
+
+    return results;
 }
