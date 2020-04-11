@@ -41,22 +41,23 @@ function addWordBreaks(text: string, shouldBreak: (char: string) => boolean) {
     const results: JSX.Element[] = [];
 
     let word = '';
+    let i = 0;
 
     for (const char of text) {
         if (shouldBreak(char) && word.length > 0) {
             if (results.length > 0) {
                 results.push(
-                    <>
+                    <React.Fragment key={i++}>
                         <wbr/>
                         {word}
-                    </>
+                    </React.Fragment>
                 )
             }
             else {
                 results.push(
-                    <>
+                    <React.Fragment key={i++}>
                         {word}
-                    </>
+                    </React.Fragment>
                 )
             }
             
@@ -68,10 +69,10 @@ function addWordBreaks(text: string, shouldBreak: (char: string) => boolean) {
     
     if (word.length > 0) {
         results.push(
-            <>
+            <React.Fragment key={i++}>
                 <wbr/>
                 {word}
-            </>
+            </React.Fragment>
         );
     }
 
