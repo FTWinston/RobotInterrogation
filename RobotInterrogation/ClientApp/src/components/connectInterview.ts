@@ -105,11 +105,10 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         });
     });
 
-    connection.on('ShowQuestions', (primary: IInterviewQuestion[], secondary: IInterviewQuestion[]) => {
+    connection.on('ShowQuestions', (questions: IInterviewQuestion[]) => {
         dispatch({
             type: 'set questions',
-            primary,
-            secondary,
+            questions,
         });
     });
 

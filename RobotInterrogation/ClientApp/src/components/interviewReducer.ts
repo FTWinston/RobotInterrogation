@@ -60,8 +60,7 @@ export interface IInterviewState {
     patternConnections?: Direction[][];
     patternContent?: string[][];
     patternSolution?: string[];
-    primaryQuestions: IInterviewQuestion[];
-    secondaryQuestions: IInterviewQuestion[];
+    questions: IInterviewQuestion[];
     suspectBackground: string;
     role?: ISuspectRole;
     duration: number;
@@ -73,9 +72,8 @@ export const initialState: IInterviewState = {
     position: InterviewPosition.None,
     packet: '',
     penalty: '',
-    primaryQuestions: [],
     prompt: '',
-    secondaryQuestions: [],
+    questions: [],
     status: InterviewStatus.NotConnected,
     suspectBackground: '',
 };
@@ -118,8 +116,7 @@ export type InterviewAction = {
     solution: string[];
 } | {
     type: 'set questions';
-    primary: IInterviewQuestion[];
-    secondary: IInterviewQuestion[];
+    questions: IInterviewQuestion[];
 } | {
     type: 'set background choice';
     options: string[];
@@ -176,13 +173,12 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
                 outcome: undefined,
                 packet: '',
                 penalty: '',
-                primaryQuestions: [],
                 prompt: '',
                 patternConnections: undefined,
                 patternContent: undefined,
                 patternSolution: undefined,
+                questions: [],
                 role: undefined,
-                secondaryQuestions: [],
                 suspectBackground: '',
             };
             
@@ -250,8 +246,7 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
             return {
                 ...state,
                 status: InterviewStatus.ShowingInducer,
-                primaryQuestions: action.primary,
-                secondaryQuestions: action.secondary,
+                questions: action.questions,
             };
 
         case 'set background choice':

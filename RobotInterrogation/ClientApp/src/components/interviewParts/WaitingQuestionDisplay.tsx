@@ -5,14 +5,12 @@ import { InterviewPosition } from '../interviewReducer';
 import { PositionHeader } from './elements/PositionHeader';
 
 interface IProps {
-    primary: IInterviewQuestion[],
-    secondary: IInterviewQuestion[],
+    questions: IInterviewQuestion[],
     waitingFor: string,
 }
 
 export const WaitingQuestionDisplay: React.FunctionComponent<IProps> = props => {
-    const primary = props.primary.map((q, i) => <InterviewQuestion primary={true} question={q} key={i} />);
-    const secondary = props.secondary.map((q, i) => <InterviewQuestion primary={false} question={q} key={i} />);
+    const questions = props.questions.map((q, i) => <InterviewQuestion question={q} key={i} />);
 
     return (
         <div>
@@ -20,8 +18,7 @@ export const WaitingQuestionDisplay: React.FunctionComponent<IProps> = props => 
 
             <p>Waiting for the suspect to select their {props.waitingFor}. Your questions are as follows:</p>
             <div className="itemGroup">
-                {primary}
-                {secondary}
+                {questions}
             </div>
         </div>
     );

@@ -153,8 +153,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
             if (state.position === InterviewPosition.Interviewer) {
                 return (
                     <WaitingQuestionDisplay
-                        primary={state.primaryQuestions}
-                        secondary={state.secondaryQuestions}
+                        questions={state.questions}
                         waitingFor="background"
                     />
                 );
@@ -170,9 +169,8 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
 
                 return (
                     <InterviewerReadyToStart
-                        primary={state.primaryQuestions}
+                        questions={state.questions}
                         prompt={state.prompt}
-                        secondary={state.secondaryQuestions}
                         suspectBackground={state.suspectBackground}
                         penalty={state.penalty}
                         ready={ready}
@@ -199,8 +197,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         duration={state.duration}
                         penalty={state.penalty}
                         prompt={state.prompt}
-                        primary={state.primaryQuestions}
-                        secondary={state.secondaryQuestions}
+                        questions={state.questions}
                         suspectBackground={state.suspectBackground}
                     />
                 );

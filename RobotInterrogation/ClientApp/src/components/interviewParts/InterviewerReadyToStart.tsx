@@ -6,24 +6,29 @@ import { InterviewPosition } from '../interviewReducer';
 
 interface IProps {
     prompt: string,
-    primary: IInterviewQuestion[],
-    secondary: IInterviewQuestion[],
+    questions: IInterviewQuestion[],
     suspectBackground: string,
     penalty: string,
     ready: () => void,
 }
 
 export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props => {
-    const primary = props.primary.map((q, i) => <InterviewQuestion primary={true} question={q} key={i} />);
-    const secondary = props.secondary.map((q, i) => <InterviewQuestion primary={false} question={q} key={i} />);
+    const questions = props.questions.map((q, i) => {
+
+        return (
+            <InterviewQuestion
+                question={q}
+                key={i}
+            />
+        )
+    });
 
     return (
         <div>
             <PositionHeader position={InterviewPosition.Interviewer} />
             <p>Ask the suspect their name and confirm their background.<br/>When you are ready, read them the prompt, then start the timer.</p>
             <div>
-                {primary}
-                {secondary}
+                {questions}
             </div>
             <p>Penalty: {props.penalty}</p>
             <p>Suspect background: {props.suspectBackground}</p>

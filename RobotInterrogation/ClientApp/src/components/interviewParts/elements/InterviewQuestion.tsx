@@ -3,18 +3,20 @@ import './InterviewQuestion.css';
 
 export interface IInterviewQuestion {
     challenge: string;
-    examples: string[]
+    examples: string[];
+    isPrimary: boolean;
 }
 
 interface IProps {
-    primary: boolean;
     question: IInterviewQuestion;
 }
 
 export const InterviewQuestion: React.FunctionComponent<IProps> = props => {
-    const classes = `interviewQuestion interviewQuestion--${props.primary ? 'primary' : 'secondary'}`;
+    const classes = `interviewQuestion interviewQuestion--${props.question.isPrimary ? 'primary' : 'secondary'}`;
     const examples = props.question.examples.map((q, i) => <li className="interviewQuestion__example" key={i}>{q}</li>);
-    const secondary = props.primary ? undefined : <div className="interviewQuestion__secondaryWrapper">while fulfilling another prompt</div>
+    const secondary = props.question.isPrimary
+        ? undefined
+        : <div className="interviewQuestion__secondaryWrapper">while fulfilling another prompt</div>
 
     return (
         <div className={classes}>

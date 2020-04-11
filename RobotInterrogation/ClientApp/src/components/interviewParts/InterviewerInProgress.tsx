@@ -8,8 +8,7 @@ import { InterviewPosition } from '../interviewReducer';
 
 interface IProps {
     prompt: string;
-    primary: IInterviewQuestion[];
-    secondary: IInterviewQuestion[];
+    questions: IInterviewQuestion[];
     suspectBackground: string;
     penalty: string;
     duration: number;
@@ -17,8 +16,7 @@ interface IProps {
 }
 
 export const InterviewerInProgress: React.FunctionComponent<IProps> = props => {
-    const primary = props.primary.map((q, i) => <InterviewQuestion primary={true} question={q} key={i} />);
-    const secondary = props.secondary.map((q, i) => <InterviewQuestion primary={false} question={q} key={i} />);
+    const questions = props.questions.map((q, i) => <InterviewQuestion question={q} key={i} />);
 
     const isHuman = () => props.conclude(false);
     const isRobot = () => props.conclude(true);
@@ -35,8 +33,7 @@ export const InterviewerInProgress: React.FunctionComponent<IProps> = props => {
         <p>Prompt: {props.prompt}</p>
 
         <div>
-            {primary}
-            {secondary}
+            {questions}
         </div>
 
         <p>Penalty: {props.penalty}</p>
