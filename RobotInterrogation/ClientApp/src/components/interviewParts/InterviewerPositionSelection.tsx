@@ -14,9 +14,13 @@ export const InterviewerPositionSelection: React.FunctionComponent<IProps> = pro
 
             <p>Please select an option:</p>
 
-            <button onClick={props.stay}>Remain as the interviewer</button>
+            <button onClick={props.stay}>Remain as the Interviewer</button>
             <br />
-            <button onClick={props.swap}>Switch roles and become the suspect</button>
+            <button onClick={props.swap}>Switch roles and become the Suspect</button>
+
+            <p>The Interviewer must try to determine whether the Suspect is a human or a robot.</p>
+                
+            <p>The Suspect should try to convince the Interviewer that they are human.</p>
         </div>
     );
 }

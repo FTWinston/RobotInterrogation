@@ -15,6 +15,8 @@ export const SuspectPenaltySelection: React.FunctionComponent<IProps> = props =>
             <p>Select one of the following penalities to <strong>use</strong> for this interview.</p>
 
             {renderOptions(props.options, props.action)}
+
+            <p>The penalty is a suspicious action that robots may perform under stress during the interrogation. Human suspects should avoid performing the penalty.</p>
         </div>
     );
 }

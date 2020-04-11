@@ -24,6 +24,7 @@ import { connectInterview } from './connectInterview';
 import { InducerPrompt } from './interviewParts/InducerPrompt';
 import { InducerResponse } from './interviewParts/InducerResponse';
 import { InducerDisplay } from './interviewParts/InducerDisplay';
+import { PositionSelection } from './interviewParts/PositionSelection';
 
 export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string }>> = props => {
     const [state, dispatch] = useReducer(interviewReducer, initialState);
@@ -63,7 +64,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                 return <InterviewerPositionSelection stay={confirm} swap={swap} />
             }
             else {
-                return <Wait position={state.position} waitFor="the interviewer to confirm your respective roles" />
+                return <PositionSelection position={state.position} />
             }
 
         case InterviewStatus.PenaltySelection:
@@ -76,8 +77,8 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
             }
             else {
                 const waitFor = state.position === InterviewPosition.Interviewer
-                    ? 'the suspect to choose a penalty'
-                    : 'the interviewer to discard a penalty';
+                    ? 'the Suspect to choose a penalty'
+                    : 'the Interviewer to discard a penalty';
 
                 return (
                     <Wait

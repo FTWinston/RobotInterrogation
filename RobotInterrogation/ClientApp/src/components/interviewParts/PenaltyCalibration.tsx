@@ -11,8 +11,8 @@ interface IProps {
 
 export const PenaltyCalibration: React.FunctionComponent<IProps> = props => {
     const extraMessage = props.position === InterviewPosition.Interviewer
-        ? <p>Ask the suspect to perform this penalty 3 times.<br/>When you are satisfied that they have done so, click to continue.</p>
-        : <p>The interviewer will now ask you to perform this penalty 3 times.</p>
+        ? <p>Ask the Suspect to perform this penalty 3 times.<br/>When you are satisfied that they have done so, click to continue.</p>
+        : <p>The Interviewer will now ask you to perform this penalty 3 times.</p>
 
     const confirm = props.confirm
         ? <div className="actionSet"><button onClick={() => props.confirm!()}>Continue</button></div>
@@ -22,7 +22,7 @@ export const PenaltyCalibration: React.FunctionComponent<IProps> = props => {
         <div>
             <PositionHeader position={props.position} />
 
-            <p>The chosen penality is:</p>
+            <p>The chosen penalty is:</p>
             <p className="valueDisplay">{props.penalty}</p>
 
             {extraMessage}

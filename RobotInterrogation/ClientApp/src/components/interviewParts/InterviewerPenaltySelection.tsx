@@ -12,9 +12,11 @@ export const InterviewerPenaltySelection: React.FunctionComponent<IProps> = prop
     return (
         <div>
             <PositionHeader position={InterviewPosition.Interviewer} />
-            <p>Select one of the following penalities to <strong>discard</strong>. The suspect will choose from the remaining two.</p>
+            <p>Select one of the following penalities to <strong>discard</strong>. The Suspect will choose from the remaining two.</p>
 
             {renderOptions(props.options, props.action)}
+
+            <p>The penalty is a suspicious action that robots may perform under stress during the interrogation. Human suspects should avoid performing the penalty.</p>
         </div>
     );
 }
