@@ -6,7 +6,6 @@ import { PositionHeader } from './elements/PositionHeader';
 
 interface IProps {
     questions: IInterviewQuestion[],
-    waitingFor: string,
 }
 
 export const WaitingQuestionDisplay: React.FunctionComponent<IProps> = props => {
@@ -16,7 +15,7 @@ export const WaitingQuestionDisplay: React.FunctionComponent<IProps> = props => 
         <div>
             <PositionHeader position={InterviewPosition.Interviewer} />
 
-            <p>Waiting for the suspect to select their {props.waitingFor}. Your questions are as follows:</p>
+            <p>Waiting for the Suspect to select their background. Your questions are as follows:</p>
             <div className="itemGroup">
                 {questions}
             </div>

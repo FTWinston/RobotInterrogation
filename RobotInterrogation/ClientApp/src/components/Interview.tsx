@@ -155,7 +155,6 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                 return (
                     <WaitingQuestionDisplay
                         questions={state.questions}
-                        waitingFor="background"
                     />
                 );
             }

@@ -33,7 +33,7 @@ export const InducerDisplay: React.FunctionComponent<IProps> = props => {
 
             {patternOrSolution}
 
-            <p>Answer the interviewer's question based on the above diagram.<br/>If you answer correctly, you can choose your background.</p>
+            <p>Answer the Interviewer's question based on the above diagram.<br/>If you answer correctly, you can choose your background.</p>
         </div>
     )
 }

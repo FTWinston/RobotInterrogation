@@ -20,10 +20,8 @@ export const InducerPrompt: React.FunctionComponent<IProps> = props => {
 
             <InterferenceSolution solution={props.solution} />
 
-            <p>
-                Ask the suspect a question based on the sequence above, then click below to administer the inducer, revealing the suspect's role to them, along with an interference task that will allow them to answer your question.
-                <br/>
-            </p>
+            <p>Ask the Suspect a question based on the sequence above, then click below to administer the inducer, revealing the Suspect's role to them.</p>
+            <p>Robots will see the same diagram as you, but need time to read the details of their role. Humans will need to solve a puzzle to answer your question.</p>
 
             <div>
                 Example questions:
