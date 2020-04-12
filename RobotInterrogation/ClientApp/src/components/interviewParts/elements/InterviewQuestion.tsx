@@ -9,7 +9,8 @@ export interface IInterviewQuestion {
 
 interface IProps {
     question: IInterviewQuestion;
-    sort?: (up: boolean) => void;
+    sortUp?: () => void;
+    sortDown?: () => void;
 }
 
 export const InterviewQuestion = React.forwardRef<HTMLDivElement, IProps>((props, ref) => {
@@ -19,11 +20,18 @@ export const InterviewQuestion = React.forwardRef<HTMLDivElement, IProps>((props
         ? undefined
         : <div className="interviewQuestion__secondaryWrapper">while fulfilling another prompt</div>
 
-    const buttons = props.sort
-        ? <>
-            <button className="interviewQuestion__sort interviewQuestion__sort--up" onClick={() => props.sort!(true)}>↑</button>
-            <button className="interviewQuestion__sort interviewQuestion__sort--down" onClick={() => props.sort!(false)}>↓</button>
-        </>
+    const sortUp = props.sortUp
+        ? <button
+            className="interviewQuestion__sort interviewQuestion__sort--up"
+            onClick={props.sortUp}
+        >↑</button>
+        : undefined;
+
+    const sortDown = props.sortDown
+        ? <button
+            className="interviewQuestion__sort interviewQuestion__sort--down"
+            onClick={props.sortDown}
+        >↓</button>
         : undefined;
 
     return (
@@ -37,7 +45,8 @@ export const InterviewQuestion = React.forwardRef<HTMLDivElement, IProps>((props
                 {examples}
             </ul>
             <div className="interviewQuestion__wrapper">to be human</div>
-            {buttons}
+            {sortUp}
+            {sortDown}
         </div>
     );
 })
