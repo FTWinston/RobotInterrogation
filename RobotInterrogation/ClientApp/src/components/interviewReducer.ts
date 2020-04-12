@@ -115,6 +115,8 @@ export type InterviewAction = {
     role: ISuspectRole;
     solution: string[];
 } | {
+    type: 'show inducer';
+} | {
     type: 'set questions';
     questions: IInterviewQuestion[];
 } | {
@@ -228,7 +230,6 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
         case 'set role and pattern':
             return {
                 ...state,
-                status: InterviewStatus.ShowingInducer,
                 role: action.role,
                 patternConnections: action.patternConnections,
                 patternContent: action.patternContent,
@@ -237,7 +238,6 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
         case 'set role and solution':
             return {
                 ...state,
-                status: InterviewStatus.ShowingInducer,
                 role: action.role,
                 patternSolution: action.solution,
             };
@@ -245,8 +245,13 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
         case 'set questions':
             return {
                 ...state,
-                status: InterviewStatus.ShowingInducer,
                 questions: action.questions,
+            };
+        
+        case 'show inducer':
+            return {
+                ...state,
+                status: InterviewStatus.ShowingInducer,
             };
 
         case 'set background choice':

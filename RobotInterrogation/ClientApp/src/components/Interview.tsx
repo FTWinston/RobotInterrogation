@@ -174,6 +174,10 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         suspectBackground={state.suspectBackground}
                         penalty={state.penalty}
                         ready={ready}
+                        sortQuestions={questions => dispatch({
+                            type: 'set questions',
+                            questions,
+                        })}
                     />
                 );
             }
@@ -196,7 +200,6 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         conclude={conclude}
                         duration={state.duration}
                         penalty={state.penalty}
-                        prompt={state.prompt}
                         questions={state.questions}
                         suspectBackground={state.suspectBackground}
                     />

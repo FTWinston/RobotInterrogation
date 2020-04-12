@@ -7,7 +7,6 @@ import { PositionHeader } from './elements/PositionHeader';
 import { InterviewPosition } from '../interviewReducer';
 
 interface IProps {
-    prompt: string;
     questions: IInterviewQuestion[];
     suspectBackground: string;
     penalty: string;
@@ -29,8 +28,7 @@ export const InterviewerInProgress: React.FunctionComponent<IProps> = props => {
 
     return <div>
         <PositionHeader position={InterviewPosition.Interviewer} />
-        <p>Ask the suspect questions and decide whether they are human or a robot.</p>
-        <p>Prompt: {props.prompt}</p>
+        <p>Ask the Suspect questions and decide whether they are human or a robot.</p>
 
         <div>
             {questions}

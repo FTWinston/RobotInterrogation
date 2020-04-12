@@ -9,6 +9,7 @@ export interface IInterviewQuestion {
 
 interface IProps {
     question: IInterviewQuestion;
+    sort?: (up: boolean) => void;
 }
 
 export const InterviewQuestion: React.FunctionComponent<IProps> = props => {
@@ -17,6 +18,13 @@ export const InterviewQuestion: React.FunctionComponent<IProps> = props => {
     const secondary = props.question.isPrimary
         ? undefined
         : <div className="interviewQuestion__secondaryWrapper">while fulfilling another prompt</div>
+
+    const buttons = props.sort
+        ? <>
+            <button className="interviewQuestion__sort interviewQuestion__sort--up" onClick={() => props.sort!(true)}>↑</button>
+            <button className="interviewQuestion__sort interviewQuestion__sort--down" onClick={() => props.sort!(false)}>↓</button>
+        </>
+        : undefined;
 
     return (
         <div className={classes}>
@@ -29,6 +37,7 @@ export const InterviewQuestion: React.FunctionComponent<IProps> = props => {
                 {examples}
             </ul>
             <div className="interviewQuestion__wrapper">to be human</div>
+            {buttons}
         </div>
     );
 }

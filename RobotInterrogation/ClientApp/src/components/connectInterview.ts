@@ -88,7 +88,7 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         });
     });
 
-    connection.on('ShowRoleWithPattern', (role: ISuspectRole, connections: number[][], contents: string[][]) => {
+    connection.on('SetRoleWithPattern', (role: ISuspectRole, connections: number[][], contents: string[][]) => {
         dispatch({
             type: 'set role and pattern',
             role,
@@ -97,7 +97,7 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         });
     });
 
-    connection.on('ShowRoleWithSolution', (role: ISuspectRole, solution: string[]) => {
+    connection.on('SetRoleWithSolution', (role: ISuspectRole, solution: string[]) => {
         dispatch({
             type: 'set role and solution',
             role,
@@ -105,10 +105,16 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         });
     });
 
-    connection.on('ShowQuestions', (questions: IInterviewQuestion[]) => {
+    connection.on('SetQuestions', (questions: IInterviewQuestion[]) => {
         dispatch({
             type: 'set questions',
             questions,
+        });
+    });
+
+    connection.on('ShowInducer', () => {
+        dispatch({
+            type: 'show inducer',
         });
     });
 

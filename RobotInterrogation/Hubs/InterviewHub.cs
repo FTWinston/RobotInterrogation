@@ -29,10 +29,12 @@ namespace RobotInterrogation.Hubs
         Task ShowInducerPrompt(List<string> solution);
         Task WaitForInducer();
 
-        Task ShowRoleWithPattern(SuspectRole role, int[][] connections, string[][] contents);
-        Task ShowRoleWithSolution(SuspectRole role, List<string> solution);
+        Task SetRoleWithPattern(SuspectRole role, int[][] connections, string[][] contents);
+        Task SetRoleWithSolution(SuspectRole role, List<string> solution);
 
-        Task ShowQuestions(IList<Question> questions);
+        Task SetQuestions(IList<Question> questions);
+
+        Task ShowInducer();
 
         Task ShowSuspectBackgroundChoice(List<string> notes);
         Task WaitForSuspectBackgroundChoice();
@@ -223,24 +225,32 @@ namespace RobotInterrogation.Hubs
             if (interview.Role.Type == SuspectRoleType.Human)
             {
                 await suspectClient
-                    .ShowRoleWithPattern(
+                    .SetRoleWithPattern(
                         interview.Role,
                         pattern.Connections.ToJaggedArray(val => (int)val),
                         pattern.CellContents.ToJaggedArray(val => val ?? string.Empty)
                     );
+
+                await suspectClient.ShowInducer();
             }
             else
             {
                 await suspectClient
-                    .ShowRoleWithSolution(interview.Role, pattern.SolutionSequence);
+                    .SetRoleWithSolution(interview.Role, pattern.SolutionSequence);
+
+                await suspectClient.ShowInducer();
             }
         }
 
         private async Task ShowQuestions(Interview interview)
         {
-            await Clients
-                .Client(interview.InterviewerConnectionID)
-                .ShowQuestions(interview.Packet.Questions);
+            var interviewer = Clients
+                .Client(interview.InterviewerConnectionID);
+            
+            await interviewer
+                .SetQuestions(interview.Packet.Questions);
+
+            await interviewer.ShowInducer();
         }
 
         private async Task DiscardSinglePenalty(int index, Interview interview)

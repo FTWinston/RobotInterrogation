@@ -10,15 +10,33 @@ interface IProps {
     suspectBackground: string,
     penalty: string,
     ready: () => void,
+    sortQuestions: (questions: IInterviewQuestion[]) => void;
 }
 
 export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props => {
     const questions = props.questions.map((q, i) => {
+        const sort = (up: boolean) => {
+            const sorted = props.questions.slice();
+            sorted.splice(i, 1);
+            const sortQuestion = props.questions[i];
+            
+            if (up) {
+                if (i > 0) {
+                    sorted.splice(i - 1, 0, sortQuestion);
+                }
+            }
+            else if (i < props.questions.length - 1) {
+                sorted.splice(i + 1, 0, sortQuestion);
+            }
+            
+            props.sortQuestions(sorted);
+        }
 
         return (
             <InterviewQuestion
                 question={q}
-                key={i}
+                key={q.challenge}
+                sort={sort}
             />
         )
     });
@@ -26,7 +44,7 @@ export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props =>
     return (
         <div>
             <PositionHeader position={InterviewPosition.Interviewer} />
-            <p>Ask the suspect their name and confirm their background.<br/>When you are ready, read them the prompt, then start the timer.</p>
+            <p>Ask the Suspect their name and confirm their background.<br/>When you are ready, read them the prompt, then start the timer.</p>
             <div>
                 {questions}
             </div>
