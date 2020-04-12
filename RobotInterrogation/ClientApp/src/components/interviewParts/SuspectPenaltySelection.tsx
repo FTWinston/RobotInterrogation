@@ -12,7 +12,7 @@ export const SuspectPenaltySelection: React.FunctionComponent<IProps> = props =>
     return (
         <div>
             <PositionHeader position={InterviewPosition.Suspect} />
-            <p>Select one of the following penalities to <strong>use</strong> for this interview.</p>
+            <p>Select one of the following penalties to <strong>use</strong> for this interview.</p>
 
             {renderOptions(props.options, props.action)}
 
