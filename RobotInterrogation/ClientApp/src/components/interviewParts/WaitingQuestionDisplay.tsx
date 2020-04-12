@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IInterviewQuestion, InterviewQuestion } from './elements/InterviewQuestion';
+import { IInterviewQuestion } from './elements/InterviewQuestion';
 import { InterviewPosition } from '../interviewReducer';
 import { PositionHeader } from './elements/PositionHeader';
 import { SortableQuestions } from './elements/SortableQuestions';
@@ -10,8 +10,6 @@ interface IProps {
 }
 
 export const WaitingQuestionDisplay: React.FunctionComponent<IProps> = props => {
-    const questions = props.questions.map((q, i) => <InterviewQuestion question={q} key={i} />);
-
     return (
         <div>
             <PositionHeader position={InterviewPosition.Interviewer} />

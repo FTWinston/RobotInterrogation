@@ -1,6 +1,6 @@
 import * as React from 'react';
 import './ActionSet.css';
-import { IInterviewQuestion, InterviewQuestion } from './elements/InterviewQuestion';
+import { IInterviewQuestion } from './elements/InterviewQuestion';
 import { PositionHeader } from './elements/PositionHeader';
 import { InterviewPosition } from '../interviewReducer';
 import { SortableQuestions } from './elements/SortableQuestions';
@@ -15,8 +15,6 @@ interface IProps {
 }
 
 export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props => {
-    
-
     return (
         <div>
             <PositionHeader position={InterviewPosition.Interviewer} />
