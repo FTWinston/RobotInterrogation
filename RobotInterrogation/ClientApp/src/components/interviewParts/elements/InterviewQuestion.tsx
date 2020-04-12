@@ -12,7 +12,7 @@ interface IProps {
     sort?: (up: boolean) => void;
 }
 
-export const InterviewQuestion: React.FunctionComponent<IProps> = props => {
+export const InterviewQuestion = React.forwardRef<HTMLDivElement, IProps>((props, ref) => {
     const classes = `interviewQuestion interviewQuestion--${props.question.isPrimary ? 'primary' : 'secondary'}`;
     const examples = props.question.examples.map((q, i) => <li className="interviewQuestion__example" key={i}>{q}</li>);
     const secondary = props.question.isPrimary
@@ -27,7 +27,7 @@ export const InterviewQuestion: React.FunctionComponent<IProps> = props => {
         : undefined;
 
     return (
-        <div className={classes}>
+        <div className={classes} ref={ref}>
             <div className="interviewQuestion__wrapper">Suspect must</div>
             {secondary}
             <div className="interviewQuestion__text">
@@ -40,4 +40,4 @@ export const InterviewQuestion: React.FunctionComponent<IProps> = props => {
             {buttons}
         </div>
     );
-}
+})

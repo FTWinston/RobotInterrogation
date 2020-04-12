@@ -155,6 +155,10 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                 return (
                     <WaitingQuestionDisplay
                         questions={state.questions}
+                        sortQuestions={questions => dispatch({
+                            type: 'set questions',
+                            questions,
+                        })}
                     />
                 );
             }
