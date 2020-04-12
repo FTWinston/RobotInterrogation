@@ -1,10 +1,11 @@
 import * as React from 'react';
+import ReactMarkdown from 'react-markdown';
 import './SuspectRole.css';
 
 export interface ISuspectRole {
     type: string;
     fault: string;
-    traits: string[],
+    traits: string,
 }
 
 interface IProps {
@@ -22,7 +23,6 @@ export const SuspectRole: React.FunctionComponent<IProps> = props => {
         classes += ' suspectRole--selectable';
     }
 
-    const traits = props.role.traits.map((t, i) => <li className="suspectRole__trait" key={i}>{t}</li>);
     let displayName = props.role.type.replace('Robot', ' Robot');
     if (props.role.type !== "Human") {
         displayName += ` (${props.role.fault})`;
@@ -31,9 +31,7 @@ export const SuspectRole: React.FunctionComponent<IProps> = props => {
     return (
         <div className={classes} onClick={onClick}>
             <div className="suspectRole__name">{displayName}</div>
-            <ul className="suspectRole__traits">
-                {traits}
-            </ul>
+            <ReactMarkdown source={props.role.traits} className="suspectRole__traits" />
         </div>
     )
 }
