@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { InterviewOutcome, InterviewPosition } from '../interviewReducer';
-import './ActionSet.css';
 import { ISuspectRole } from './elements/SuspectRole';
 import { InterviewerHumanCorrect } from './InterviewerHumanCorrect';
 import { InterviewerHumanIncorrect } from './InterviewerHumanIncorrect';
@@ -12,6 +11,7 @@ import { SuspectHumanIncorrect } from './SuspectHumanIncorrect';
 import { SuspectRobotCorrect } from './SuspectRobotCorrect';
 import { SuspectRobotIncorrect } from './SuspectRobotIncorrect';
 import { SuspectViolentKilled } from './SuspectViolentKilled';
+import { ActionSet } from './elements/ActionSet';
 
 interface IProps {
     position: InterviewPosition;
@@ -56,9 +56,9 @@ export const InterviewFinished: React.FunctionComponent<IProps> = props => {
     return (
         <div>
             {renderOutcome()}
-            <div className="actionSet">
+            <ActionSet>
                 <button onClick={props.playAgain} className="btn btn-secondary">Play again</button>
-            </div>
+            </ActionSet>
         </div>
     );
 }

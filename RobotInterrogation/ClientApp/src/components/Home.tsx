@@ -1,18 +1,20 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import { Typography, Container, Button } from '@material-ui/core';
+import { ActionSet } from './interviewParts/elements/ActionSet';
 
 export const Home: React.FunctionComponent = () => {
     return (
-        <div className="page">
-            <h1>Robot Interrogation</h1>
-            <p>Can <em>you</em> tell if someone is secretly a robot?</p>
+        <Container maxWidth="sm">
+            <Typography variant="h2" gutterBottom>Robot Interrogation</Typography>
+            <Typography paragraph>Can you tell if someone is secretly a robot?</Typography>
 
-            <p>Play with a friend, either in the same room or via video chat.</p>
+            <Typography paragraph>Play with a friend, either in the same room or via video chat.</Typography>
 
-            <div className="actionSet">
-                <Link to="/about">Information</Link>
-                <Link to="/host">Start a game</Link>
-            </div>
-        </div>
+            <ActionSet>
+                <Button variant="outlined" component={Link} to="/about">Information</Button>
+                <Button variant="outlined" color="primary" component={Link} to="/host">Start a game</Button>
+            </ActionSet>
+        </Container>
     );
 }

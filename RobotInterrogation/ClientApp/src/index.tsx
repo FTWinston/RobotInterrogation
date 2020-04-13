@@ -1,4 +1,3 @@
-import 'bootstrap/dist/css/bootstrap-reboot.css'
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
@@ -6,7 +5,6 @@ import { About } from './components/About';
 import { Home } from './components/Home';
 import { Host } from './components/Host';
 import { Interview } from './components/Interview';
-import './index.css';
 
 const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href')!;
 ReactDOM.render(

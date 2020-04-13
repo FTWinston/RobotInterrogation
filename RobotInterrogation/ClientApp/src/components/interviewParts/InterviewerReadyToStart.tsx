@@ -1,9 +1,9 @@
 import * as React from 'react';
-import './ActionSet.css';
 import { IInterviewQuestion } from './elements/InterviewQuestion';
 import { PositionHeader } from './elements/PositionHeader';
 import { InterviewPosition } from '../interviewReducer';
 import { SortableQuestions } from './elements/SortableQuestions';
+import { ActionSet } from './elements/ActionSet';
 
 interface IProps {
     prompt: string,
@@ -30,9 +30,9 @@ export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props =>
 
             <p>Prompt: {props.prompt}</p>
             
-            <div className="actionSet">
+            <ActionSet>
                 <button onClick={props.ready} className="btn btn-primary">Start the Timer</button>
-            </div>
+            </ActionSet>
         </div>
     );
 }

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { InterviewPosition } from '../interviewReducer';
 import './ValueDisplay.css';
 import { PositionHeader } from './elements/PositionHeader';
+import { ActionSet } from './elements/ActionSet';
 
 interface IProps {
     position: InterviewPosition;
@@ -15,7 +16,7 @@ export const PenaltyCalibration: React.FunctionComponent<IProps> = props => {
         : <p>The Interviewer will now ask you to perform this penalty 3 times.</p>
 
     const confirm = props.confirm
-        ? <div className="actionSet"><button onClick={() => props.confirm!()}>Continue</button></div>
+        ? <ActionSet><button onClick={() => props.confirm!()}>Continue</button></ActionSet>
         : undefined;
 
     return (

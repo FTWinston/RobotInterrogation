@@ -4,6 +4,7 @@ import './ValueDisplay.css';
 import { PositionHeader } from './elements/PositionHeader';
 import { InterferenceSolution } from './elements/InterferenceSolution';
 import { PacketDisplay } from './elements/PacketDisplay';
+import { ActionSet } from './elements/ActionSet';
 
 interface IProps {
     solution: string[];
@@ -31,9 +32,9 @@ export const InducerPrompt: React.FunctionComponent<IProps> = props => {
                 </ul>
             </div>
             
-            <div className="actionSet">
+            <ActionSet>
                 <button onClick={() => props.continue()}>Continue</button>
-            </div>
+            </ActionSet>
         </div>
     )
 }

@@ -4,6 +4,7 @@ import './ValueDisplay.css';
 import { PositionHeader } from './elements/PositionHeader';
 import { InterferenceSolution } from './elements/InterferenceSolution';
 import { PacketDisplay } from './elements/PacketDisplay';
+import { ActionSet } from './elements/ActionSet';
 
 interface IProps {
     solution: string[];
@@ -25,10 +26,10 @@ export const InducerResponse: React.FunctionComponent<IProps> = props => {
                 Wait for the Suspect to respond to your question, then indicate whether their response is correct.
             </p>
 
-            <div className="actionSet">
+            <ActionSet>
                 <button onClick={() => props.correct()}>Correct response</button>
                 <button onClick={() => props.incorrect()}>Incorrect response</button>
-            </div>
+            </ActionSet>
         </div>
     )
 }

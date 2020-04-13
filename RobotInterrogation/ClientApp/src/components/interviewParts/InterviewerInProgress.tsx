@@ -1,10 +1,10 @@
 import * as React from 'react';
-import './ActionSet.css';
 import { Countdown } from './elements/Countdown';
 import { IInterviewQuestion, InterviewQuestion } from './elements/InterviewQuestion';
 import { useState } from 'react';
 import { PositionHeader } from './elements/PositionHeader';
 import { InterviewPosition } from '../interviewReducer';
+import { ActionSet } from './elements/ActionSet';
 
 interface IProps {
     questions: IInterviewQuestion[];
@@ -45,7 +45,7 @@ export const InterviewerInProgress: React.FunctionComponent<IProps> = props => {
 
         {elapsedPrompt}
 
-        <div className="actionSet">
+        <ActionSet>
             <button
                 onClick={isHuman}
                 disabled={!elapsed}
@@ -54,6 +54,6 @@ export const InterviewerInProgress: React.FunctionComponent<IProps> = props => {
                 Suspect is Human
             </button>
             <button onClick={isRobot}>Suspect is a Robot</button>
-        </div>
+        </ActionSet>
     </div>
 }

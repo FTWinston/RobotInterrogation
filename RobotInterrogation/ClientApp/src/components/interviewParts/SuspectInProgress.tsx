@@ -1,10 +1,10 @@
 import * as React from 'react';
-import './ActionSet.css';
 import { Countdown } from './elements/Countdown';
 import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
 import { useState } from 'react';
 import { PositionHeader } from './elements/PositionHeader';
 import { InterviewPosition } from '../interviewReducer';
+import { ActionSet } from './elements/ActionSet';
 
 interface IProps {
     suspectBackground: string;
@@ -17,9 +17,9 @@ interface IProps {
 export const SuspectInProgress: React.FunctionComponent<IProps> = props => {
     const terminate = props.role.type === 'ViolentRobot'
         ? (
-            <div className="actionSet">
+            <ActionSet>
                 <button onClick={props.terminateInterviewer}>Kill interviewer</button>
-            </div>
+            </ActionSet>
         )
         : undefined;
     

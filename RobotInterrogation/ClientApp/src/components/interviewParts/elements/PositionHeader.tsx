@@ -1,17 +1,22 @@
 import React from 'react';
 import { InterviewPosition } from '../../interviewReducer';
+import { Typography } from '@material-ui/core';
 
 interface Props {
     position: InterviewPosition
 }
 
 export const PositionHeader: React.FC<Props> = props => {
-    switch (props.position) {
+    return <Typography variant="h4" gutterBottom>{getText(props.position)}</Typography>
+}
+
+function getText(position: InterviewPosition) {
+    switch (position) {
         case InterviewPosition.Interviewer:
-            return <h2>You are the interviewer.</h2>
+            return 'You are the interviewer';
         case InterviewPosition.Suspect:
-            return <h2>You are the suspect.</h2>
+            return 'You are the suspect';
         default:
-            return <h2>You are not in this interview.</h2>
+            return 'You are a spectator';
     }
 }

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import './GameLink.css';
+import { Container, Typography, Link } from '@material-ui/core';
 
 interface IProps {
     interviewID: string;
@@ -19,21 +20,19 @@ export const WaitingForOpponent: React.FunctionComponent<IProps> = props => {
     );
 
     return (
-        <div>
-            <h2>Waiting for opponent to&nbsp;join.</h2>
+        <Container maxWidth="sm">
+            <Typography variant="h4" gutterBottom>Waiting for opponent to&nbsp;join</Typography>
 
-            <p>
-                Invite a friend by giving them this link:
-            </p>
+            <Typography paragraph>Invite a friend by giving them this link:</Typography>
 
-            <p>
-                <a target="_new" className="gameLink" href={fullLocation}>{fixedLocation}<wbr/><span className="gameLink__focus">{detailLocation}</span></a>
-            </p>
+            <Typography paragraph>
+                <Link target="_new" className="gameLink" href={fullLocation}>{fixedLocation}<wbr/><span className="gameLink__focus">{detailLocation}</span></Link>
+            </Typography>
 
-            <p>
+            <Typography paragraph>
                 <strong>Don't</strong> open the link yourself, or you will become your own opponent.
-            </p>
-        </div>
+            </Typography>
+        </Container>
     );
 }
 

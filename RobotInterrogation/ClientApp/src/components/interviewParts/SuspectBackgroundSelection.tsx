@@ -3,6 +3,7 @@ import { renderOptions } from './renderOptions';
 import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
 import { InterviewPosition } from '../interviewReducer';
 import { PositionHeader } from './elements/PositionHeader';
+import { ActionSet } from './elements/ActionSet';
 
 interface IProps {
     options: string[],
@@ -17,9 +18,9 @@ export const SuspectBackgroundSelection: React.FunctionComponent<IProps> = props
 
     const options = props.options.length === 1
         ? (
-            <div className="actionSet">
+            <ActionSet>
                 <button onClick={() => props.action(0)}>{props.options[0]}</button>
-            </div>
+            </ActionSet>
         )
         : renderOptions(props.options, props.action)
 
