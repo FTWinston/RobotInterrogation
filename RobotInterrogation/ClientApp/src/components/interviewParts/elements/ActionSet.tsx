@@ -9,7 +9,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export const ActionSet: React.FunctionComponent<{}> = props => {
+export const ActionSet: React.FunctionComponent = props => {
     const classes = useStyles();
     
     return (

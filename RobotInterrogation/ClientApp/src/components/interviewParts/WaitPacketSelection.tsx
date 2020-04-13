@@ -1,19 +1,19 @@
 import * as React from 'react';
 import { InterviewPosition } from '../interviewReducer';
 import { PositionHeader } from './elements/PositionHeader';
-import { Help } from './elements/Help';
-import { P } from './elements/P';
 import { Page } from './elements/Page';
+import { P } from './elements/P';
+import { Help } from './elements/Help';
 
 interface IProps {
-    position: InterviewPosition;
+    position: InterviewPosition,
 }
 
-export const PositionSelection: React.FunctionComponent<IProps> = props => {
+export const WaitPacketSelection: React.FunctionComponent<IProps> = props => {
     return (
         <Page>
             <PositionHeader position={props.position} />
-            <P>Wait for the Interviewer to confirm your respective <Help entry="positions">positions</Help>.</P>
+            <P>Wait for the Interviewer to select an interview <Help entry="packet">packet</Help>.</P>
         </Page>
     );
 }

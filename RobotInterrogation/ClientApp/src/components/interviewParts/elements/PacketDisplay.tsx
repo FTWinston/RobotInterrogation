@@ -1,12 +1,11 @@
 import React from 'react';
+import { ValueDisplay } from './ValueDisplay';
+import { Help } from './Help';
 
 interface Props {
     packet: string;
 }
 
 export const PacketDisplay: React.FC<Props> = props => (
-    <>
-        <p>Using this interview packet:</p>
-        <p className="valueDisplay">{props.packet}</p>
-    </>
+    <ValueDisplay value={props.packet}>Interview <Help entry="packet">packet</Help>:</ValueDisplay>
 )

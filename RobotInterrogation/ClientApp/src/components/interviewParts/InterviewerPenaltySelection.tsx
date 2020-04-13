@@ -1,7 +1,10 @@
 import * as React from 'react';
-import { renderOptions } from './renderOptions';
 import { PositionHeader } from './elements/PositionHeader';
 import { InterviewPosition } from '../interviewReducer';
+import { Page } from './elements/Page';
+import { P } from './elements/P';
+import { Help } from './elements/Help';
+import { ChoiceArray } from './elements/ChoiceArray';
 
 interface IProps {
     options: string[],
@@ -10,13 +13,11 @@ interface IProps {
 
 export const InterviewerPenaltySelection: React.FunctionComponent<IProps> = props => {
     return (
-        <div>
+        <Page>
             <PositionHeader position={InterviewPosition.Interviewer} />
-            <p>Select one of the following penalties to <strong>discard</strong>. The Suspect will choose from the remaining two.</p>
+            <P>Select one of the following <Help entry="penalty">penalties</Help> to <strong>discard</strong>. The Suspect will choose from the remaining two.</P>
 
-            {renderOptions(props.options, props.action)}
-
-            <p>The penalty is a suspicious action that robots may perform under stress during the interview. Human suspects should avoid performing the penalty.</p>
-        </div>
+            <ChoiceArray options={props.options} action={props.action} />
+        </Page>
     );
 }

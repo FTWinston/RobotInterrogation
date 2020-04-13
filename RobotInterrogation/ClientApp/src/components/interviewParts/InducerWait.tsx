@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { InterviewPosition } from '../interviewReducer';
-import './ValueDisplay.css';
 import { PositionHeader } from './elements/PositionHeader';
 import { PacketDisplay } from './elements/PacketDisplay';
+import { Page } from './elements/Page';
+import { P } from './elements/P';
+import { Help } from './elements/Help';
 
 interface IProps {
     position: InterviewPosition;
@@ -11,15 +13,14 @@ interface IProps {
 
 export const InducerWait: React.FunctionComponent<IProps> = props => {
     return (
-        <div>
+        <Page>
             <PositionHeader position={props.position} />
 
             <PacketDisplay packet={props.packet} />
 
-            <p>The Interviewer will shortly ask you a question, and then administer the inducer.</p>
-            <p>You will see your role for this interview, and a diagram you will need to answer the Interviewer's question.</p>
-            <p>Robots will see the same diagram as the Interviewer, but need time to read the details of their role. Humans will need to solve a puzzle to answer the question.</p>
-            <p>Answer the Interviewer's question correctly to be able to choose your background.</p>
-        </div>
+            <P>The Interviewer will ask you a question, and then administer the <Help entry="inducer">inducer</Help>.</P>
+            <P>You will see your <Help entry="roles">role</Help> for this interview, and a diagram you will need to answer the Interviewer's question.</P>
+            <P>Answer the question correctly to be able to choose your <Help entry="background">background</Help>.</P>
+        </Page>
     )
 }

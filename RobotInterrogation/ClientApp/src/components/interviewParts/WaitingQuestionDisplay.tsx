@@ -3,6 +3,9 @@ import { IInterviewQuestion } from './elements/InterviewQuestion';
 import { InterviewPosition } from '../interviewReducer';
 import { PositionHeader } from './elements/PositionHeader';
 import { SortableQuestions } from './elements/SortableQuestions';
+import { Page } from './elements/Page';
+import { P } from './elements/P';
+import { Help } from './elements/Help';
 
 interface IProps {
     questions: IInterviewQuestion[],
@@ -11,15 +14,18 @@ interface IProps {
 
 export const WaitingQuestionDisplay: React.FunctionComponent<IProps> = props => {
     return (
-        <div>
+        <Page>
             <PositionHeader position={InterviewPosition.Interviewer} />
 
-            <p>Waiting for the Suspect to select their background. Your questions are as follows:</p>
+            <P>
+                Waiting for the Suspect to select their <Help entry="background">background</Help>.
+                <br/>Your <Help entry="questions">questions</Help> are as follows:
+            </P>
 
             <SortableQuestions
                 questions={props.questions}
                 sort={props.sortQuestions}
             />
-        </div>
+        </Page>
     );
 }

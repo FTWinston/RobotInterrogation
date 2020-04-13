@@ -1,7 +1,10 @@
 import * as React from 'react';
-import { renderOptions } from './renderOptions';
 import { PositionHeader } from './elements/PositionHeader';
 import { InterviewPosition } from '../interviewReducer';
+import { ChoiceArray } from './elements/ChoiceArray';
+import { P } from './elements/P';
+import { Page } from './elements/Page';
+import { Help } from './elements/Help';
 
 interface IProps {
     options: string[],
@@ -10,11 +13,11 @@ interface IProps {
 
 export const PacketSelection: React.FunctionComponent<IProps> = props => {
     return (
-        <div>
+        <Page>
             <PositionHeader position={InterviewPosition.Interviewer} />
-            <p>Please select an interview packet to use for this interview.</p>
+            <P>Please select an interview <Help entry="packet">packet</Help> to use for this interview.</P>
 
-            {renderOptions(props.options, props.action)}
-        </div>
+            <ChoiceArray options={props.options} action={props.action} />
+        </Page>
     )
 }

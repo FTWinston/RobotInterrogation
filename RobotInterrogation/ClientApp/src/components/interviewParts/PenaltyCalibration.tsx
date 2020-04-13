@@ -1,8 +1,12 @@
 import * as React from 'react';
 import { InterviewPosition } from '../interviewReducer';
-import './ValueDisplay.css';
 import { PositionHeader } from './elements/PositionHeader';
 import { ActionSet } from './elements/ActionSet';
+import { Page } from './elements/Page';
+import { Button } from '@material-ui/core';
+import { P } from './elements/P';
+import { Help } from './elements/Help';
+import { ValueDisplay } from './elements/ValueDisplay';
 
 interface IProps {
     position: InterviewPosition;
@@ -12,22 +16,25 @@ interface IProps {
 
 export const PenaltyCalibration: React.FunctionComponent<IProps> = props => {
     const extraMessage = props.position === InterviewPosition.Interviewer
-        ? <p>Ask the Suspect to perform this penalty 3 times.<br/>When you are satisfied that they have done so, click to continue.</p>
-        : <p>The Interviewer will now ask you to perform this penalty 3 times.</p>
+        ? <P>Ask the Suspect to perform this penalty 3 times.<br/>When you are satisfied that they have done so, click to continue.</P>
+        : <P>The Interviewer will now ask you to perform this penalty 3 times.</P>
 
     const confirm = props.confirm
-        ? <ActionSet><button onClick={() => props.confirm!()}>Continue</button></ActionSet>
+        ? (
+            <ActionSet>
+                <Button variant="outlined" onClick={() => props.confirm!()}>Continue</Button>
+            </ActionSet>
+        )
         : undefined;
 
     return (
-        <div>
+        <Page>
             <PositionHeader position={props.position} />
 
-            <p>The chosen penalty is:</p>
-            <p className="valueDisplay">{props.penalty}</p>
+            <ValueDisplay value={props.penalty}>The chosen <Help entry="penalty">penalty</Help> is:</ValueDisplay>
 
             {extraMessage}
             {confirm}
-        </div>
+        </Page>
     )
 }

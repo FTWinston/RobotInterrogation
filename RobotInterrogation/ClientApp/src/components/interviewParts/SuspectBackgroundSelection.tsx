@@ -1,9 +1,13 @@
 import * as React from 'react';
-import { renderOptions } from './renderOptions';
 import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
 import { InterviewPosition } from '../interviewReducer';
 import { PositionHeader } from './elements/PositionHeader';
 import { ActionSet } from './elements/ActionSet';
+import { ChoiceArray } from './elements/ChoiceArray';
+import { Button, Typography } from '@material-ui/core';
+import { P } from './elements/P';
+import { Help } from './elements/Help';
+import { Page } from './elements/Page';
 
 interface IProps {
     options: string[],
@@ -13,26 +17,27 @@ interface IProps {
 
 export const SuspectBackgroundSelection: React.FunctionComponent<IProps> = props => {
     const message = props.options.length === 1
-        ? <p>You failed. You can only choose the following background:</p>
-        : <p>You succeeded. Select one of the following backgrounds:</p>
+        ? <P>You answered incorrectly. You can only choose the following <Help entry="background">background</Help>:</P>
+        : <P>You answered correctly. Select one of the following <Help entry="background">backgrounds</Help>:</P>
 
     const options = props.options.length === 1
         ? (
             <ActionSet>
-                <button onClick={() => props.action(0)}>{props.options[0]}</button>
+                <Button variant="outlined" onClick={() => props.action(0)}>{props.options[0]}</Button>
             </ActionSet>
         )
-        : renderOptions(props.options, props.action)
+        : <ChoiceArray options={props.options} action={props.action} />
 
     return (
-        <div>
+        <Page>
             <PositionHeader position={InterviewPosition.Suspect} />
 
+            <Typography>Your <Help entry="roles">role</Help>:</Typography>
             <SuspectRole role={props.role} />
 
             {message}
 
             {options}
-        </div>
+        </Page>
     );
 }

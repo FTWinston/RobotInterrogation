@@ -15,7 +15,7 @@ import { SuspectInProgress } from './interviewParts/SuspectInProgress';
 import { SuspectBackgroundSelection } from './interviewParts/SuspectBackgroundSelection';
 import { SuspectPenaltySelection } from './interviewParts/SuspectPenaltySelection';
 import { SuspectReadyToStart } from './interviewParts/SuspectReadyToStart';
-import { Wait } from './interviewParts/Wait';
+import { WaitPacketSelection } from './interviewParts/WaitPacketSelection';
 import { WaitingForOpponent } from './interviewParts/WaitingForOpponent';
 import { WaitingQuestionDisplay } from './interviewParts/WaitingQuestionDisplay';
 import { InterviewStatus, InterviewOutcome, interviewReducer, initialState, InterviewPosition } from './interviewReducer';
@@ -25,6 +25,7 @@ import { InducerPrompt } from './interviewParts/InducerPrompt';
 import { InducerResponse } from './interviewParts/InducerResponse';
 import { InducerDisplay } from './interviewParts/InducerDisplay';
 import { PositionSelection } from './interviewParts/PositionSelection';
+import { WaitPenalty } from './interviewParts/WaitPenalty';
 
 export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string }>> = props => {
     const [state, dispatch] = useReducer(interviewReducer, initialState);
@@ -63,9 +64,8 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
 
                 return <InterviewerPositionSelection stay={confirm} swap={swap} />
             }
-            else {
-                return <PositionSelection position={state.position} />
-            }
+            
+            return <PositionSelection position={state.position} />
 
         case InterviewStatus.PenaltySelection:
             if (state.choice.length > 0) {
@@ -75,18 +75,8 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                     ? <InterviewerPenaltySelection options={state.choice} action={selectPenalty} />
                     : <SuspectPenaltySelection options={state.choice} action={selectPenalty} />
             }
-            else {
-                const waitFor = state.position === InterviewPosition.Interviewer
-                    ? 'the Suspect to choose a penalty'
-                    : 'the Interviewer to discard a penalty';
-
-                return (
-                    <Wait
-                        position={state.position}
-                        waitFor={waitFor}
-                    />
-                )
-            }
+            
+            return <WaitPenalty position={state.position} />
 
         case InterviewStatus.PenaltyCalibration:
             const confirmPenalty = state.position === InterviewPosition.Interviewer
@@ -106,7 +96,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
 
             return state.position === InterviewPosition.Interviewer
                 ? <PacketSelection options={state.choice} action={selectPacket} />
-                : <Wait position={state.position} waitFor="the interviewer to select an interview packet" />
+                : <WaitPacketSelection position={state.position} />
 
         case InterviewStatus.InducerPrompt:
             const administer = () => connection?.invoke('Select', 0);

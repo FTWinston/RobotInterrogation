@@ -4,6 +4,8 @@ import { PositionHeader } from './elements/PositionHeader';
 import { InterviewPosition } from '../interviewReducer';
 import { SortableQuestions } from './elements/SortableQuestions';
 import { ActionSet } from './elements/ActionSet';
+import { Page } from './elements/Page';
+import { P } from './elements/P';
 
 interface IProps {
     prompt: string,
@@ -16,23 +18,23 @@ interface IProps {
 
 export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props => {
     return (
-        <div>
+        <Page>
             <PositionHeader position={InterviewPosition.Interviewer} />
-            <p>Ask the Suspect their name and confirm their background.<br/>When you are ready, read them the prompt, then start the timer.</p>
+            <P>Ask the Suspect their name, then confirm their background.<br/>When you are ready, read them the prompt, then start the timer.</P>
 
             <SortableQuestions
                 questions={props.questions}
                 sort={props.sortQuestions}
             />
 
-            <p>Penalty: {props.penalty}</p>
-            <p>Suspect background: {props.suspectBackground}</p>
+            <P>Penalty: {props.penalty}</P>
+            <P>Suspect background: {props.suspectBackground}</P>
 
-            <p>Prompt: {props.prompt}</p>
+            <P>Prompt: {props.prompt}</P>
             
             <ActionSet>
                 <button onClick={props.ready} className="btn btn-primary">Start the Timer</button>
             </ActionSet>
-        </div>
+        </Page>
     );
 }

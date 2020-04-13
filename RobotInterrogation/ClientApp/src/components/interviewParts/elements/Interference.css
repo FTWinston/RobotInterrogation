@@ -6,6 +6,9 @@
     line-height: 1em;
 }
 
+.interference table {
+    border-collapse: collapse;
+}
 
 .interference--pattern {
     display: flex;

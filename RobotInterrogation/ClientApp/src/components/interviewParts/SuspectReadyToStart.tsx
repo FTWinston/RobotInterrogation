@@ -2,6 +2,8 @@ import * as React from 'react';
 import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
 import { PositionHeader } from './elements/PositionHeader';
 import { InterviewPosition } from '../interviewReducer';
+import { Page } from './elements/Page';
+import { P } from './elements/P';
 
 interface IProps {
     suspectBackground: string,
@@ -11,20 +13,21 @@ interface IProps {
 
 export const SuspectReadyToStart: React.FunctionComponent<IProps> = props => {
     const robotPrompt = props.role.type === 'ViolentRobot'
-        ? <p>You must complete 2 of the 3 tasks listed below, <em>and then wait 10 seconds</em> before you can kill the interviewer.</p>
-        : props.role.type === 'PassiveRobot'
-            ? <p>You must perform the penalty each time you violate your vulnerability.</p>
+        ? <P>You must complete 2 of the 3 tasks listed below, <em>and then wait 10 seconds</em> before you can kill the Interviewer.</P>
+        : props.role.type === 'PatientRobot'
+            ? <P>You must perform the penalty each time you violate your vulnerability.</P>
             : undefined;
 
     return (
-        <div>
+        <Page>
             <PositionHeader position={InterviewPosition.Suspect} />
-            <p>When the interviewer is ready, the interview will start.</p>
+            <P>The interview will start when the Interviewer is ready.</P>
             {robotPrompt}
 
             <SuspectRole role={props.role} />
-            <p>Penalty: {props.penalty}</p>
-            <p>Suspect background: {props.suspectBackground}</p>
-        </div>
+            
+            <P>Penalty: {props.penalty}</P>
+            <P>Suspect background: {props.suspectBackground}</P>
+        </Page>
     );
 }
