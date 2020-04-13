@@ -26,7 +26,7 @@ export const About: React.FunctionComponent = () => {
     const classes = useStyles();
 
     return (
-        <Container maxWidth="md">
+        <Container maxWidth="sm">
             <Typography variant="h2" gutterBottom>Robot Interrogation</Typography>
 
             <Typography paragraph>This game is a conversation between two players, an interviewer and a suspect. It is best played by two people in the same room, though playing via video chat also works.</Typography>
