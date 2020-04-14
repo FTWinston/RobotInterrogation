@@ -6,6 +6,8 @@ import { SortableQuestions } from './elements/SortableQuestions';
 import { ActionSet } from './elements/ActionSet';
 import { Page } from './elements/Page';
 import { P } from './elements/P';
+import { Button } from '@material-ui/core';
+import { Help } from './elements/Help';
 
 interface IProps {
     prompt: string,
@@ -27,13 +29,13 @@ export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props =>
                 sort={props.sortQuestions}
             />
 
-            <P>Penalty: {props.penalty}</P>
-            <P>Suspect background: {props.suspectBackground}</P>
+            <P><Help entry="penalty">Penalty</Help>: {props.penalty}</P>
+            <P>Suspect <Help entry="background">background</Help>: {props.suspectBackground}</P>
 
             <P>Prompt: {props.prompt}</P>
             
             <ActionSet>
-                <button onClick={props.ready} className="btn btn-primary">Start the Timer</button>
+                <Button variant="outlined" color="primary" onClick={props.ready}>Start the Timer</Button>
             </ActionSet>
         </Page>
     );

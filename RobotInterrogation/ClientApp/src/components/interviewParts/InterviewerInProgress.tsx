@@ -5,6 +5,9 @@ import { useState } from 'react';
 import { PositionHeader } from './elements/PositionHeader';
 import { InterviewPosition } from '../interviewReducer';
 import { ActionSet } from './elements/ActionSet';
+import { Button } from '@material-ui/core';
+import { P } from './elements/P';
+import { Page } from './elements/Page';
 
 interface IProps {
     questions: IInterviewQuestion[];
@@ -26,17 +29,17 @@ export const InterviewerInProgress: React.FunctionComponent<IProps> = props => {
         ? <p>You can ask one final question.</p>
         : <p/>;
 
-    return <div>
+    return <Page>
         <PositionHeader position={InterviewPosition.Interviewer} />
-        <p>Ask the Suspect questions and decide whether they are human or a robot.</p>
+        <P>Ask the Suspect questions and decide whether they are human or a robot.</P>
 
         <div>
             {questions}
         </div>
 
-        <p>Penalty: {props.penalty}</p>
+        <P>Penalty: {props.penalty}</P>
 
-        <p>Suspect background: {props.suspectBackground}</p>
+        <P>Suspect background: {props.suspectBackground}</P>
 
         <Countdown
             duration={props.duration}
@@ -46,14 +49,20 @@ export const InterviewerInProgress: React.FunctionComponent<IProps> = props => {
         {elapsedPrompt}
 
         <ActionSet>
-            <button
+            <Button
+                variant="outlined"
                 onClick={isHuman}
                 disabled={!elapsed}
                 title={elapsed ? undefined : `You can't certify the subject as human until the time has elapsed`}
             >
                 Suspect is Human
-            </button>
-            <button onClick={isRobot}>Suspect is a Robot</button>
+            </Button>
+            <Button
+                variant="outlined"
+                onClick={isRobot}
+            >
+                Suspect is a Robot
+            </Button>
         </ActionSet>
-    </div>
+    </Page>
 }

@@ -1,5 +1,8 @@
 import * as React from 'react';
 import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
+import { Typography } from '@material-ui/core';
+import { P } from './elements/P';
+import { Page } from './elements/Page';
 
 interface IProps {
     role: ISuspectRole;
@@ -7,11 +10,11 @@ interface IProps {
 
 export const SuspectViolentKilled: React.FunctionComponent<IProps> = props => {
     return (
-        <div>
-            <p>You completed your obsession and killed the interviewer.</p>
-            <h2>You win.</h2>
+        <Page>
+            <P>You completed your obsession and killed the Interviewer.</P>
+            <Typography variant="h4">You win.</Typography>
 
             <SuspectRole role={props.role} />
-        </div>
+        </Page>
     )
 }

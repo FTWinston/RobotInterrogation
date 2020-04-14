@@ -26,7 +26,7 @@ export const InducerPrompt: React.FunctionComponent<IProps> = props => {
             
             <InterferenceSolution solution={props.solution} />
 
-            <Typography>
+            <Typography component="div">
                 Example questions:
                 <ul>
                     <li>What letters come between A and D?</li>

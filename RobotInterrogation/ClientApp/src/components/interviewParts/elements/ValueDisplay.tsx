@@ -16,7 +16,7 @@ export const ValueDisplay: React.FunctionComponent<IProps> = props => {
     const classes = useStyles();
 
     return (
-        <Typography paragraph>
+        <Typography paragraph component="div">
             {props.children}
             <div className={classes.root}>
                 {props.value}

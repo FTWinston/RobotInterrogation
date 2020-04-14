@@ -5,6 +5,9 @@ import { useState } from 'react';
 import { PositionHeader } from './elements/PositionHeader';
 import { InterviewPosition } from '../interviewReducer';
 import { ActionSet } from './elements/ActionSet';
+import { P } from './elements/P';
+import { Button } from '@material-ui/core';
+import { Page } from './elements/Page';
 
 interface IProps {
     suspectBackground: string;
@@ -18,36 +21,36 @@ export const SuspectInProgress: React.FunctionComponent<IProps> = props => {
     const terminate = props.role.type === 'ViolentRobot'
         ? (
             <ActionSet>
-                <button onClick={props.terminateInterviewer}>Kill interviewer</button>
+                <Button variant="outlined" color="secondary" onClick={props.terminateInterviewer}>Kill interviewer</Button>
             </ActionSet>
         )
         : undefined;
     
     const robotPrompt = props.role.type === 'ViolentRobot'
-        ? <p>
-            You must complete 2 of the 3 tasks listed below, <em>and then wait 10 seconds</em> before you can kill the interviewer.<br/>
-            If you cannot kill the interviewer before finishing answering their final question, you must visibly malfunction.
-        </p>
+        ? <P>
+            You must complete 2 of the 3 tasks listed below, <em>and then wait 10 seconds</em> before you can kill the Interviewer.<br/>
+            If you cannot kill the Interviewer before finishing answering their final question, you must visibly malfunction.
+        </P>
         : props.role.type === 'PassiveRobot'
-            ? <p>You must perform the penalty each time you violate your vulnerability.</p>
+            ? <P>You must perform the penalty each time you violate your vulnerability.</P>
             : undefined;
 
     const [elapsed, setElapsed] = useState(false);
 
     const elapsedPrompt = elapsed
-        ? <p>The interviewer can ask one final question.</p>
-        : <p/>;
+        ? <P>The interviewer can ask one final question.</P>
+        : <P/>;
 
-    return <div>
+    return <Page>
         <PositionHeader position={InterviewPosition.Suspect} />
-        <p>Answer the interviewer's questions, try to convince them that you are human.</p>
+        <P>Answer the Interviewer's questions, try to convince them that you are human.</P>
         {robotPrompt}
 
         <SuspectRole role={props.role} />
         
-        <p>Penalty: {props.penalty}</p>
+        <P>Penalty: {props.penalty}</P>
         
-        <p>Your background: {props.suspectBackground}</p>
+        <P>Your background: {props.suspectBackground}</P>
 
         <Countdown
             duration={props.duration}
@@ -57,5 +60,5 @@ export const SuspectInProgress: React.FunctionComponent<IProps> = props => {
         {elapsedPrompt}
 
         {terminate}
-    </div>
+    </Page>
 }

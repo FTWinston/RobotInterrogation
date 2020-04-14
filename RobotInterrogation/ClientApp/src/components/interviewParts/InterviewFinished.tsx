@@ -12,6 +12,9 @@ import { SuspectRobotCorrect } from './SuspectRobotCorrect';
 import { SuspectRobotIncorrect } from './SuspectRobotIncorrect';
 import { SuspectViolentKilled } from './SuspectViolentKilled';
 import { ActionSet } from './elements/ActionSet';
+import { Page } from './elements/Page';
+import { Button } from '@material-ui/core';
+import { P } from './elements/P';
 
 interface IProps {
     position: InterviewPosition;
@@ -49,16 +52,16 @@ export const InterviewFinished: React.FunctionComponent<IProps> = props => {
                     : <SuspectViolentKilled role={props.role} />;
 
             default:
-                return <div>Unknown outcome</div>;
+                return <P>Unknown outcome</P>;
         }
     }
 
     return (
-        <div>
+        <Page>
             {renderOutcome()}
             <ActionSet>
-                <button onClick={props.playAgain} className="btn btn-secondary">Play again</button>
+                <Button variant="outlined" onClick={props.playAgain}>Play again</Button>
             </ActionSet>
-        </div>
+        </Page>
     );
 }

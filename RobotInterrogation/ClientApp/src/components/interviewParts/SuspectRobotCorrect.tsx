@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
-import { PositionHeader } from './elements/PositionHeader';
-import { InterviewPosition } from '../interviewReducer';
+import { Page } from './elements/Page';
+import { P } from './elements/P';
+import { Typography } from '@material-ui/core';
 
 interface IProps {
     role: ISuspectRole;
@@ -9,12 +10,10 @@ interface IProps {
 
 export const SuspectRobotCorrect: React.FunctionComponent<IProps> = props => {
     return (
-        <div>
-            <PositionHeader position={InterviewPosition.Suspect} />
-            <p>The interviewer correctly identified you as a robot.</p>
-            <p>You lose.</p>
-
+        <Page>
+            <P>The Interviewer correctly identified you as a robot.</P>
+            <Typography variant="h4">You lose.</Typography>
             <SuspectRole role={props.role} />
-        </div>
+        </Page>
     );
 }

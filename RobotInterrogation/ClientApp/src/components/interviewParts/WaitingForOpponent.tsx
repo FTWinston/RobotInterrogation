@@ -1,6 +1,6 @@
 import * as React from 'react';
 import './GameLink.css';
-import { Container, Typography, Link } from '@material-ui/core';
+import { Typography, Link } from '@material-ui/core';
 import { Page } from './elements/Page';
 import { P } from './elements/P';
 
