@@ -88,7 +88,7 @@ function getContent(entry: Entry, className: string): JSX.Element {
             return <Typography className={className} component="div">
                 <p>A human Suspect has nothing to hide, and no restrictions on their behaviour.</p>
                 <p>A patient robot has a restriction, something they cannot mention.</p>
-                <p>A violent robot has an obsession, and must complete 2 of 3 tasks to fulfil this obsession and allow them to kill the Interviewer.</p>
+                <p>A violent robot has an obsession, and must complete tasks to fulfil this obsession and allow them to kill the Interviewer.</p>
             </Typography>
 
         case 'penalty':
@@ -107,20 +107,21 @@ function getContent(entry: Entry, className: string): JSX.Element {
 
         case 'inducer':
             return <Typography className={className} component="div">
-                <p>Humans will need to solve a puzzle to answer the question.</p>
+                <p>The Interviewer asks the Suspect a question based on a simple diagram, and then administers the inducer. This reveals the Suspect's role to them.</p>
                 <p>Robots will see the same diagram as the Interviewer, but need time to read the details of their role.</p>
+                <p>Humans will need to solve more complicated diagram to answer the question.</p>
             </Typography>
 
         case 'background':
             return <Typography className={className} component="div">
                 <p>Backgrounds provide the Suspect with a biographical detail to help them improvise a character.</p>
-                <p>The Invesitgator and the Suspect should act as if the background really is true.</p>
+                <p>The Investigator and the Suspect should act as if the background really is true.</p>
             </Typography>
 
         case 'questions':
             return <Typography className={className} component="div">
                 <p>The questions in an interview packet relate directly to the patient and violent robot roles in that packet.</p>
-                <p>The Investigator can deviate as much as they like, but these questions should help an Investigator draw out patterns of robot behavior.</p>
+                <p>The Investigator can deviate as much as they like, but these questions should help draw out patterns of robot behavior.</p>
             </Typography>
 
         case 'timer':
