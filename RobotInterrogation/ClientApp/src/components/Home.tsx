@@ -9,9 +9,10 @@ export const Home: React.FunctionComponent = () => {
     return (
         <Page>
             <Typography variant="h2" gutterBottom>Robot Interrogation</Typography>
+
             <P>Can you tell if someone is secretly a robot?</P>
 
-            <P>Play with a friend, either in the same room or via video chat.</P>
+            <P>Play with a friend over video chat, or in the same room.</P>
 
             <ActionSet>
                 <Button variant="outlined" component={Link} to="/about">Information</Button>
