@@ -1,6 +1,6 @@
 import { connectSignalR } from 'src/Connectivity';
 import { Dispatch } from 'react';
-import { InterviewAction, InterviewOutcome } from './interviewReducer';
+import { InterviewAction, InterviewOutcome, IPacket } from './interviewReducer';
 import { ISuspectRole } from './interviewParts/elements/SuspectRole';
 import { IInterviewQuestion } from './interviewParts/elements/InterviewQuestion';
 
@@ -53,7 +53,7 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         });
     });
 
-    connection.on('ShowPacketChoice', (options: string[]) => {
+    connection.on('ShowPacketChoice', (options: IPacket[]) => {
         dispatch({
             type: 'set packet choice',
             options,

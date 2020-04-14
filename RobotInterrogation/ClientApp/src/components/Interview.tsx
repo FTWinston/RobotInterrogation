@@ -95,7 +95,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
             const selectPacket = (index: number) => connection!.invoke('Select', index);
 
             return state.position === InterviewPosition.Interviewer
-                ? <PacketSelection options={state.choice} action={selectPacket} />
+                ? <PacketSelection options={state.packets!} action={selectPacket} />
                 : <WaitPacketSelection position={state.position} />
 
         case InterviewStatus.InducerPrompt:

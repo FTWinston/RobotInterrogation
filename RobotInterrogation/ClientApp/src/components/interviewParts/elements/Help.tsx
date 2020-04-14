@@ -102,7 +102,8 @@ function getContent(entry: Entry, className: string): JSX.Element {
 
         case 'packet':
             return <Typography className={className} component="div">
-                An interview packet is a collection of question prompts and robot roles that relate to them.
+                <p>An interview packet is a collection of question prompts and robot roles that relate to them.</p>
+                <p>It forms the topic of the interview.</p>
             </Typography>
 
         case 'inducer':

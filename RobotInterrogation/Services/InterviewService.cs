@@ -161,11 +161,9 @@ namespace RobotInterrogation.Services
             AllocateRandomValues(Configuration.Penalties, interview.Penalties, 3);
         }
 
-        public string[] GetAllPackets()
+        public PacketInfo[] GetAllPackets()
         {
-            return Configuration.Packets
-                .Select(p => p.Description)
-                .ToArray();
+            return Configuration.Packets;
         }
 
         public Packet GetPacket(int index)
@@ -265,7 +263,7 @@ namespace RobotInterrogation.Services
                 interview.Status,
                 interview.Outcome,
                 Duration = duration,
-                Packet = interview.Packet.Description,
+                Packet = interview.Packet.Name,
                 InterferencePattern = interview.InterferencePattern.ToString(),
                 InterferenceSolution = interview.InterferencePattern.SolutionSequence,
                 SuspectBackground = interview.SuspectBackgrounds.First(),

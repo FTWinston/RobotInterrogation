@@ -22,7 +22,7 @@ namespace RobotInterrogation.Hubs
         Task WaitForPenaltyChoice();
         Task SetPenalty(string penalty);
 
-        Task ShowPacketChoice(string[] options);
+        Task ShowPacketChoice(PacketInfo[] options);
         Task WaitForPacketChoice();
         Task SetPacket(string packetName, string packetPrompt);
 
@@ -210,7 +210,7 @@ namespace RobotInterrogation.Hubs
             Service.SetPacketAndInducer(interview, index);
 
             await Clients.Group(SessionID)
-                .SetPacket(interview.Packet.Description, interview.Packet.Prompt);
+                .SetPacket(interview.Packet.Name, interview.Packet.Prompt);
         }
 
         private async Task SetSuspectRole(Interview interview)

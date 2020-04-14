@@ -49,12 +49,19 @@ export enum Direction {
     West = 1 << 3,
 }
 
+export interface IPacket {
+    name: string;
+    difficulty: string;
+    icon: string;
+}
+
 export interface IInterviewState {
     position: InterviewPosition;
     status: InterviewStatus;
     outcome?: InterviewOutcome;
     choice: string[];
     packet: string;
+    packets?: IPacket[];
     prompt: string;
     penalty: string;
     patternConnections?: Direction[][];
@@ -95,7 +102,7 @@ export type InterviewAction = {
     penalty: string;
 } | {
     type: 'set packet choice';
-    options: string[];
+    options: IPacket[];
 } | {
     type: 'set packet';
     packet: string;
@@ -174,6 +181,7 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
                 duration: 0,
                 outcome: undefined,
                 packet: '',
+                packets: [],
                 penalty: '',
                 prompt: '',
                 patternConnections: undefined,
@@ -203,7 +211,7 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
             return {
                 ...state,
                 status: InterviewStatus.PacketSelection,
-                choice: action.options,
+                packets: action.options,
             };
             
         case 'set packet':
@@ -212,6 +220,7 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
                 packet: action.packet,
                 prompt: action.prompt,
                 choice: [],
+                packets: [],
             };
 
         case 'prompt inducer':
