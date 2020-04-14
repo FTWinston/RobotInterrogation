@@ -4,6 +4,7 @@ import { PositionHeader } from './elements/PositionHeader';
 import { InterviewPosition } from '../interviewReducer';
 import { Page } from './elements/Page';
 import { P } from './elements/P';
+import { Help } from './elements/Help';
 
 interface IProps {
     suspectBackground: string,
@@ -21,13 +22,14 @@ export const SuspectReadyToStart: React.FunctionComponent<IProps> = props => {
     return (
         <Page>
             <PositionHeader position={InterviewPosition.Suspect} />
-            <P>The interview will start when the Interviewer is ready.</P>
+            <P>Once they start the timer, the Interviewer will ask you a series of <Help entry="questions">questions</Help> to try to determine whether you are a human or a robot.</P>
+
             {robotPrompt}
 
             <SuspectRole role={props.role} />
             
-            <P>Penalty: {props.penalty}</P>
-            <P>Suspect background: {props.suspectBackground}</P>
+            <P><Help entry="penalty">Penalty</Help>: {props.penalty}</P>
+            <P>Suspect <Help entry="background">background</Help>: {props.suspectBackground}</P>
         </Page>
     );
 }

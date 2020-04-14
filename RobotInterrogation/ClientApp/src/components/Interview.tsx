@@ -41,7 +41,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
 
             connect();
         },
-        []
+        [props.match.params.id]
     );
 
     switch (state.status) {

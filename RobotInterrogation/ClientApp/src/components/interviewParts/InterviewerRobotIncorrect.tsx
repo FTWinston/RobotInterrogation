@@ -6,7 +6,7 @@ import { P } from './elements/P';
 export const InterviewerRobotIncorrect: React.FunctionComponent = () => {
     return (
         <Page>
-            <P>You wrongly identified the suspect as a robot. They are actually human.</P>
+            <P>You wrongly identified the suspect as a robot.<br />They are actually human.</P>
             <Typography variant="h4">You both lose.</Typography>
         </Page>
     );

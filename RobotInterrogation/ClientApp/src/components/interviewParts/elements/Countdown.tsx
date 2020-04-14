@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import './Countdown.css';
+import { Typography } from '@material-ui/core';
 
 interface IProps {
     duration: number,
@@ -10,6 +11,8 @@ interface IProps {
 export const Countdown: React.FunctionComponent<IProps> = props => {
     const [timeRemaining, setTimeRemaining] = useState(props.duration);
 
+    const onElapsed = props.onElapsed;
+
     useEffect(
         () => {
             let interval: NodeJS.Timeout | undefined = setInterval(() => {
@@ -18,8 +21,8 @@ export const Countdown: React.FunctionComponent<IProps> = props => {
                         clearInterval(interval);
                         interval = undefined;
 
-                        if (props.onElapsed) {
-                            props.onElapsed();
+                        if (onElapsed) {
+                            onElapsed();
                         }
                     }
                     return val - 1;
@@ -32,7 +35,7 @@ export const Countdown: React.FunctionComponent<IProps> = props => {
                 }
             }
         },
-        []
+        [onElapsed]
     );
 
     if (timeRemaining > 0) {
@@ -43,15 +46,15 @@ export const Countdown: React.FunctionComponent<IProps> = props => {
         }
 
         return (
-            <div className="countdown">
+            <Typography className="countdown">
                 {minutes}:{seconds} remaining
-            </div>
+            </Typography>
         );
     }
 
     return (
-        <div className="countdown countdown--expired">
+        <Typography className="countdown countdown--expired">
             time expired
-        </div>
+        </Typography>
     );
 }

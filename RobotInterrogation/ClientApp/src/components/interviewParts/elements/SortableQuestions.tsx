@@ -40,10 +40,8 @@ export const SortableQuestions: React.FunctionComponent<IProps> = props => {
     });
     
     return (
-        <div>
-            <FlipMove>
-                {questions}
-            </FlipMove>
-        </div>
+        <FlipMove>
+            {questions}
+        </FlipMove>
     )
 }

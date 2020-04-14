@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { inCompatibilityMode, setCompatibilityMode } from 'src/Connectivity';
 import { useState } from 'react';
-import { Container, Typography, Button, Link as A, makeStyles } from '@material-ui/core';
+import { Typography, Button, Link as A, makeStyles } from '@material-ui/core';
 import { ActionSet } from './interviewParts/elements/ActionSet';
 import { Page } from './interviewParts/elements/Page';
 import { P } from './interviewParts/elements/P';
