@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
     },
     rootViolent: {
         backgroundColor: '#666',
-        color: '#ccc',
+        color: '#eee',
     },
     title: {
         textAlign: 'center',

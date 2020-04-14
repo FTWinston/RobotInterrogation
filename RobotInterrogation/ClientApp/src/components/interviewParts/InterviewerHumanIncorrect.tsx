@@ -10,8 +10,8 @@ interface IProps {
 
 export const InterviewerHumanIncorrect: React.FunctionComponent<IProps> = props => {
     const winOrLose = props.role.type === 'ViolentRobot'
-        ? <Typography variant="h4">You both lose.</Typography>
-        : <Typography variant="h4">You lose.</Typography>
+        ? <Typography variant="h4">You both lose</Typography>
+        : <Typography variant="h4">You lose</Typography>
 
     const extra = props.role.type === 'ViolentRobot'
         ? <P>(Violent robots cannot win by being certified as human. They only win by completing their tasks.)</P>

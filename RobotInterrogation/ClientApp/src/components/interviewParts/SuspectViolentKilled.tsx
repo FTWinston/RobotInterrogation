@@ -12,7 +12,7 @@ export const SuspectViolentKilled: React.FunctionComponent<IProps> = props => {
     return (
         <Page>
             <P>You completed your obsession and killed the Interviewer.</P>
-            <Typography variant="h4">You win.</Typography>
+            <Typography variant="h4">You win</Typography>
 
             <SuspectRole role={props.role} />
         </Page>

@@ -12,7 +12,7 @@ export const SuspectRobotCorrect: React.FunctionComponent<IProps> = props => {
     return (
         <Page>
             <P>The Interviewer correctly identified you as a robot.</P>
-            <Typography variant="h4">You lose.</Typography>
+            <Typography variant="h4">You lose</Typography>
             <SuspectRole role={props.role} />
         </Page>
     );

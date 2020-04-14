@@ -12,7 +12,7 @@ export const InterviewerViolentKilled: React.FunctionComponent<IProps> = props =
     return (
         <Page>
             <P>The suspect was a violent robot who completed their obsession and killed you.</P>
-            <Typography variant="h4">You lose.</Typography>
+            <Typography variant="h4">You lose</Typography>
 
             <SuspectRole role={props.role} />
         </Page>
