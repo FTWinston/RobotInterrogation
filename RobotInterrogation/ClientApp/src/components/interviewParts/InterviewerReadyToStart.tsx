@@ -22,7 +22,7 @@ export const InterviewerReadyToStart: React.FunctionComponent<IProps> = props =>
     return (
         <Page>
             <PositionHeader position={InterviewPosition.Interviewer} />
-            <P>Ask the Suspect their name, then confirm their background.<br/>When you are ready, read them the prompt, then start the timer.</P>
+            <P>Ask the Suspect their name, then confirm their background.<br/>When you are ready, read them the prompt, then start the <Help entry="timer">timer</Help>.</P>
 
             <SortableQuestions
                 questions={props.questions}

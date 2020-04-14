@@ -22,7 +22,7 @@ export const SuspectReadyToStart: React.FunctionComponent<IProps> = props => {
     return (
         <Page>
             <PositionHeader position={InterviewPosition.Suspect} />
-            <P>Once they start the timer, the Interviewer will ask you a series of <Help entry="questions">questions</Help> to try to determine whether you are a human or a robot.</P>
+            <P>Once they start the <Help entry="timer">timer</Help>, the Interviewer will ask you a series of <Help entry="questions">questions</Help> to try to determine whether you are a human or a robot.</P>
 
             {robotPrompt}
 
