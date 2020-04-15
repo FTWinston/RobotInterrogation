@@ -1,4 +1,6 @@
 .interference {
+    display: flex;
+    justify-content: center;
     white-space: pre;
     padding: 1em;
     font-family: 'Courier New', Courier, monospace;
@@ -8,11 +10,6 @@
 
 .interference table {
     border-collapse: collapse;
-}
-
-.interference--pattern {
-    display: flex;
-    justify-content: center;
 }
 
 .interference--solution {
