@@ -4,7 +4,18 @@ import { InterviewPosition, IPacket } from '../interviewReducer';
 import { P } from './elements/P';
 import { Page } from './elements/Page';
 import { Help } from './elements/Help';
-import { Phone, Transform, WbIncandescent, People, Favorite, SentimentVeryDissatisfied, Warning, LocalBar, TransferWithinAStation, Portrait, BeachAccess, HelpOutline } from '@material-ui/icons';
+import Phone from '@material-ui/icons/Phone';
+import Transform from '@material-ui/icons/Transform';
+import WbIncandescent from '@material-ui/icons/WbIncandescent';
+import People from '@material-ui/icons/People';
+import Favorite from '@material-ui/icons/Favorite';
+import SentimentVeryDissatisfied from '@material-ui/icons/SentimentVeryDissatisfied';
+import Warning from '@material-ui/icons/Warning';
+import LocalBar from '@material-ui/icons/LocalBar';
+import TransferWithinAStation from '@material-ui/icons/TransferWithinAStation';
+import Portrait from '@material-ui/icons/Portrait';
+import BeachAccess from '@material-ui/icons/BeachAccess';
+import HelpOutline from '@material-ui/icons/HelpOutline';
 import { List, ListItemIcon, ListItem, ListItemText } from '@material-ui/core';
 
 interface IProps {
