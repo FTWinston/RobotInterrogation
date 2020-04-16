@@ -1,21 +1,8 @@
-.countdown {
-    font-size: 1.5em;
-    text-align: center;
-    padding-bottom: 0.25em;
-    position: relative;
-    top: -0.25em;
-}
-
 @keyframes blinker {
     40% {
-        opacity: 0;
+        color: transparent;
     }
     60% {
-        opacity: 1;
+        color: white;
     }
-}
-
-.countdown--expired {
-    text-transform: uppercase;
-    animation: blinker 1s step-start infinite;
 }

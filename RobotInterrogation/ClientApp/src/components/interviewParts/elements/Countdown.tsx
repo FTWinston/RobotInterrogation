@@ -1,14 +1,37 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import './Countdown.css';
-import { Typography } from '@material-ui/core';
+import { Fab, makeStyles } from '@material-ui/core';
+import HourglassEmpty from '@material-ui/icons/HourglassEmpty';
+import HourglassFull from '@material-ui/icons/HourglassFull';
 
 interface IProps {
     duration: number,
     onElapsed?: () => void;
 }
 
+const useStyles = makeStyles(theme => ({
+    wrapper: {
+        position: 'absolute',
+        left: 'calc(100% - 7em)',
+        top: '0.5em',
+    },
+    main: {    
+        position: 'fixed',
+        paddingRight: '1em',
+        pointerEvents: 'none',
+    },
+    expired: {
+        animation: 'blinker 1s step-start infinite',
+    },
+    icon: {
+        paddingRight: '0.15em',
+    },
+}))
+
 export const Countdown: React.FunctionComponent<IProps> = props => {
+    const classes = useStyles();
+
     const [timeRemaining, setTimeRemaining] = useState(props.duration);
 
     const onElapsed = props.onElapsed;
@@ -24,6 +47,7 @@ export const Countdown: React.FunctionComponent<IProps> = props => {
                         if (onElapsed) {
                             onElapsed();
                         }
+                        return 0;
                     }
                     return val - 1;
                 });
@@ -38,23 +62,30 @@ export const Countdown: React.FunctionComponent<IProps> = props => {
         [onElapsed]
     );
 
-    if (timeRemaining > 0) {
-        const minutes = Math.floor(timeRemaining / 60);
-        let seconds = (timeRemaining - minutes * 60).toString();
-        if (seconds.length < 2) {
-            seconds = `0${seconds}`;
-        }
+    const elapsed = timeRemaining <= 0;
 
-        return (
-            <Typography className="countdown">
-                {minutes}:{seconds} remaining
-            </Typography>
-        );
+    const minutes = Math.floor(timeRemaining / 60);
+    let seconds = (timeRemaining - minutes * 60).toString();
+    if (seconds.length < 2) {
+        seconds = `0${seconds}`;
     }
 
+    const color = elapsed ? 'secondary' : 'primary';
+
+    const mainClasses = elapsed
+        ? `${classes.main} ${classes.expired}`
+        : classes.main;
+
+    const icon = elapsed
+        ? <HourglassEmpty />
+        : <HourglassFull />
+
     return (
-        <Typography className="countdown countdown--expired">
-            time expired
-        </Typography>
+        <div className={classes.wrapper}>
+            <Fab size="small" color={color} className={mainClasses} variant="extended">
+                {icon}
+                {minutes}:{seconds}
+            </Fab>
+        </div>
     );
 }
