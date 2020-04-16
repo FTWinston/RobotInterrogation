@@ -13,8 +13,8 @@ interface IProps {
 const useStyles = makeStyles(theme => ({
     wrapper: {
         position: 'absolute',
-        left: 'calc(100% - 7em)',
-        top: '0.5em',
+        left: 'calc(100% - 6.5em)',
+        top: '0.25em',
     },
     main: {    
         position: 'fixed',
@@ -77,8 +77,8 @@ export const Countdown: React.FunctionComponent<IProps> = props => {
         : classes.main;
 
     const icon = elapsed
-        ? <HourglassEmpty />
-        : <HourglassFull />
+        ? <HourglassEmpty className={classes.icon} />
+        : <HourglassFull className={classes.icon} />
 
     return (
         <div className={classes.wrapper}>
