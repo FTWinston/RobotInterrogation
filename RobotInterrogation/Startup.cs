@@ -36,6 +36,7 @@ namespace RobotInterrogation
             services.Configure<GameConfiguration>(options => Configuration.GetSection("GameConfiguration").Bind(options));
             services.Configure<IDGeneration>(options => Configuration.GetSection("IDGeneration").Bind(options));
 
+            services.AddScoped<GameInstanceService>();
             services.AddScoped<InterviewService>();
             services.AddScoped<InterferenceService>();
 

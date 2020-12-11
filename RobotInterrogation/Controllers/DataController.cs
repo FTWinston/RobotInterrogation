@@ -12,9 +12,9 @@ namespace RobotInterrogation.Controllers
     public class DataController : Controller
     {
         [HttpGet("[action]")]
-        public string GetNextSessionID([FromServices] InterviewService service)
+        public string GetNextSessionID([FromServices] GameInstanceService service)
         {
-            return service.GetNewInterviewID();
+            return service.GetNewGameInstanceID();
         }
 
         [HttpGet("[action]")]

@@ -47,16 +47,18 @@ namespace RobotInterrogation.Hubs
 
     public class InterviewHub : Hub<IInterviewMessages>
     {
-        public InterviewHub(InterviewService service, IOptions<GameConfiguration> configuration)
+        public InterviewHub(InterviewService interviewService, GameInstanceService gameInstanceService, IOptions<GameConfiguration> configuration)
         {
-            Service = service;
+            this.InterviewService = interviewService;
+            this.GameInstanceService = gameInstanceService;
             Configuration = configuration.Value;
         }
 
         private static ConcurrentDictionary<string, string> UserSessions = new ConcurrentDictionary<string, string>();
         private string SessionID => UserSessions[Context.ConnectionId];
 
-        private InterviewService Service { get; }
+        private InterviewService InterviewService { get; }
+        private GameInstanceService GameInstanceService { get; }
         private GameConfiguration Configuration { get; }
 
         public override async Task OnDisconnectedAsync(Exception exception)
@@ -65,7 +67,7 @@ namespace RobotInterrogation.Hubs
                 .GroupExcept(SessionID, Context.ConnectionId)
                 .EndGame((int)InterviewOutcome.Disconnected, null);
 
-            Service.RemoveInterview(SessionID);
+            GameInstanceService.RemoveGameInstance(SessionID);
             UserSessions.TryRemove(Context.ConnectionId, out _);
             await base.OnDisconnectedAsync(exception);
         }
@@ -84,19 +86,19 @@ namespace RobotInterrogation.Hubs
 
         public async Task<bool> Join(string session)
         {
-            if (!Service.TryGetInterview(session, out Interview interview))
+            if (!GameInstanceService.TryGetGameInstance(session, out GameInstance gameInstance))
                 return false;
 
-            if (interview.Status != InterviewStatus.WaitingForConnections)
+            if (gameInstance.Interview.Status != InterviewStatus.WaitingForConnections)
                 return false;
 
-            if (!Service.TryAddUser(interview, Context.ConnectionId))
+            if (!GameInstanceService.TryAddUser(gameInstance, Context.ConnectionId))
                 return false;
 
             UserSessions[Context.ConnectionId] = session;
             await Groups.AddToGroupAsync(Context.ConnectionId, session);
 
-            bool isInterviewer = interview.InterviewerConnectionID == Context.ConnectionId;
+            bool isInterviewer = gameInstance.Interview.InterviewerConnectionID == Context.ConnectionId;
 
             await Clients.Caller.SetPosition(isInterviewer);
 
@@ -108,7 +110,7 @@ namespace RobotInterrogation.Hubs
             }
             else // must be suspect, then
             {
-                interview.Status = InterviewStatus.SelectingPositions;
+                gameInstance.Interview.Status = InterviewStatus.SelectingPositions;
 
                 await Clients
                     .Group(session)
@@ -120,32 +122,37 @@ namespace RobotInterrogation.Hubs
 
         public async Task ConfirmPositions()
         {
-            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.SelectingPositions);
+            var gameInstance = GameInstanceService.GetGameInstanceWithStatus(SessionID, InterviewStatus.SelectingPositions);
 
-            EnsureIsInterviewer(interview);
+            EnsureIsInterviewer(gameInstance.Interview);
 
-            interview.Status = InterviewStatus.SelectingPenalty_Interviewer;
+            gameInstance.Interview.Status = InterviewStatus.SelectingPenalty_Interviewer;
 
-            Service.AllocatePenalties(interview);
-
-            await Clients
-                .Client(interview.InterviewerConnectionID)
-                .ShowPenaltyChoice(interview.Penalties);
+            InterviewService.AllocatePenalties(gameInstance.Interview);
 
             await Clients
-                .GroupExcept(SessionID, interview.InterviewerConnectionID)
+                .Client(gameInstance.Interview.InterviewerConnectionID)
+                .ShowPenaltyChoice(gameInstance.Interview.Penalties);
+
+            await Clients
+                .GroupExcept(SessionID, gameInstance.Interview.InterviewerConnectionID)
                 .WaitForPenaltyChoice();
         }
 
         public async Task SwapPositions()
         {
-            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.SelectingPositions);
+            var gameInstance = GameInstanceService.GetGameInstanceWithStatus(SessionID, InterviewStatus.SelectingPositions);
 
-            EnsureIsInterviewer(interview);
+            EnsureIsInterviewer(gameInstance.Interview);
 
-            var tmp = interview.InterviewerConnectionID;
-            interview.InterviewerConnectionID = interview.SuspectConnectionID;
-            interview.SuspectConnectionID = tmp;
+            var newInterviewer = GameInstanceService.GetSuspect(gameInstance);
+            var newSuspect = GameInstanceService.GetInterviewer(gameInstance);
+
+            newInterviewer.Seat = PlayerSeat.Interviewer;
+            newSuspect.Seat = PlayerSeat.Suspect;
+
+            gameInstance.Interview.InterviewerConnectionID = newInterviewer.ConnectionID;
+            gameInstance.Interview.SuspectConnectionID = newSuspect.ConnectionID;
 
             await Clients
                 .Group(SessionID)
@@ -154,9 +161,10 @@ namespace RobotInterrogation.Hubs
 
         public async Task Select(int index)
         {
-            var interview = Service.GetInterview(SessionID);
+            var gameInstance = GameInstanceService.GetGameInstance(SessionID);
+            var interview = gameInstance.Interview;
 
-            switch (interview.Status)
+            switch (gameInstance.Interview.Status)
             {
                 case InterviewStatus.SelectingPenalty_Interviewer:
                     await DiscardSinglePenalty(index, interview);
@@ -207,7 +215,7 @@ namespace RobotInterrogation.Hubs
 
         private async Task SetPacket(Interview interview, int index)
         {
-            Service.SetPacketAndInducer(interview, index);
+            InterviewService.SetPacketAndInducer(interview, index);
 
             await Clients.Group(SessionID)
                 .SetPacket(interview.Packet.Name, interview.Packet.Prompt);
@@ -215,7 +223,7 @@ namespace RobotInterrogation.Hubs
 
         private async Task SetSuspectRole(Interview interview)
         {
-            Service.AllocateRole(interview);
+            InterviewService.AllocateRole(interview);
 
             var suspectClient = Clients
                 .Client(interview.SuspectConnectionID);
@@ -286,7 +294,7 @@ namespace RobotInterrogation.Hubs
 
         private async Task ShowPacketChoice(Interview interview)
         {
-            var packets = Service.GetAllPackets();
+            var packets = InterviewService.GetAllPackets();
 
             await Clients
                 .Client(interview.InterviewerConnectionID)
@@ -310,7 +318,7 @@ namespace RobotInterrogation.Hubs
 
         private async Task ShowSuspectBackgrounds(Interview interview, bool suspectCanChoose)
         {
-            Service.AllocateSuspectBackgrounds(interview, suspectCanChoose ? 3 : 1);
+            InterviewService.AllocateSuspectBackgrounds(interview, suspectCanChoose ? 3 : 1);
             interview.Status = InterviewStatus.SelectingSuspectBackground;
 
             await Clients
@@ -335,48 +343,48 @@ namespace RobotInterrogation.Hubs
 
         public async Task StartInterview()
         {
-            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.ReadyToStart);
-            EnsureIsInterviewer(interview);
+            var gameInstance = GameInstanceService.GetGameInstanceWithStatus(SessionID, InterviewStatus.ReadyToStart);
+            EnsureIsInterviewer(gameInstance.Interview);
 
             await Clients
                 .Group(SessionID)
                 .StartTimer(Configuration.Duration);
 
-            interview.Status = InterviewStatus.InProgress;
-            interview.Started = DateTime.Now;
+            gameInstance.Interview.Status = InterviewStatus.InProgress;
+            gameInstance.Interview.Started = DateTime.Now;
         }
 
         public async Task ConcludeInterview(bool isRobot)
         {
-            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.InProgress);
-            EnsureIsInterviewer(interview);
+            var gameInstance = GameInstanceService.GetGameInstanceWithStatus(SessionID, InterviewStatus.InProgress);
+            EnsureIsInterviewer(gameInstance.Interview);
 
             // Cannot record the suspect as human before the time has elapsed.
-            if (!isRobot && !Service.HasTimeElapsed(interview))
+            if (!isRobot && !InterviewService.HasTimeElapsed(gameInstance.Interview))
                 return;
 
-            var outcome = Service.GuessSuspectRole(interview, isRobot);
+            var outcome = InterviewService.GuessSuspectRole(gameInstance.Interview, isRobot);
 
             await Clients
                 .Group(SessionID)
-                .EndGame((int)outcome, interview.Role);
+                .EndGame((int)outcome, gameInstance.Interview.Role);
         }
 
         public async Task KillInterviewer()
         {
-            var interview = Service.GetInterviewWithStatus(SessionID, InterviewStatus.InProgress);
-            EnsureIsSuspect(interview);
+            var gameInstance = GameInstanceService.GetGameInstanceWithStatus(SessionID, InterviewStatus.InProgress);
+            EnsureIsSuspect(gameInstance.Interview);
 
-            Service.KillInterviewer(interview);
+            InterviewService.KillInterviewer(gameInstance.Interview);
 
             await Clients
                 .Group(SessionID)
-                .EndGame((int)InterviewOutcome.KilledInterviewer, interview.Role);
+                .EndGame((int)InterviewOutcome.KilledInterviewer, gameInstance.Interview.Role);
         }
 
         public async Task NewInterview()
         {
-            Service.ResetInterview(SessionID);
+            GameInstanceService.ResetGameInstanceInterview(SessionID);
 
             await Clients
                 .Group(SessionID)
