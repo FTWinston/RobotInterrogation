@@ -11,9 +11,11 @@ namespace RobotInterrogation.Models
 
         public DateTime? Started { get; set; }
 
-        public string InterviewerConnectionID { get; set; }
+        public List<Player> Players { get; } = new List<Player>();
 
-        public string SuspectConnectionID { get; set; }
+        public int InterviewerIndex { get; set; } = -1;
+
+        public int SuspectIndex { get; set; } = -1;
 
         public List<string> Penalties { get; } = new List<string>();
         

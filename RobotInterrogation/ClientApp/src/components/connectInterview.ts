@@ -1,16 +1,16 @@
 import { connectSignalR } from 'src/Connectivity';
 import { Dispatch } from 'react';
-import { InterviewAction, InterviewOutcome, IPacket } from './interviewReducer';
+import { InterviewPosition, InterviewAction, InterviewOutcome, IPacket } from './interviewReducer';
 import { ISuspectRole } from './interviewParts/elements/SuspectRole';
 import { IInterviewQuestion } from './interviewParts/elements/InterviewQuestion';
 
 export async function connectInterview(session: string, dispatch: Dispatch<InterviewAction>) {
     const connection = connectSignalR('/hub/Interview');
 
-    connection.on('SetPosition', (isInterviewer: boolean) => {
+    connection.on('SetPosition', (position: number) => {
         dispatch({
             type: 'set position',
-            isInterviewer,
+            position,
         });
     });
 

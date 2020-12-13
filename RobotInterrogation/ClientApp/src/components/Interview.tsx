@@ -26,6 +26,7 @@ import { InducerResponse } from './interviewParts/InducerResponse';
 import { InducerDisplay } from './interviewParts/InducerDisplay';
 import { PositionSelection } from './interviewParts/PositionSelection';
 import { WaitPenalty } from './interviewParts/WaitPenalty';
+import { SpectatorPlaceholder } from './interviewParts/SpectatorPlaceholder';
 
 export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string }>> = props => {
     const [state, dispatch] = useReducer(interviewReducer, initialState);
@@ -43,6 +44,9 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
         },
         [props.match.params.id]
     );
+
+    if (state.position === InterviewPosition.Spectator)
+        return <SpectatorPlaceholder position={state.position} />
 
     switch (state.status) {
         case InterviewStatus.InvalidSession:

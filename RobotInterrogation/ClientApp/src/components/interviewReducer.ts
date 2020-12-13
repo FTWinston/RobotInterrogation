@@ -36,9 +36,10 @@ export enum InterviewOutcome {
 }
 
 export enum InterviewPosition {
-    None,
     Interviewer,
     Suspect,
+    Spectator,
+    None,
 }
 
 export enum Direction {
@@ -87,7 +88,7 @@ export const initialState: IInterviewState = {
 
 export type InterviewAction = {
     type: 'set position';
-    isInterviewer: boolean;
+    position: number;
 } | {
     type: 'swap position';
 } | {
@@ -146,13 +147,12 @@ export type InterviewAction = {
 }
 
 export function interviewReducer(state: IInterviewState, action: InterviewAction): IInterviewState {
+
     switch (action.type) {
         case 'set position':
             return {
                 ...state,
-                position: action.isInterviewer
-                    ? InterviewPosition.Interviewer
-                    : InterviewPosition.Suspect,
+                position: [InterviewPosition.Interviewer, InterviewPosition.Suspect, InterviewPosition.Spectator][action.position],
             };
 
         case 'swap position':

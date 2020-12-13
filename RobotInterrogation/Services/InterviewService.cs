@@ -75,24 +75,44 @@ namespace RobotInterrogation.Services
             return id;
         }
 
+        public string GetInterviewerConnectionID(Interview interview)
+        {
+            return interview.Players[interview.InterviewerIndex].ConnectionID;
+        }
+
+        public string GetSuspectConnectionID(Interview interview)
+        {
+            return interview.Players[interview.SuspectIndex].ConnectionID;
+        }
+
+        public Player GetPlayerByConnectionID(Interview interview, string connectionID)
+        {
+            return interview.Players.Where(p => p.ConnectionID == connectionID).First();
+        }
+
         public bool TryAddUser(Interview interview, string connectionID)
         {
-            if (interview.Status != InterviewStatus.WaitingForConnections)
+            if (interview.Players.Count >= Configuration.MaxPlayers)
                 return false;
 
-            if (interview.InterviewerConnectionID == null)
+            var player = new Player();
+            player.ConnectionID = connectionID;
+            interview.Players.Add(player);
+
+            if (interview.InterviewerIndex == -1)
             {
-                interview.InterviewerConnectionID = connectionID;
-                return true;
+                player.Position = PlayerPosition.Interviewer;
+                interview.InterviewerIndex = interview.Players.Count - 1;
+            } else if (interview.SuspectIndex == -1)
+            {
+                player.Position = PlayerPosition.Suspect;
+                interview.SuspectIndex = interview.Players.Count - 1;
+            } else
+            {
+                player.Position = PlayerPosition.Spectator;
             }
 
-            if (interview.SuspectConnectionID == null)
-            {
-                interview.SuspectConnectionID = connectionID;
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
         public void RemoveInterview(string interviewID)
@@ -246,8 +266,9 @@ namespace RobotInterrogation.Services
             Interviews[interviewID.ToLower()] = newInterview;
 
             newInterview.Status = InterviewStatus.SelectingPositions;
-            newInterview.InterviewerConnectionID = oldInterview.InterviewerConnectionID;
-            newInterview.SuspectConnectionID = oldInterview.SuspectConnectionID;
+            newInterview.Players.AddRange(oldInterview.Players);
+            newInterview.InterviewerIndex = oldInterview.InterviewerIndex;
+            newInterview.SuspectIndex = oldInterview.SuspectIndex;
 
             return newInterview;
         }
