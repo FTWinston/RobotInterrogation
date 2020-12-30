@@ -45,9 +45,6 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
         [props.match.params.id]
     );
 
-    if (state.position === InterviewPosition.Spectator)
-        return <SpectatorPlaceholder position={state.position} />
-
     switch (state.status) {
         case InterviewStatus.InvalidSession:
             return <Redirect to="/" />
@@ -62,16 +59,24 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
             return <WaitingForOpponent interviewID={props.match.params.id} />
 
         case InterviewStatus.SelectingPositions:
-            if (state.position === InterviewPosition.Interviewer) {
-                const confirm = () => connection!.invoke('ConfirmPositions');
-                const swap = () => connection!.invoke('SwapPositions');
+            switch (state.position) {
+                case InterviewPosition.Interviewer:
+                    const confirm = () => connection!.invoke('ConfirmPositions');
+                    const swap = () => connection!.invoke('SwapPositions');
 
-                return <InterviewerPositionSelection stay={confirm} swap={swap} />
+                    return <InterviewerPositionSelection stay={confirm} swap={swap} />
+                case InterviewPosition.Suspect:
+                    return <PositionSelection position={state.position} />
+                case InterviewPosition.Spectator:
+                    return <SpectatorPlaceholder status={state.status} />
             }
-            
-            return <PositionSelection position={state.position} />
 
         case InterviewStatus.PenaltySelection:
+            if (state.position === InterviewPosition.Spectator) {
+                //TODO: display who is selecting and what their options are
+                return <SpectatorPlaceholder status={state.status} />
+            }
+
             if (state.choice.length > 0) {
                 const selectPenalty = (index: number) => connection!.invoke('Select', index);
 
@@ -105,28 +110,39 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
         case InterviewStatus.InducerPrompt:
             const administer = () => connection?.invoke('Select', 0);
 
-            return state.position === InterviewPosition.Interviewer
-                ? (
-                    <InducerPrompt
+            switch (state.position) {
+                case InterviewPosition.Interviewer:
+                    return <InducerPrompt
                         solution={state.patternSolution!}
                         packet={state.packet}
                         continue={administer}
                     />
-                )
-                : (
-                    <InducerWait
+
+                case InterviewPosition.Suspect:
+                    return <InducerWait
                         position={state.position}
                         packet={state.packet}
                     />
-                );
+
+                case InterviewPosition.Spectator:
+                    return <SpectatorPlaceholder status={state.status} />
+            }
 
         case InterviewStatus.ShowingInducer:
             const correctResponse = () => connection!.invoke('Select', 0);
             const incorrectResponse = () => connection!.invoke('Select', 1);
 
-            return state.position === InterviewPosition.Suspect
-                ? (
-                    <InducerDisplay
+            switch (state.position) {
+                case InterviewPosition.Interviewer:
+                    return <InducerResponse
+                        solution={state.patternSolution!}
+                        packet={state.packet}
+                        correct={correctResponse}
+                        incorrect={incorrectResponse}
+                    />
+
+                case InterviewPosition.Suspect:
+                    return <InducerDisplay
                         position={state.position}
                         packet={state.packet}
                         role={state.role!}
@@ -134,87 +150,89 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         content={state.patternContent}
                         solution={state.patternSolution}
                     />
-                )
-                : (
-                    <InducerResponse
-                        solution={state.patternSolution!}
-                        packet={state.packet}
-                        correct={correctResponse}
-                        incorrect={incorrectResponse}
-                    />
-                );
+
+                case InterviewPosition.Spectator:
+                    return <SpectatorPlaceholder status={state.status} />
+            }
 
         case InterviewStatus.BackgroundSelection:
-            if (state.position === InterviewPosition.Interviewer) {
-                return (
-                    <WaitingQuestionDisplay
+            switch (state.position) {
+                case InterviewPosition.Interviewer:
+                    return <WaitingQuestionDisplay
                         questions={state.questions}
                         sortQuestions={questions => dispatch({
                             type: 'set questions',
                             questions,
                         })}
                     />
-                );
-            }
-            else {
-                const selectBackground = (index: number) => connection!.invoke('Select', index);
-                return <SuspectBackgroundSelection options={state.choice} role={state.role!} action={selectBackground} />
+
+                case InterviewPosition.Suspect:
+                    const selectBackground = (index: number) => connection!.invoke('Select', index);
+                    return <SuspectBackgroundSelection options={state.choice} role={state.role!} action={selectBackground} />
+
+                case InterviewPosition.Spectator:
+                    return <SpectatorPlaceholder status={state.status} />
             }
 
         case InterviewStatus.ReadyToStart:
-            if (state.position === InterviewPosition.Interviewer) {
-                const ready = () => connection!.invoke('StartInterview');
+            switch (state.position) {
+                case InterviewPosition.Interviewer:
+                    const ready = () => connection!.invoke('StartInterview');
+                    return (
+                        <InterviewerReadyToStart
+                            questions={state.questions}
+                            prompt={state.prompt}
+                            suspectBackground={state.suspectBackground}
+                            penalty={state.penalty}
+                            ready={ready}
+                            sortQuestions={questions => dispatch({
+                                type: 'set questions',
+                                questions,
+                            })}
+                        />
+                    );
 
-                return (
-                    <InterviewerReadyToStart
-                        questions={state.questions}
-                        prompt={state.prompt}
-                        suspectBackground={state.suspectBackground}
-                        penalty={state.penalty}
-                        ready={ready}
-                        sortQuestions={questions => dispatch({
-                            type: 'set questions',
-                            questions,
-                        })}
-                    />
-                );
-            }
-            else {
-                return (
-                    <SuspectReadyToStart
-                        role={state.role!}
-                        suspectBackground={state.suspectBackground}
-                        penalty={state.penalty}
-                    />
-                );
+                case InterviewPosition.Suspect:
+                    return (
+                        <SuspectReadyToStart
+                            role={state.role!}
+                            suspectBackground={state.suspectBackground}
+                            penalty={state.penalty}
+                        />
+                    );
+
+                case InterviewPosition.Spectator:
+                    return <SpectatorPlaceholder status={state.status} />
             }
 
         case InterviewStatus.InProgress:
-            if (state.position === InterviewPosition.Interviewer) {
-                const conclude = (isRobot: boolean) => connection!.invoke('ConcludeInterview', isRobot);
+            switch (state.position) {
+                case InterviewPosition.Interviewer:
+                    const conclude = (isRobot: boolean) => connection!.invoke('ConcludeInterview', isRobot);
+                    return (
+                        <InterviewerInProgress
+                            conclude={conclude}
+                            duration={state.duration}
+                            penalty={state.penalty}
+                            questions={state.questions}
+                            suspectBackground={state.suspectBackground}
+                        />
+                    );
 
-                return (
-                    <InterviewerInProgress
-                        conclude={conclude}
-                        duration={state.duration}
-                        penalty={state.penalty}
-                        questions={state.questions}
-                        suspectBackground={state.suspectBackground}
-                    />
-                );
-            }
-            else {
-                const terminate = () => connection!.invoke('KillInterviewer');
+                case InterviewPosition.Suspect:
+                    const terminate = () => connection!.invoke('KillInterviewer');
+                    return (
+                        <SuspectInProgress
+                            duration={state.duration}
+                            penalty={state.penalty}
+                            role={state.role!}
+                            suspectBackground={state.suspectBackground}
+                            terminateInterviewer={terminate}
+                        />
+                    );
 
-                return (
-                    <SuspectInProgress
-                        duration={state.duration}
-                        penalty={state.penalty}
-                        role={state.role!}
-                        suspectBackground={state.suspectBackground}
-                        terminateInterviewer={terminate}
-                    />
-                );
+                case InterviewPosition.Spectator:
+                    return <SpectatorPlaceholder status={state.status} />
             }
 
         case InterviewStatus.Finished:
@@ -223,6 +241,9 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
             }
 
             const playAgain = () => connection!.invoke('NewInterview');
+
+            if (state.position === InterviewPosition.Spectator)
+                return <SpectatorPlaceholder status={state.status} />
 
             return (
                 <InterviewFinished
