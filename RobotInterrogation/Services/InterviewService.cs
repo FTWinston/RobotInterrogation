@@ -12,6 +12,7 @@ namespace RobotInterrogation.Services
 {
     public class InterviewService
     {
+        private static ConcurrentDictionary<string, Player> Players = new ConcurrentDictionary<string, Player>();
         private static ConcurrentDictionary<string, Interview> Interviews = new ConcurrentDictionary<string, Interview>();
 
         private static Random IdGenerator = new Random();
@@ -35,9 +36,10 @@ namespace RobotInterrogation.Services
         {
             lock (IdGenerator)
             {
-                string id = GenerateID();
-                Interviews[id.ToLower()] = new Interview();
-                return id;
+                var interview = new Interview();
+                interview.InterviewID = GenerateID();
+                Interviews[interview.InterviewID.ToLower()] = interview;
+                return interview.InterviewID;
             }
         }
 
@@ -85,9 +87,9 @@ namespace RobotInterrogation.Services
             return interview.Players[interview.SuspectIndex].ConnectionID;
         }
 
-        public Player GetPlayerByConnectionID(Interview interview, string connectionID)
+        public Player GetPlayerByConnectionID(string connectionID)
         {
-            return interview.Players.Where(p => p.ConnectionID == connectionID).First();
+            return Players[connectionID];
         }
 
         public bool TryAddUser(Interview interview, string connectionID)
@@ -97,6 +99,7 @@ namespace RobotInterrogation.Services
 
             var player = new Player();
             player.ConnectionID = connectionID;
+            Players[connectionID] = player;
             interview.Players.Add(player);
 
             if (interview.InterviewerIndex == -1)
@@ -112,13 +115,26 @@ namespace RobotInterrogation.Services
                 player.Position = PlayerPosition.Spectator;
             }
 
+            player.InterviewID = interview.InterviewID;
+
             return true;
+        }
+
+        public void RemovePlayer(Player player)
+        {
+            GetInterview(player.InterviewID).Players.Remove(player);
+            Players.Remove(player.ConnectionID, out Player p);
         }
 
         public void RemoveInterview(string interviewID)
         {
-            if (!Interviews.TryRemove(interviewID.ToLower(), out Interview interview))
+            Interview interview;
+            if (!Interviews.TryRemove(interviewID.ToLower(), out interview))
+            {
+                foreach(Player player in interview.Players)
+                    Players.TryRemove(player.ConnectionID, out Player p);
                 return;
+            }
 
             if (interview.Status == InterviewStatus.InProgress)
             {
@@ -265,6 +281,7 @@ namespace RobotInterrogation.Services
             var newInterview = new Interview();
             Interviews[interviewID.ToLower()] = newInterview;
 
+            newInterview.InterviewID = interviewID;
             newInterview.Status = InterviewStatus.SelectingPositions;
             newInterview.Players.AddRange(oldInterview.Players);
             newInterview.InterviewerIndex = oldInterview.InterviewerIndex;

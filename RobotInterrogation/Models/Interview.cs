@@ -5,6 +5,8 @@ namespace RobotInterrogation.Models
 {
     public class Interview
     {
+        public string InterviewID { get; set; }
+
         public InterviewStatus Status { get; set; } = InterviewStatus.WaitingForConnections;
 
         public InterviewOutcome? Outcome { get; set; }

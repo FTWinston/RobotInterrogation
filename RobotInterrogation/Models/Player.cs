@@ -9,6 +9,8 @@ namespace RobotInterrogation.Models
     {
         public string ConnectionID { get; set; }
 
+        public string InterviewID { get; set; }
+
         public string Name { get; set; }
 
         public PlayerPosition Position { get; set; }

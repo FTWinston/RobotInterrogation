@@ -61,13 +61,21 @@ namespace RobotInterrogation.Hubs
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            await Clients
-                .GroupExcept(SessionID, Context.ConnectionId)
-                .EndGame((int)InterviewOutcome.Disconnected, null);
+            var player = Service.GetPlayerByConnectionID(Context.ConnectionId);
+            if (player.Position == PlayerPosition.Spectator)
+            {
+                Service.RemovePlayer(player);
+            }
+            else
+            {
+                await Clients
+                    .GroupExcept(SessionID, Context.ConnectionId)
+                    .EndGame((int)InterviewOutcome.Disconnected, null);
 
-            Service.RemoveInterview(SessionID);
-            UserSessions.TryRemove(Context.ConnectionId, out _);
-            await base.OnDisconnectedAsync(exception);
+                Service.RemoveInterview(SessionID);
+                UserSessions.TryRemove(Context.ConnectionId, out _);
+                await base.OnDisconnectedAsync(exception);
+            }
         }
 
         private void EnsureIsInterviewer(Interview interview)
@@ -96,7 +104,7 @@ namespace RobotInterrogation.Hubs
             UserSessions[Context.ConnectionId] = session;
             await Groups.AddToGroupAsync(Context.ConnectionId, session);
 
-            var player = Service.GetPlayerByConnectionID(interview, Context.ConnectionId);
+            var player = Service.GetPlayerByConnectionID(Context.ConnectionId);
 
             await Clients.Caller.SetPosition((int)player.Position);
 
@@ -106,14 +114,55 @@ namespace RobotInterrogation.Hubs
                     .Group(session)
                     .SetWaitingForPlayer();
             }
-            else // must be suspect, then
+            else if (player.Position == PlayerPosition.Suspect)
             {
                 interview.Status = InterviewStatus.SelectingPositions;
 
                 await Clients
                     .Group(session)
                     .SetPlayersPresent();
-            } // else spectator, do nothing
+            } else //Spectator
+            {
+                var client = Clients.Client(Context.ConnectionId);
+                switch (interview.Status)
+                {
+                    case InterviewStatus.WaitingForConnections:
+                        await client.SetWaitingForPlayer();
+                        break;
+                    case InterviewStatus.SelectingPositions:
+                        await client.SetPlayersPresent();
+                        break;
+                    case InterviewStatus.SelectingPenalty_Interviewer:
+                    case InterviewStatus.SelectingPenalty_Suspect:
+                        await client.WaitForPenaltyChoice();
+                        break;
+                    case InterviewStatus.CalibratingPenalty:
+                        await client.SetPenalty(interview.Penalties[0]);
+                        break;
+                    case InterviewStatus.SelectingPacket:
+                        await client.WaitForPacketChoice();
+                        break;
+                    case InterviewStatus.PromptingInducer:
+                        await client.ShowInducer();
+                        break;
+                    case InterviewStatus.SolvingInducer:
+                        await client.ShowInducer();
+                        break;
+                    case InterviewStatus.SelectingSuspectBackground:
+                        await client.WaitForSuspectBackgroundChoice();
+                        break;
+                    case InterviewStatus.ReadyToStart:
+                        await client.SetSuspectBackground(interview.SuspectBackgrounds[0]);
+                        break;
+                    case InterviewStatus.InProgress:
+                        await client.StartTimer(Configuration.Duration);
+                        break;
+                    case InterviewStatus.Finished:
+                        await client.EndGame((int)interview.Outcome, interview.Role);
+                        break;
+                }
+
+            }
 
             return true;
         }
