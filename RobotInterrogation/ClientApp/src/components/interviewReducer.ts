@@ -156,11 +156,7 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
         case 'swap position':
             return {
                 ...state,
-                position: state.position === InterviewPosition.Interviewer
-                    ? InterviewPosition.Suspect
-                    : InterviewPosition.Suspect
-                        ? InterviewPosition.Interviewer
-                        : InterviewPosition.None,
+                position: [InterviewPosition.Suspect, InterviewPosition.Interviewer, InterviewPosition.Spectator][state.position],
             };
             
         case 'set waiting for opponent':
