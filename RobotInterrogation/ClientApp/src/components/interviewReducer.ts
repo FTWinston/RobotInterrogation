@@ -112,8 +112,6 @@ export type InterviewAction = {
     type: 'prompt inducer';
     solution: string[];
 } | {
-    type: 'set waiting for inducer';
-} | {
     type: 'set role and pattern';
     role: ISuspectRole;
     patternConnections: Direction[][];
@@ -227,13 +225,7 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
             return {
                 ...state,
                 status: InterviewStatus.InducerPrompt,
-                patternSolution: action.solution,
-            };
-
-        case 'set waiting for inducer':
-            return {
-                ...state,
-                status: InterviewStatus.InducerPrompt,
+                patternSolution: action.solution.length > 0 ? action.solution : undefined,
             };
 
         case 'set role and pattern':

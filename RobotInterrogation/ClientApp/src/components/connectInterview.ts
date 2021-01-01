@@ -46,6 +46,13 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         });
     });
 
+    connection.on('SpectatorWaitForPenaltyChoice', (options: string[]) => {
+        dispatch({
+            type: 'set penalty choice',
+            options,
+        });
+    });
+
     connection.on('SetPenalty', (penalty: string) => {
         dispatch({
             type: 'set penalty',
@@ -84,7 +91,15 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
 
     connection.on('WaitForInducer', () => {
         dispatch({
-            type: 'set waiting for inducer',
+            type: 'prompt inducer',
+            solution: []
+        });
+    });
+
+    connection.on('SpectatorWaitForInducer', (solution: string[]) => {
+        dispatch({
+            type: 'prompt inducer',
+            solution,
         });
     });
 
@@ -129,6 +144,13 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         dispatch({
             type: 'set background choice',
             options: [],
+        });
+    });
+
+    connection.on('SpectatorWaitForSuspectBackgroundChoice', (options: string[]) => {
+        dispatch({
+            type: 'set background choice',
+            options,
         });
     });
 
