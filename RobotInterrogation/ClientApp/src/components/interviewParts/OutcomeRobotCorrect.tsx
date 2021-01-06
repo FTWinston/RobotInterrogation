@@ -30,7 +30,7 @@ export const OutcomeRobotCorrect: React.FunctionComponent<IProps> = (props) => {
                 </Page>
             );
 
-        case InterviewPosition.Spectator:
+        default:
             return (
                 <Page>
                     <P>The Interviewer correctly identified the suspect as a robot.</P>
@@ -38,8 +38,5 @@ export const OutcomeRobotCorrect: React.FunctionComponent<IProps> = (props) => {
                     <SuspectRole role={props.role} />
                 </Page>
             );
-
-        default:
-            return <P>Unknown outcome</P>;
     }
 }

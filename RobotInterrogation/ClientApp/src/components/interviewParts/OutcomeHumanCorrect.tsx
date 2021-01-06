@@ -26,15 +26,12 @@ export const OutcomeHumanCorrect: React.FunctionComponent<IProps> = (props) => {
                 </Page>
             );
 
-        case InterviewPosition.Spectator:
+        default:
             return (
                 <Page>
                     <P>The interviewer correctly identified the suspect as a human.</P>
                     <Typography variant="h4">They both win.</Typography>
                 </Page>
             );
-
-        default:
-            return <P>Unknown outcome</P>;
     }
 }

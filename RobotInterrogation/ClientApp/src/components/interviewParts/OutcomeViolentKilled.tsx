@@ -32,7 +32,7 @@ export const OutcomeViolentKilled: React.FunctionComponent<IProps> = props => {
                 </Page>
             );
 
-        case InterviewPosition.Spectator:
+        default:
             return (
                 <Page>
                     <P>Suspect completed their obsession and killed the Interviewer.</P>
@@ -41,8 +41,5 @@ export const OutcomeViolentKilled: React.FunctionComponent<IProps> = props => {
                     <SuspectRole role={props.role} />
                 </Page>
             );
-
-        default:
-            return <P>Unknown outcome</P>;
     }
 }

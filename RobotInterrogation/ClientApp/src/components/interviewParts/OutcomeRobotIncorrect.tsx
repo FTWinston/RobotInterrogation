@@ -26,15 +26,12 @@ export const OutcomeRobotIncorrect: React.FunctionComponent<IProps> = (props) =>
                 </Page>
             );
 
-        case InterviewPosition.Spectator:
+        default:
             return (
                 <Page>
                     <P>The Interviewer wrongly identified the suspect as a robot.</P>
                     <Typography variant="h4">They both lose.</Typography>
                 </Page>
             );
-
-        default:
-            return <P>Unknown outcome</P>;
     }
 }

@@ -48,7 +48,7 @@ export const OutcomeHumanIncorrect: React.FunctionComponent<IProps> = props => {
                 </Page>
             );
 
-        case InterviewPosition.Spectator:
+        default:
             winOrLose = props.role.type === 'ViolentRobot'
                 ? <Typography variant="h4">They both lose.</Typography>
                 : <Typography variant="h4">Suspect wins.</Typography>
@@ -65,8 +65,5 @@ export const OutcomeHumanIncorrect: React.FunctionComponent<IProps> = props => {
                     {extra}
                 </Page>
             );
-
-        default:
-            return <P>Unknown outcome</P>;
     }
 }
