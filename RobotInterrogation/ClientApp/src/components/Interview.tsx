@@ -26,7 +26,6 @@ import { InducerResponse } from './interviewParts/InducerResponse';
 import { InducerDisplay } from './interviewParts/InducerDisplay';
 import { PositionSelection } from './interviewParts/PositionSelection';
 import { WaitPenalty } from './interviewParts/WaitPenalty';
-import { SpectatorPlaceholder } from './interviewParts/SpectatorPlaceholder';
 import { SpectatorPenaltySelection } from './interviewParts/SpectatorPenaltySelection';
 import { SpectatorInducerDisplay } from './interviewParts/SpectatorInducerDisplay';
 import { SpectatorBackgroundSelection } from './interviewParts/SpectatorBackgroundSelection';
