@@ -19,6 +19,12 @@ interface IProps {
 }
 
 export const InterviewFinished: React.FunctionComponent<IProps> = props => {
+    const playAgain = props.position === InterviewPosition.Interviewer || props.position === InterviewPosition.Suspect
+        ? <ActionSet>
+            <Button variant="outlined" onClick={props.playAgain}>Play again</Button>
+        </ActionSet>
+        : undefined;
+
     function renderOutcome() {
         switch (props.outcome) {
             case InterviewOutcome.CorrectlyGuessedHuman:
@@ -44,9 +50,7 @@ export const InterviewFinished: React.FunctionComponent<IProps> = props => {
     return (
         <Page>
             {renderOutcome()}
-            <ActionSet>
-                <Button variant="outlined" onClick={props.playAgain}>Play again</Button>
-            </ActionSet>
+            {playAgain}
         </Page>
     );
 }
