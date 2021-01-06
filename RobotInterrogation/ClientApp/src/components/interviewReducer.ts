@@ -58,6 +58,7 @@ export interface IPacket {
 
 export interface IInterviewState {
     position: InterviewPosition;
+    turn: InterviewPosition;
     status: InterviewStatus;
     outcome?: InterviewOutcome;
     choice: string[];
@@ -78,6 +79,7 @@ export const initialState: IInterviewState = {
     choice: [],
     duration: 0,
     position: InterviewPosition.None,
+    turn: InterviewPosition.Interviewer,
     packet: '',
     penalty: '',
     prompt: '',
@@ -98,6 +100,7 @@ export type InterviewAction = {
 } | {
     type: 'set penalty choice';
     options: string[]
+    turn?: number
 } | {
     type: 'set penalty';
     penalty: string;
@@ -111,6 +114,12 @@ export type InterviewAction = {
 } | {
     type: 'prompt inducer';
     solution: string[];
+} | {
+    type: 'spectator wait inducer';
+    role: ISuspectRole;
+    solution: string[];
+    patternConnections?: number[][];
+    patternContent?: string[][];
 } | {
     type: 'set role and pattern';
     role: ISuspectRole;
@@ -150,7 +159,7 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
         case 'set position':
             return {
                 ...state,
-                position: [InterviewPosition.Interviewer, InterviewPosition.Suspect, InterviewPosition.Spectator][action.position],
+                position: action.position,
             };
 
         case 'swap position':
@@ -191,6 +200,7 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
                 ...state,
                 status: InterviewStatus.PenaltySelection,
                 choice: action.options,
+                turn: action.turn === undefined ? InterviewPosition.Interviewer : action.turn,
             };
 
         case 'set penalty':
@@ -222,6 +232,16 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
                 ...state,
                 status: InterviewStatus.InducerPrompt,
                 patternSolution: action.solution.length > 0 ? action.solution : undefined,
+            };
+
+        case 'spectator wait inducer':
+            return {
+                ...state,
+                status: InterviewStatus.InducerPrompt,
+                role: action.role,
+                patternSolution: action.solution.length > 0 ? action.solution : undefined,
+                patternConnections: action.patternConnections,
+                patternContent: action.patternContent,
             };
 
         case 'set role and pattern':

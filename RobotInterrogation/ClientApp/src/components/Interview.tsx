@@ -27,6 +27,11 @@ import { InducerDisplay } from './interviewParts/InducerDisplay';
 import { PositionSelection } from './interviewParts/PositionSelection';
 import { WaitPenalty } from './interviewParts/WaitPenalty';
 import { SpectatorPlaceholder } from './interviewParts/SpectatorPlaceholder';
+import { SpectatorPenaltySelection } from './interviewParts/SpectatorPenaltySelection';
+import { SpectatorInducerDisplay } from './interviewParts/SpectatorInducerDisplay';
+import { SpectatorBackgroundSelection } from './interviewParts/SpectatorBackgroundSelection';
+import { SpectatorReadyToStart } from './interviewParts/SpectatorReadyToStart';
+import { SpectatorInProgress } from './interviewParts/SpectatorInProgress';
 
 export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string }>> = props => {
     const [state, dispatch] = useReducer(interviewReducer, initialState);
@@ -66,16 +71,13 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
 
                     return <InterviewerPositionSelection stay={confirm} swap={swap} />
                 case InterviewPosition.Suspect:
-                    return <PositionSelection position={state.position} />
                 case InterviewPosition.Spectator:
-                    return <SpectatorPlaceholder status={state.status} />
+                    return <PositionSelection position={state.position} />
             }
 
         case InterviewStatus.PenaltySelection:
-            if (state.position === InterviewPosition.Spectator) {
-                //TODO: display who is selecting and what their options are
-                return <SpectatorPlaceholder status={state.status} />
-            }
+            if (state.position === InterviewPosition.Spectator)
+                return <SpectatorPenaltySelection options={state.choice} turn={state.turn} />
 
             if (state.choice.length > 0) {
                 const selectPenalty = (index: number) => connection!.invoke('Select', index);
@@ -125,7 +127,14 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                     />
 
                 case InterviewPosition.Spectator:
-                    return <SpectatorPlaceholder status={state.status} />
+                    return <SpectatorInducerDisplay
+                        position={state.position}
+                        packet={state.packet}
+                        role={state.role!}
+                        connections={state.patternConnections}
+                        content={state.patternContent}
+                        solution={state.patternSolution}
+                    />
             }
 
         case InterviewStatus.ShowingInducer:
@@ -152,7 +161,14 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                     />
 
                 case InterviewPosition.Spectator:
-                    return <SpectatorPlaceholder status={state.status} />
+                    return <SpectatorInducerDisplay
+                        position={state.position}
+                        packet={state.packet}
+                        role={state.role!}
+                        connections={state.patternConnections}
+                        content={state.patternContent}
+                        solution={state.patternSolution}
+                    />
             }
 
         case InterviewStatus.BackgroundSelection:
@@ -171,7 +187,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                     return <SuspectBackgroundSelection options={state.choice} role={state.role!} action={selectBackground} />
 
                 case InterviewPosition.Spectator:
-                    return <SpectatorPlaceholder status={state.status} />
+                    return <SpectatorBackgroundSelection options={state.choice} role={state.role!}/>
             }
 
         case InterviewStatus.ReadyToStart:
@@ -202,7 +218,13 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                     );
 
                 case InterviewPosition.Spectator:
-                    return <SpectatorPlaceholder status={state.status} />
+                    return (
+                        <SpectatorReadyToStart
+                            role={state.role!}
+                            suspectBackground={state.suspectBackground}
+                            penalty={state.penalty}
+                        />
+                    );
             }
 
         case InterviewStatus.InProgress:
@@ -232,7 +254,14 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                     );
 
                 case InterviewPosition.Spectator:
-                    return <SpectatorPlaceholder status={state.status} />
+                    return (
+                        <SpectatorInProgress
+                            duration={state.duration}
+                            penalty={state.penalty}
+                            role={state.role!}
+                            suspectBackground={state.suspectBackground}
+                        />
+                    );
             }
 
         case InterviewStatus.Finished:
@@ -241,9 +270,6 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
             }
 
             const playAgain = () => connection!.invoke('NewInterview');
-
-            if (state.position === InterviewPosition.Spectator)
-                return <SpectatorPlaceholder status={state.status} />
 
             return (
                 <InterviewFinished

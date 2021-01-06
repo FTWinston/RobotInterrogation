@@ -44,8 +44,9 @@ namespace RobotInterrogation.Hubs
 
         Task EndGame(int endType, SuspectRole role);
 
-        Task SpectatorWaitForPenaltyChoice(List<string> options);
-        Task SpectatorWaitForInducer(List<string> solution);
+        Task SpectatorWaitForPenaltyChoice(List<string> options, int turn);
+        Task SpectatorWaitForInducer(SuspectRole role, List<string> solution);
+        Task SpectatorWaitForInducer(SuspectRole role, List<string> solution, int[][] connections, string[][] contents);
         Task SpectatorWaitForSuspectBackgroundChoice(List<string> notes);
     }
 
@@ -137,8 +138,10 @@ namespace RobotInterrogation.Hubs
                         await client.SetPlayersPresent();
                         break;
                     case InterviewStatus.SelectingPenalty_Interviewer:
+                        await client.SpectatorWaitForPenaltyChoice(interview.Penalties, (int)PlayerPosition.Interviewer);
+                        break;
                     case InterviewStatus.SelectingPenalty_Suspect:
-                        await client.SpectatorWaitForPenaltyChoice(interview.Penalties);
+                        await client.SpectatorWaitForPenaltyChoice(interview.Penalties, (int)PlayerPosition.Suspect);
                         break;
                     case InterviewStatus.CalibratingPenalty:
                         await client.SetPenalty(interview.Penalties[0]);
@@ -148,7 +151,20 @@ namespace RobotInterrogation.Hubs
                         break;
                     case InterviewStatus.PromptingInducer:
                     case InterviewStatus.SolvingInducer:
-                        await client.SpectatorWaitForInducer(interview.InterferencePattern.SolutionSequence);
+                        if (interview.Role.Type == SuspectRoleType.Human)
+                            await client
+                                .SpectatorWaitForInducer(
+                                    interview.Role,
+                                    interview.InterferencePattern.SolutionSequence,
+                                    interview.InterferencePattern.Connections.ToJaggedArray(val => (int)val),
+                                    interview.InterferencePattern.CellContents.ToJaggedArray(val => val ?? string.Empty)
+                            );
+                        else
+                            await client
+                                .SpectatorWaitForInducer(
+                                    interview.Role,
+                                    interview.InterferencePattern.SolutionSequence
+                            );
                         break;
                     case InterviewStatus.SelectingSuspectBackground:
                         await client.SpectatorWaitForSuspectBackgroundChoice(interview.SuspectBackgrounds);
@@ -189,7 +205,7 @@ namespace RobotInterrogation.Hubs
 
             await Clients
                 .GroupExcept(SessionID, Service.GetInterviewerConnectionID(interview), Service.GetSuspectConnectionID(interview))
-                .SpectatorWaitForPenaltyChoice(interview.Penalties);
+                .SpectatorWaitForPenaltyChoice(interview.Penalties, (int)PlayerPosition.Interviewer);
         }
 
         public async Task SwapPositions()
@@ -232,6 +248,7 @@ namespace RobotInterrogation.Hubs
                 case InterviewStatus.SelectingPacket:
                     EnsureIsInterviewer(interview);
                     await SetPacket(interview, index);
+                    Service.AllocateRole(interview);
                     await ShowInducerPrompt(interview);
                     interview.Status = InterviewStatus.PromptingInducer;
                     break;
@@ -270,8 +287,6 @@ namespace RobotInterrogation.Hubs
 
         private async Task SetSuspectRole(Interview interview)
         {
-            Service.AllocateRole(interview);
-
             var suspectClient = Clients
                 .Client(Service.GetSuspectConnectionID(interview));
 
@@ -327,7 +342,7 @@ namespace RobotInterrogation.Hubs
 
             await Clients
                 .GroupExcept(SessionID, Service.GetInterviewerConnectionID(interview), Service.GetSuspectConnectionID(interview))
-                .SpectatorWaitForPenaltyChoice(interview.Penalties);
+                .SpectatorWaitForPenaltyChoice(interview.Penalties, (int)PlayerPosition.Suspect);
         }
 
         private async Task AllocatePenalty(int index, Interview interview)
@@ -366,9 +381,22 @@ namespace RobotInterrogation.Hubs
                 .Client(Service.GetSuspectConnectionID(interview))
                 .WaitForInducer();
 
-            await Clients
-                .GroupExcept(SessionID, Service.GetInterviewerConnectionID(interview), Service.GetSuspectConnectionID(interview))
-                .SpectatorWaitForInducer(interview.InterferencePattern.SolutionSequence);
+            if (interview.Role.Type == SuspectRoleType.Human)
+                await Clients
+                    .GroupExcept(SessionID, Service.GetInterviewerConnectionID(interview), Service.GetSuspectConnectionID(interview))
+                    .SpectatorWaitForInducer(
+                        interview.Role,
+                        interview.InterferencePattern.SolutionSequence,
+                        interview.InterferencePattern.Connections.ToJaggedArray(val => (int)val),
+                        interview.InterferencePattern.CellContents.ToJaggedArray(val => val ?? string.Empty)
+                );
+            else
+                await Clients
+                    .GroupExcept(SessionID, Service.GetInterviewerConnectionID(interview), Service.GetSuspectConnectionID(interview))
+                    .SpectatorWaitForInducer(
+                        interview.Role,
+                        interview.InterferencePattern.SolutionSequence
+                );
         }
 
         private async Task ShowSuspectBackgrounds(Interview interview, bool suspectCanChoose)

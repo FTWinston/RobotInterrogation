@@ -46,10 +46,11 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         });
     });
 
-    connection.on('SpectatorWaitForPenaltyChoice', (options: string[]) => {
+    connection.on('SpectatorWaitForPenaltyChoice', (options: string[], turn: number) => {
         dispatch({
             type: 'set penalty choice',
             options,
+            turn
         });
     });
 
@@ -96,10 +97,21 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         });
     });
 
-    connection.on('SpectatorWaitForInducer', (solution: string[]) => {
+    connection.on('SpectatorWaitForInducer', (role: ISuspectRole, solution: string[]) => {
         dispatch({
-            type: 'prompt inducer',
+            type: 'spectator wait inducer',
+            role,
             solution,
+        });
+    });
+
+    connection.on('SpectatorWaitForInducer', (role: ISuspectRole, solution: string[], connections: number[][], contents: string[][]) => {
+        dispatch({
+            type: 'spectator wait inducer',
+            role,
+            solution,
+            patternConnections: connections,
+            patternContent: contents,
         });
     });
 
