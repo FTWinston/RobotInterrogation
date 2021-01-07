@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { InterviewPosition, InterviewStatus } from '../interviewReducer';
+import { InterviewPosition } from '../interviewReducer';
 import { PositionHeader } from './elements/PositionHeader';
 import { Help } from './elements/Help';
 import { P } from './elements/P';
