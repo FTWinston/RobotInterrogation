@@ -267,6 +267,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         />
                     );
             }
+            break;
 
         case InterviewStatus.Finished:
             if (state.outcome! === InterviewOutcome.Disconnected) {
@@ -283,8 +284,6 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                     playAgain={playAgain}
                 />
             );
-    
-            break;
         }
         
         return <div>Unknown status</div>
