@@ -73,6 +73,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                 case InterviewPosition.Spectator:
                     return <PositionSelection position={state.position} />
             }
+            break;
 
         case InterviewStatus.PenaltySelection:
             if (state.position === InterviewPosition.Spectator)
@@ -135,6 +136,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         solution={state.patternSolution}
                     />
             }
+            break;
 
         case InterviewStatus.ShowingInducer:
             const correctResponse = () => connection!.invoke('Select', 0);
@@ -169,6 +171,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         solution={state.patternSolution}
                     />
             }
+            break;
 
         case InterviewStatus.BackgroundSelection:
             switch (state.position) {
@@ -188,6 +191,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                 case InterviewPosition.Spectator:
                     return <SpectatorBackgroundSelection options={state.choice} role={state.role!}/>
             }
+            break;
 
         case InterviewStatus.ReadyToStart:
             switch (state.position) {
@@ -225,6 +229,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         />
                     );
             }
+            break;
 
         case InterviewStatus.InProgress:
             switch (state.position) {
@@ -278,8 +283,9 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                     playAgain={playAgain}
                 />
             );
-
-        default:
-            return <div>Unknown status</div>
-    }
+    
+            break;
+        }
+        
+        return <div>Unknown status</div>
 }
