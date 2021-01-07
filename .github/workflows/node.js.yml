@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x, 15.x]
+        node-version: [12.x, 14.x, 15.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -25,7 +25,12 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: cd RobotInterrogation/ClientApp
     - run: npm ci
+      shell: bash
+      working-directory: RobotInterrogation/ClientApp
     - run: npm run build --if-present
+      shell: bash
+      working-directory: RobotInterrogation/ClientApp
     - run: npm test
+      shell: bash
+      working-directory: RobotInterrogation/ClientApp
