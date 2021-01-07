@@ -4,9 +4,7 @@ import { ISuspectRole, SuspectRole } from './elements/SuspectRole';
 import { useState } from 'react';
 import { PositionHeader } from './elements/PositionHeader';
 import { InterviewPosition } from '../interviewReducer';
-import { ActionSet } from './elements/ActionSet';
 import { P } from './elements/P';
-import { Button } from '@material-ui/core';
 import { Page } from './elements/Page';
 
 interface IProps {
