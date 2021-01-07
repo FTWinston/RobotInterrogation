@@ -14,20 +14,22 @@ interface IProps {
     position: InterviewPosition;
     packet: string;
     role: ISuspectRole;
+    shown: boolean;
     connections?: Direction[][];
     content?: string[][];
     solution?: string[];
 }
 
 export const SpectatorInducerDisplay: React.FunctionComponent<IProps> = props => {
-
+    const correctTense = props.shown ? 'has been' : 'is about to be';
+        
     return (
         <Page>
             <PositionHeader position={props.position} />
 
             <PacketDisplay packet={props.packet} />
 
-            <Typography>The <Help entry="inducer">inducer</Help> has been administered. Suspect's <Help entry="roles">role</Help>:</Typography>
+            <Typography>The <Help entry="inducer">inducer</Help> {correctTense} administered.<br/>Suspect's <Help entry="roles">role</Help>:</Typography>
             <SuspectRole role={props.role} />
 
             {props.solution ? <InterferenceSolution solution={props.solution} /> : undefined}
