@@ -130,6 +130,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         position={state.position}
                         packet={state.packet}
                         role={state.role!}
+                        shown={false}
                         connections={state.patternConnections}
                         content={state.patternContent}
                         solution={state.patternSolution}
@@ -164,6 +165,7 @@ export const Interview: React.FunctionComponent<RouteComponentProps<{ id: string
                         position={state.position}
                         packet={state.packet}
                         role={state.role!}
+                        shown={true}
                         connections={state.patternConnections}
                         content={state.patternContent}
                         solution={state.patternSolution}
