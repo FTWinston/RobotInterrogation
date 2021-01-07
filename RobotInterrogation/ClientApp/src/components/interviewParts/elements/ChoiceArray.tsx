@@ -4,12 +4,12 @@ import { Choice } from './Choice';
 
 interface IProps {
     options: string[];
-    action: (index: number) => void;
+    action?: (index: number) => void;
 }
 
 export const ChoiceArray: React.FunctionComponent<IProps> = props => {
     const options = props.options.map((val: string, index: number) => {
-        const onClick = () => props.action(index);
+        const onClick = props.action ? () => props.action!(index) : undefined;
         return <Button key={index} onClick={onClick}>{val}</Button>
     });
 

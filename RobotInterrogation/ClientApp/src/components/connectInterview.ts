@@ -1,16 +1,16 @@
 import { connectSignalR } from 'src/Connectivity';
 import { Dispatch } from 'react';
-import { InterviewAction, InterviewOutcome, IPacket } from './interviewReducer';
+import { InterviewPosition, InterviewAction, InterviewOutcome, IPacket } from './interviewReducer';
 import { ISuspectRole } from './interviewParts/elements/SuspectRole';
 import { IInterviewQuestion } from './interviewParts/elements/InterviewQuestion';
 
 export async function connectInterview(session: string, dispatch: Dispatch<InterviewAction>) {
     const connection = connectSignalR('/hub/Interview');
 
-    connection.on('SetPosition', (isInterviewer: boolean) => {
+    connection.on('SetPosition', (position: number) => {
         dispatch({
             type: 'set position',
-            isInterviewer,
+            position,
         });
     });
 
@@ -43,6 +43,14 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         dispatch({
             type: 'set penalty choice',
             options: [],
+        });
+    });
+
+    connection.on('SpectatorWaitForPenaltyChoice', (options: string[], turn: number) => {
+        dispatch({
+            type: 'set penalty choice',
+            options,
+            turn
         });
     });
 
@@ -84,7 +92,26 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
 
     connection.on('WaitForInducer', () => {
         dispatch({
-            type: 'set waiting for inducer',
+            type: 'prompt inducer',
+            solution: []
+        });
+    });
+
+    connection.on('SpectatorWaitForInducer', (role: ISuspectRole, solution: string[]) => {
+        dispatch({
+            type: 'spectator wait inducer',
+            role,
+            solution,
+        });
+    });
+
+    connection.on('SpectatorWaitForInducer', (role: ISuspectRole, solution: string[], connections: number[][], contents: string[][]) => {
+        dispatch({
+            type: 'spectator wait inducer',
+            role,
+            solution,
+            patternConnections: connections,
+            patternContent: contents,
         });
     });
 
@@ -129,6 +156,13 @@ export async function connectInterview(session: string, dispatch: Dispatch<Inter
         dispatch({
             type: 'set background choice',
             options: [],
+        });
+    });
+
+    connection.on('SpectatorWaitForSuspectBackgroundChoice', (options: string[]) => {
+        dispatch({
+            type: 'set background choice',
+            options,
         });
     });
 

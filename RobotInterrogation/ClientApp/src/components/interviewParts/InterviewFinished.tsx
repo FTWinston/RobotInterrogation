@@ -1,20 +1,15 @@
 import * as React from 'react';
 import { InterviewOutcome, InterviewPosition } from '../interviewReducer';
 import { ISuspectRole } from './elements/SuspectRole';
-import { InterviewerHumanCorrect } from './InterviewerHumanCorrect';
-import { InterviewerHumanIncorrect } from './InterviewerHumanIncorrect';
-import { InterviewerRobotCorrect } from './InterviewerRobotCorrect';
-import { InterviewerRobotIncorrect } from './InterviewerRobotIncorrect';
-import { InterviewerViolentKilled } from './InterviewerViolentKilled';
-import { SuspectHumanCorrect } from './SuspectHumanCorrect';
-import { SuspectHumanIncorrect } from './SuspectHumanIncorrect';
-import { SuspectRobotCorrect } from './SuspectRobotCorrect';
-import { SuspectRobotIncorrect } from './SuspectRobotIncorrect';
-import { SuspectViolentKilled } from './SuspectViolentKilled';
 import { ActionSet } from './elements/ActionSet';
 import { Page } from './elements/Page';
 import { Button } from '@material-ui/core';
 import { P } from './elements/P';
+import { OutcomeHumanCorrect } from './OutcomeHumanCorrect';
+import { OutcomeRobotCorrect } from './OutcomeRobotCorrect';
+import { OutcomeHumanIncorrect } from './OutcomeHumanIncorrect';
+import { OutcomeRobotIncorrect } from './OutcomeRobotIncorrect';
+import { OutcomeViolentKilled } from './OutcomeViolentKilled';
 
 interface IProps {
     position: InterviewPosition;
@@ -24,32 +19,28 @@ interface IProps {
 }
 
 export const InterviewFinished: React.FunctionComponent<IProps> = props => {
+    const playAgain = props.position === InterviewPosition.Interviewer || props.position === InterviewPosition.Suspect
+        ? <ActionSet>
+            <Button variant="outlined" onClick={props.playAgain}>Play again</Button>
+        </ActionSet>
+        : undefined;
+
     function renderOutcome() {
         switch (props.outcome) {
             case InterviewOutcome.CorrectlyGuessedHuman:
-                return props.position === InterviewPosition.Interviewer
-                    ? <InterviewerHumanCorrect />
-                    : <SuspectHumanCorrect />;
+                return <OutcomeHumanCorrect position={props.position} />;
 
             case InterviewOutcome.CorrectlyGuessedRobot:
-                return props.position === InterviewPosition.Interviewer
-                    ? <InterviewerRobotCorrect role={props.role} />
-                    : <SuspectRobotCorrect role={props.role} />;
+                return <OutcomeRobotCorrect position={props.position} role={props.role} />;
 
             case InterviewOutcome.WronglyGuessedHuman:
-                return props.position === InterviewPosition.Interviewer
-                    ? <InterviewerHumanIncorrect role={props.role} />
-                    : <SuspectHumanIncorrect role={props.role} />;
+                return <OutcomeHumanIncorrect position={props.position} role={props.role} />;
 
             case InterviewOutcome.WronglyGuessedRobot:
-                return props.position === InterviewPosition.Interviewer
-                    ? <InterviewerRobotIncorrect />
-                    : <SuspectRobotIncorrect />;
+                return <OutcomeRobotIncorrect position={props.position} />;
 
             case InterviewOutcome.KilledInterviewer:
-                return props.position === InterviewPosition.Interviewer
-                    ? <InterviewerViolentKilled role={props.role} />
-                    : <SuspectViolentKilled role={props.role} />;
+                return <OutcomeViolentKilled position={props.position} role={props.role} />;
 
             default:
                 return <P>Unknown outcome</P>;
@@ -59,9 +50,7 @@ export const InterviewFinished: React.FunctionComponent<IProps> = props => {
     return (
         <Page>
             {renderOutcome()}
-            <ActionSet>
-                <Button variant="outlined" onClick={props.playAgain}>Play again</Button>
-            </ActionSet>
+            {playAgain}
         </Page>
     );
 }

@@ -11,7 +11,7 @@ namespace RobotInterrogation.Hubs
 {
     public interface IInterviewMessages
     {
-        Task SetPosition(bool isInterviewer);
+        Task SetPosition(int position);
 
         Task SetWaitingForPlayer();
         Task SetPlayersPresent();
@@ -43,6 +43,11 @@ namespace RobotInterrogation.Hubs
         Task StartTimer(int duration);
 
         Task EndGame(int endType, SuspectRole role);
+
+        Task SpectatorWaitForPenaltyChoice(List<string> options, int turn);
+        Task SpectatorWaitForInducer(SuspectRole role, List<string> solution);
+        Task SpectatorWaitForInducer(SuspectRole role, List<string> solution, int[][] connections, string[][] contents);
+        Task SpectatorWaitForSuspectBackgroundChoice(List<string> notes);
     }
 
     public class InterviewHub : Hub<IInterviewMessages>
@@ -61,24 +66,32 @@ namespace RobotInterrogation.Hubs
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            await Clients
-                .GroupExcept(SessionID, Context.ConnectionId)
-                .EndGame((int)InterviewOutcome.Disconnected, null);
+            var player = Service.GetPlayerByConnectionID(Context.ConnectionId);
+            if (player.Position == PlayerPosition.Spectator)
+            {
+                Service.RemovePlayer(player);
+            }
+            else
+            {
+                await Clients
+                    .GroupExcept(SessionID, Context.ConnectionId)
+                    .EndGame((int)InterviewOutcome.Disconnected, null);
 
-            Service.RemoveInterview(SessionID);
-            UserSessions.TryRemove(Context.ConnectionId, out _);
-            await base.OnDisconnectedAsync(exception);
+                Service.RemoveInterview(SessionID);
+                UserSessions.TryRemove(Context.ConnectionId, out _);
+                await base.OnDisconnectedAsync(exception);
+            }
         }
 
         private void EnsureIsInterviewer(Interview interview)
         {
-            if (Context.ConnectionId != interview.InterviewerConnectionID)
+            if (Context.ConnectionId != Service.GetInterviewerConnectionID(interview))
                 throw new Exception("Only the interviewer can issue this command for session " + SessionID);
         }
 
         private void EnsureIsSuspect(Interview interview)
         {
-            if (Context.ConnectionId != interview.SuspectConnectionID)
+            if (Context.ConnectionId != Service.GetSuspectConnectionID(interview))
                 throw new Exception("Only the suspect can issue this command for session " + SessionID);
         }
 
@@ -87,8 +100,8 @@ namespace RobotInterrogation.Hubs
             if (!Service.TryGetInterview(session, out Interview interview))
                 return false;
 
-            if (interview.Status != InterviewStatus.WaitingForConnections)
-                return false;
+            //if (interview.Status != InterviewStatus.WaitingForConnections)
+            //    return false;
 
             if (!Service.TryAddUser(interview, Context.ConnectionId))
                 return false;
@@ -96,23 +109,77 @@ namespace RobotInterrogation.Hubs
             UserSessions[Context.ConnectionId] = session;
             await Groups.AddToGroupAsync(Context.ConnectionId, session);
 
-            bool isInterviewer = interview.InterviewerConnectionID == Context.ConnectionId;
+            var player = Service.GetPlayerByConnectionID(Context.ConnectionId);
 
-            await Clients.Caller.SetPosition(isInterviewer);
+            await Clients.Caller.SetPosition((int)player.Position);
 
-            if (isInterviewer)
+            if (player.Position == PlayerPosition.Interviewer)
             {
                 await Clients
                     .Group(session)
                     .SetWaitingForPlayer();
             }
-            else // must be suspect, then
+            else if (player.Position == PlayerPosition.Suspect)
             {
                 interview.Status = InterviewStatus.SelectingPositions;
 
                 await Clients
                     .Group(session)
                     .SetPlayersPresent();
+            } else //Spectator
+            {
+                var client = Clients.Client(Context.ConnectionId);
+                switch (interview.Status)
+                {
+                    case InterviewStatus.WaitingForConnections:
+                        await client.SetWaitingForPlayer();
+                        break;
+                    case InterviewStatus.SelectingPositions:
+                        await client.SetPlayersPresent();
+                        break;
+                    case InterviewStatus.SelectingPenalty_Interviewer:
+                        await client.SpectatorWaitForPenaltyChoice(interview.Penalties, (int)PlayerPosition.Interviewer);
+                        break;
+                    case InterviewStatus.SelectingPenalty_Suspect:
+                        await client.SpectatorWaitForPenaltyChoice(interview.Penalties, (int)PlayerPosition.Suspect);
+                        break;
+                    case InterviewStatus.CalibratingPenalty:
+                        await client.SetPenalty(interview.Penalties[0]);
+                        break;
+                    case InterviewStatus.SelectingPacket:
+                        await client.WaitForPacketChoice();
+                        break;
+                    case InterviewStatus.PromptingInducer:
+                    case InterviewStatus.SolvingInducer:
+                        if (interview.Role.Type == SuspectRoleType.Human)
+                            await client
+                                .SpectatorWaitForInducer(
+                                    interview.Role,
+                                    interview.InterferencePattern.SolutionSequence,
+                                    interview.InterferencePattern.Connections.ToJaggedArray(val => (int)val),
+                                    interview.InterferencePattern.CellContents.ToJaggedArray(val => val ?? string.Empty)
+                            );
+                        else
+                            await client
+                                .SpectatorWaitForInducer(
+                                    interview.Role,
+                                    interview.InterferencePattern.SolutionSequence
+                            );
+                        break;
+                    case InterviewStatus.SelectingSuspectBackground:
+                        await client.SpectatorWaitForSuspectBackgroundChoice(interview.SuspectBackgrounds);
+                        break;
+                    case InterviewStatus.ReadyToStart:
+                        await client.SetSuspectBackground(interview.SuspectBackgrounds[0]);
+                        break;
+                    case InterviewStatus.InProgress:
+                        await client.StartTimer(Configuration.Duration);
+                        break;
+                    case InterviewStatus.Finished:
+                        await client.EndGame((int)interview.Outcome, interview.Role);
+                        break;
+                }
+
             }
 
             return true;
@@ -129,12 +196,16 @@ namespace RobotInterrogation.Hubs
             Service.AllocatePenalties(interview);
 
             await Clients
-                .Client(interview.InterviewerConnectionID)
+                .Client(Service.GetInterviewerConnectionID(interview))
                 .ShowPenaltyChoice(interview.Penalties);
 
             await Clients
-                .GroupExcept(SessionID, interview.InterviewerConnectionID)
+                .Client(Service.GetSuspectConnectionID(interview))
                 .WaitForPenaltyChoice();
+
+            await Clients
+                .GroupExcept(SessionID, Service.GetInterviewerConnectionID(interview), Service.GetSuspectConnectionID(interview))
+                .SpectatorWaitForPenaltyChoice(interview.Penalties, (int)PlayerPosition.Interviewer);
         }
 
         public async Task SwapPositions()
@@ -143,9 +214,9 @@ namespace RobotInterrogation.Hubs
 
             EnsureIsInterviewer(interview);
 
-            var tmp = interview.InterviewerConnectionID;
-            interview.InterviewerConnectionID = interview.SuspectConnectionID;
-            interview.SuspectConnectionID = tmp;
+            var tmp = interview.InterviewerIndex;
+            interview.InterviewerIndex = interview.SuspectIndex;
+            interview.SuspectIndex = tmp;
 
             await Clients
                 .Group(SessionID)
@@ -177,6 +248,7 @@ namespace RobotInterrogation.Hubs
                 case InterviewStatus.SelectingPacket:
                     EnsureIsInterviewer(interview);
                     await SetPacket(interview, index);
+                    Service.AllocateRole(interview);
                     await ShowInducerPrompt(interview);
                     interview.Status = InterviewStatus.PromptingInducer;
                     break;
@@ -215,10 +287,8 @@ namespace RobotInterrogation.Hubs
 
         private async Task SetSuspectRole(Interview interview)
         {
-            Service.AllocateRole(interview);
-
             var suspectClient = Clients
-                .Client(interview.SuspectConnectionID);
+                .Client(Service.GetSuspectConnectionID(interview));
 
             var pattern = interview.InterferencePattern;
 
@@ -245,7 +315,7 @@ namespace RobotInterrogation.Hubs
         private async Task ShowQuestions(Interview interview)
         {
             var interviewer = Clients
-                .Client(interview.InterviewerConnectionID);
+                .Client(Service.GetInterviewerConnectionID(interview));
             
             await interviewer
                 .SetQuestions(interview.Packet.Questions);
@@ -263,12 +333,16 @@ namespace RobotInterrogation.Hubs
             interview.Penalties.RemoveAt(index);
 
             await Clients
-                .Client(interview.SuspectConnectionID)
+                .Client(Service.GetInterviewerConnectionID(interview))
+                .WaitForPenaltyChoice();
+
+            await Clients
+                .Client(Service.GetSuspectConnectionID(interview))
                 .ShowPenaltyChoice(interview.Penalties);
 
             await Clients
-                .GroupExcept(SessionID, interview.SuspectConnectionID)
-                .WaitForPenaltyChoice();
+                .GroupExcept(SessionID, Service.GetInterviewerConnectionID(interview), Service.GetSuspectConnectionID(interview))
+                .SpectatorWaitForPenaltyChoice(interview.Penalties, (int)PlayerPosition.Suspect);
         }
 
         private async Task AllocatePenalty(int index, Interview interview)
@@ -289,23 +363,40 @@ namespace RobotInterrogation.Hubs
             var packets = Service.GetAllPackets();
 
             await Clients
-                .Client(interview.InterviewerConnectionID)
+                .Client(Service.GetInterviewerConnectionID(interview))
                 .ShowPacketChoice(packets);
 
             await Clients
-                .GroupExcept(SessionID, interview.InterviewerConnectionID)
+                .GroupExcept(SessionID, Service.GetInterviewerConnectionID(interview))
                 .WaitForPacketChoice();
         }
 
         private async Task ShowInducerPrompt(Interview interview)
         {
             await Clients
-                .Client(interview.InterviewerConnectionID)
+                .Client(Service.GetInterviewerConnectionID(interview))
                 .ShowInducerPrompt(interview.InterferencePattern.SolutionSequence);
 
             await Clients
-                .GroupExcept(SessionID, interview.InterviewerConnectionID)
+                .Client(Service.GetSuspectConnectionID(interview))
                 .WaitForInducer();
+
+            if (interview.Role.Type == SuspectRoleType.Human)
+                await Clients
+                    .GroupExcept(SessionID, Service.GetInterviewerConnectionID(interview), Service.GetSuspectConnectionID(interview))
+                    .SpectatorWaitForInducer(
+                        interview.Role,
+                        interview.InterferencePattern.SolutionSequence,
+                        interview.InterferencePattern.Connections.ToJaggedArray(val => (int)val),
+                        interview.InterferencePattern.CellContents.ToJaggedArray(val => val ?? string.Empty)
+                );
+            else
+                await Clients
+                    .GroupExcept(SessionID, Service.GetInterviewerConnectionID(interview), Service.GetSuspectConnectionID(interview))
+                    .SpectatorWaitForInducer(
+                        interview.Role,
+                        interview.InterferencePattern.SolutionSequence
+                );
         }
 
         private async Task ShowSuspectBackgrounds(Interview interview, bool suspectCanChoose)
@@ -314,12 +405,16 @@ namespace RobotInterrogation.Hubs
             interview.Status = InterviewStatus.SelectingSuspectBackground;
 
             await Clients
-                .Client(interview.SuspectConnectionID)
+                .Client(Service.GetInterviewerConnectionID(interview))
+                .WaitForSuspectBackgroundChoice();
+
+            await Clients
+                .Client(Service.GetSuspectConnectionID(interview))
                 .ShowSuspectBackgroundChoice(interview.SuspectBackgrounds);
 
             await Clients
-                .GroupExcept(SessionID, interview.SuspectConnectionID)
-                .WaitForSuspectBackgroundChoice();
+                .GroupExcept(SessionID, Service.GetInterviewerConnectionID(interview), Service.GetSuspectConnectionID(interview))
+                .SpectatorWaitForSuspectBackgroundChoice(interview.SuspectBackgrounds);
         }
 
         private async Task SetSuspectBackground(Interview interview, int index)

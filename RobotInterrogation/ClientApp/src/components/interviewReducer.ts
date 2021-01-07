@@ -36,9 +36,10 @@ export enum InterviewOutcome {
 }
 
 export enum InterviewPosition {
-    None,
     Interviewer,
     Suspect,
+    Spectator,
+    None,
 }
 
 export enum Direction {
@@ -57,6 +58,7 @@ export interface IPacket {
 
 export interface IInterviewState {
     position: InterviewPosition;
+    turn: InterviewPosition;
     status: InterviewStatus;
     outcome?: InterviewOutcome;
     choice: string[];
@@ -77,6 +79,7 @@ export const initialState: IInterviewState = {
     choice: [],
     duration: 0,
     position: InterviewPosition.None,
+    turn: InterviewPosition.Interviewer,
     packet: '',
     penalty: '',
     prompt: '',
@@ -87,7 +90,7 @@ export const initialState: IInterviewState = {
 
 export type InterviewAction = {
     type: 'set position';
-    isInterviewer: boolean;
+    position: number;
 } | {
     type: 'swap position';
 } | {
@@ -97,6 +100,7 @@ export type InterviewAction = {
 } | {
     type: 'set penalty choice';
     options: string[]
+    turn?: number
 } | {
     type: 'set penalty';
     penalty: string;
@@ -111,7 +115,11 @@ export type InterviewAction = {
     type: 'prompt inducer';
     solution: string[];
 } | {
-    type: 'set waiting for inducer';
+    type: 'spectator wait inducer';
+    role: ISuspectRole;
+    solution: string[];
+    patternConnections?: number[][];
+    patternContent?: string[][];
 } | {
     type: 'set role and pattern';
     role: ISuspectRole;
@@ -146,23 +154,18 @@ export type InterviewAction = {
 }
 
 export function interviewReducer(state: IInterviewState, action: InterviewAction): IInterviewState {
+
     switch (action.type) {
         case 'set position':
             return {
                 ...state,
-                position: action.isInterviewer
-                    ? InterviewPosition.Interviewer
-                    : InterviewPosition.Suspect,
+                position: action.position,
             };
 
         case 'swap position':
             return {
                 ...state,
-                position: state.position === InterviewPosition.Interviewer
-                    ? InterviewPosition.Suspect
-                    : InterviewPosition.Suspect
-                        ? InterviewPosition.Interviewer
-                        : InterviewPosition.None,
+                position: [InterviewPosition.Suspect, InterviewPosition.Interviewer, InterviewPosition.Spectator][state.position],
             };
             
         case 'set waiting for opponent':
@@ -197,6 +200,7 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
                 ...state,
                 status: InterviewStatus.PenaltySelection,
                 choice: action.options,
+                turn: action.turn === undefined ? InterviewPosition.Interviewer : action.turn,
             };
 
         case 'set penalty':
@@ -227,13 +231,17 @@ export function interviewReducer(state: IInterviewState, action: InterviewAction
             return {
                 ...state,
                 status: InterviewStatus.InducerPrompt,
-                patternSolution: action.solution,
+                patternSolution: action.solution.length > 0 ? action.solution : undefined,
             };
 
-        case 'set waiting for inducer':
+        case 'spectator wait inducer':
             return {
                 ...state,
                 status: InterviewStatus.InducerPrompt,
+                role: action.role,
+                patternSolution: action.solution.length > 0 ? action.solution : undefined,
+                patternConnections: action.patternConnections,
+                patternContent: action.patternContent,
             };
 
         case 'set role and pattern':
